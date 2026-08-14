@@ -1,9 +1,8 @@
 import { Game } from "../core/game";
-import { createGameplayScene, level2 } from "./scenes/gameplay";
-import { createInterstitial } from "./scenes/interstitial";
+import { createMainScene } from "./scenes/main_scene";
 import { createState } from "./state";
 
 new Game(
-  createGameplayScene(),
+  createMainScene(),
   createState(),
 );
