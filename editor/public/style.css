@@ -1,0 +1,205 @@
+/* Layout ----------- */
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #444
+}
+
+#svg {
+  width: 700px;
+  height: 700px;
+}
+
+#wrap {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  height: 800px;
+}
+
+#left,
+#right {
+  width: 160px;
+  height: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#actions {
+  display: flex;
+  flex-direction: column;
+}
+
+#colors {
+  flex: 2;
+}
+
+#textures {
+  flex: 2;
+}
+
+.panel {
+  border-radius: 5px;
+  padding: 5px;
+  margin-bottom: 10px;
+  background: #555;
+  color: white;
+  font-family: monospace;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  gap: 5px;
+}
+
+#left .panel:last-child {
+  flex: 1;
+}
+
+#right .panel {
+  flex: 1;
+}
+
+/* SVG stuff ----------- */
+
+.poly.active {
+  stroke: aqua;
+  stroke-width: 2px;
+}
+
+.coord {
+  fill: #fff;
+  stroke: #333;
+  opacity: 0.3;
+  stroke-width: 2px;
+  paint-order: stroke fill;
+  mix-blend-mode: luminosity;
+}
+
+.coord.center {
+  stroke: purple;
+  stroke-width: 8px;
+  paint-order: stroke fill;
+}
+
+.coord.active {
+  stroke: aqua;
+  stroke-width: 8px;
+}
+
+.coord.over {
+  stroke-width: 8px;
+  stroke: #aaa;
+}
+
+.add .coord.over {
+  opacity: 0.8;
+  stroke: lime;
+}
+
+.move .coord.selected,
+.move .coord.selected,
+.add .coord.selected {
+  opacity: 0.8;
+  stroke: green;
+}
+
+/* Components ----------- */
+
+.button-container {
+  padding: 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: flex-end;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+
+#colors .button-container {
+  padding: 0;
+  margin-bottom: 0px;
+  margin-top: 4px;
+  justify-content: flex-start;
+}
+
+.button-container.active {
+  background: rgb(69, 141, 111);
+}
+
+button {
+  flex: 1;
+  height: 24px;
+  text-align: left;
+  border: 2px solid #a2a2a2;
+  border-top: 2px solid #c2c2c2;
+  background: #555555;
+  cursor: pointer;
+  font-family: monospace;
+  color: white;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+button:hover {
+  background: #666666;
+}
+
+button.extra,
+.add-color button,
+.add-texture button,
+#colors button {
+  height: 24px;
+  width: 24px;
+  text-align: center;
+  font-size: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.color {
+  width: auto;
+  height: 40px;
+  border: 2px solid #888;
+  border-top: 0px solid #888;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.color:first-child {
+  border-top: 2px solid #888;
+}
+
+.color.active {
+  border: 3px solid #444;
+}
+
+#backgrounds {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+#backgrounds div {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #888;
+}
