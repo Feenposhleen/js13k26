@@ -1,6 +1,6 @@
 class Polygon {
   constructor(points = [], color = "#000", style = 0) {
-    this.points = points; // [x,y, x,y, x,y, ...]
+    this.points = points; // [x,y, x,y, x,y, ...] in 0..resolution grid
     this.color = color; // e.g. "#ff00aa" or "rgba(...)"
     this.style = style; // e.g. 1=fill, 2=stroke, 3=both
   }
@@ -66,18 +66,39 @@ class Polygon {
   }
 
   serialize(palette) {
+    let str = '';
+    for (let i = 0; i < this.points.length; i += 2) {
+      const px = Math.min(Math.max(0, Math.round(this.points[i])), SvgPolygonView.resolution);
+      const py = Math.min(Math.max(0, Math.round(this.points[i + 1])), SvgPolygonView.resolution);
+      str += String.fromCharCode(40 + px) + String.fromCharCode(40 + py);
+    }
     return [
       palette.indexOf(this.color),
       this.style,
-      ...this.points.map(v => v / SvgPolygonView.resolution)
+      str
     ];
   }
 
   static deserialize(serializedData, palette) {
-    return new Polygon(
-      serializedData.slice(2).map(v => Math.round(v * SvgPolygonView.resolution)),
-      palette[serializedData[0]],
-      serializedData[1]
-    );
+    const color = palette[serializedData[0]];
+    const style = serializedData[1];
+    const data = serializedData[2];
+    const points = [];
+
+    if (typeof data === 'string') {
+      for (let i = 0; i < data.length; i += 2) {
+        points.push(data.charCodeAt(i) - 40, data.charCodeAt(i + 1) - 40);
+      }
+    } else {
+      // Backwards compatibility if old array format is loaded
+      for (let i = 2; i < serializedData.length; i += 2) {
+        points.push(
+          Math.round(serializedData[i] * SvgPolygonView.resolution),
+          Math.round(serializedData[i + 1] * SvgPolygonView.resolution)
+        );
+      }
+    }
+
+    return new Polygon(points, color, style);
   }
 }

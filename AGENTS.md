@@ -61,7 +61,8 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 - **Procedural Vector Texture Atlas** (`src/core/assets/drawables.gen.ts` & `src/core/asset_library.ts`):
   - To save bundle size, binary image assets are not used.
   - Textures are defined as procedural 2D canvas drawing instruction arrays in `drawables.gen.ts`.
-  - At startup (`AssetLibrary._preRenderTextures()`), these instructions are rasterized onto an offscreen canvas and uploaded to a WebGL texture atlas.
+  - Polygon coordinates are stored as compact ASCII strings: `[colorIndex, style, "coordString"]` using an ASCII offset of 40 on a 50x50 grid (`String.fromCharCode(40 + Math.round(coord * 50))`), saving space by eliminating float decimal points, zeros, and comma separators.
+  - At startup (`AssetLibrary._preRenderTextures()`), these instructions are decoded, rasterized onto an offscreen canvas, and uploaded to a WebGL texture atlas.
 
 ---
 

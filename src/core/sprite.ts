@@ -1,10 +1,11 @@
+import { RawTexture } from "./assets/drawables.gen";
 import { FullState } from "./game_worker";
 import { Vec } from "./utils";
 
 export type SpriteUpdater = (sprite: Sprite, state: FullState, delta: number) => void;
 
 export type Sprite = {
-  _texture: number[][] | null;
+  _texture: RawTexture | null;
   _position: Vec;
   _scale: Vec;
   _angle: number;
@@ -19,7 +20,7 @@ export type Sprite = {
 };
 
 const createSprite = (
-  texture: number[][] | null,
+  texture: RawTexture | null,
   position: Vec,
   scale: Vec = [1, 1],
   opacity: number = 1,

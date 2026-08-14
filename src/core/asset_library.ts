@@ -1,11 +1,11 @@
-import drawables, { RawDrawableData } from "./assets/drawables.gen";
+import drawables, { RawDrawableData, RawPolygon } from "./assets/drawables.gen";
 import { RENDERER_SPRITE_RESOLUTION } from "./config";
 import { PlayOptions } from "./sound";
 
 const assetLibrary = {
   _textures: drawables._textures,
   _textureCache: new Map<string, ImageData>(),
-  _textureDataMap: new Map<number[][], number>(),
+  _textureDataMap: new Map<any, number>(),
 
   async _preRenderTextures(): Promise<void> {
     let i = 0;
@@ -25,7 +25,7 @@ const assetLibrary = {
 
   async _preRenderTexture(
     palette: string[],
-    textureData: number[][],
+    textureData: RawPolygon[],
   ): Promise<ImageData> {
     const canvas = new OffscreenCanvas(RENDERER_SPRITE_RESOLUTION, RENDERER_SPRITE_RESOLUTION);
     const ctx = canvas.getContext('2d')!;
@@ -35,18 +35,18 @@ const assetLibrary = {
 
     for (let i = 0; i < textureData.length; i++) {
       const poly = textureData[i];
-      const color = palette[poly[0]];
-      const style = textureData[1];
+      const color = palette[poly[0] as number];
+      const str = poly[2] as string;
 
-      const firstX = canvas.width * poly[2];
-      const firstY = canvas.height * poly[3];
+      const firstX = (canvas.width * (str.charCodeAt(0) - 40)) / 50;
+      const firstY = (canvas.height * (str.charCodeAt(1) - 40)) / 50;
 
       ctx.beginPath();
       ctx.moveTo(firstX, firstY);
 
-      for (let j = 4; j < poly.length; j += 2) {
-        const x = canvas.width * poly[j];
-        const y = canvas.height * poly[j + 1];
+      for (let j = 2; j < str.length; j += 2) {
+        const x = (canvas.width * (str.charCodeAt(j) - 40)) / 50;
+        const y = (canvas.height * (str.charCodeAt(j + 1) - 40)) / 50;
         ctx.lineTo(x, y);
       }
 
@@ -58,7 +58,7 @@ const assetLibrary = {
     return ctx.getImageData(0, 0, canvas.width, canvas.height);
   },
 
-  _textureIndex(data: number[][]): number {
+  _textureIndex(data: any): number {
     if (this._textureDataMap.size === 0) {
       Object.keys(this._textures).forEach((key, i) => {
         this._textureDataMap.set((drawables._textures as any)[key], i);
