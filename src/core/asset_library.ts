@@ -1,4 +1,4 @@
-import drawables, { RawDrawableData, RawPolygon } from "./assets/drawables.gen";
+import drawables, { RawDrawableData, RawTexture } from "./assets/drawables.gen";
 import { RENDERER_SPRITE_RESOLUTION } from "./config";
 import { PlayOptions } from "./sound";
 
@@ -25,7 +25,7 @@ const assetLibrary = {
 
   async _preRenderTexture(
     palette: string[],
-    textureData: RawPolygon[],
+    textureData: RawTexture,
   ): Promise<ImageData> {
     const canvas = new OffscreenCanvas(RENDERER_SPRITE_RESOLUTION, RENDERER_SPRITE_RESOLUTION);
     const ctx = canvas.getContext('2d')!;
@@ -34,17 +34,16 @@ const assetLibrary = {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = 0; i < textureData.length; i++) {
-      const poly = textureData[i];
-      const color = palette[poly[0] as number];
-      const str = poly[2] as string;
+      const str = textureData[i];
+      const color = palette[str.charCodeAt(0) - 40];
 
-      const firstX = (canvas.width * (str.charCodeAt(0) - 40)) / 50;
-      const firstY = (canvas.height * (str.charCodeAt(1) - 40)) / 50;
+      const firstX = (canvas.width * (str.charCodeAt(2) - 40)) / 50;
+      const firstY = (canvas.height * (str.charCodeAt(3) - 40)) / 50;
 
       ctx.beginPath();
       ctx.moveTo(firstX, firstY);
 
-      for (let j = 2; j < str.length; j += 2) {
+      for (let j = 4; j < str.length; j += 2) {
         const x = (canvas.width * (str.charCodeAt(j) - 40)) / 50;
         const y = (canvas.height * (str.charCodeAt(j + 1) - 40)) / 50;
         ctx.lineTo(x, y);

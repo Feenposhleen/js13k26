@@ -5,7 +5,7 @@
 
     const editorData = new EditorData(data);
     load(editorData);
-  }
+  };
 
   const saveData = async (editorData) => {
     await fetch('/drawables', {
@@ -17,93 +17,39 @@
     });
 
     refreshData();
-  }
+  };
 
   const load = (editorData) => {
+    let editorUi;
+
     const polygonView = new SvgPolygonView({
-      initialPolygons: editorData.textures[Object.keys(editorData.textures)[0]].polygons,
-      onCoordClick: (coords, selectedPolygon) => {
-        console.log(`Coordinate clicked: ${coords}, selectedPolygon: ${selectedPolygon}`);
-
-        switch (editorUi.selectedMode) {
-          case EditorMode.ADD: {
-            if (selectedPolygon) {
-              const closeIndex = selectedPolygon.closestIndex(coords);
-              selectedPolygon.insertPoint(closeIndex, coords);
-              polygonView.updatePolygons();
-            } else {
-              const polygon = new Polygon(coords, editorUi.selectedColor, 0);
-              editorUi.selectedTexture.addPolygon(polygon);
-              polygonView.updatePolygons(editorUi.selectedTexture.polygons);
-              polygonView.selectPolygon(polygon);
-            }
-            break;
-          }
-          case EditorMode.DELETE: {
-            if (!selectedPolygon) return;
-            if (selectedPolygon.points.length > 3) {
-              const pointIndex = selectedPolygon.pointIndex(coords);
-              if (pointIndex !== -1) {
-                selectedPolygon.removePoint(pointIndex);
-                polygonView.updatePolygons();
-              }
-            } else {
-              // Remove entire polygon
-              const texture = editorUi.selectedTexture;
-              texture.removePolygon(selectedPolygon);
-              polygonView.updatePolygons(texture.polygons);
-              editorUi.onEditorDataUpdated();
-            }
-            break;
-          }
-          case EditorMode.MOVE: {
-            if (!selectedPolygon) return;
-
-            if (editorUi.pendingMoveCoord) {
-              const potentialIndex = selectedPolygon.pointIndex(editorUi.pendingMoveCoord);
-              if (potentialIndex === -1) break;
-
-              selectedPolygon.setPoint(potentialIndex, coords);
-              polygonView.updatePolygons();
-              editorUi.pendingMoveCoord = null;
-            } else {
-              const potentialIndex = selectedPolygon.pointIndex(coords);
-              if (potentialIndex === -1) break;
-              editorUi.pendingMoveCoord = coords;
-            }
-            break;
-          }
-          case EditorMode.DRAW: {
-            if (!selectedPolygon) {
-              const polygon = new Polygon(coords, editorUi.selectedColor, 0);
-              editorUi.selectedTexture.addPolygon(polygon);
-              polygonView.updatePolygons(editorUi.selectedTexture.polygons);
-              polygonView.selectPolygon(polygon);
-            } else {
-              selectedPolygon.addPoint(coords);
-              polygonView.updatePolygons();
-            }
-            break;
-          }
-          case EditorMode.NEW: {
-            const polygon = new Polygon([coords], editorUi.selectedColor, 0);
-            editorData.selectedTexture.addPolygon(polygon);
-            polygonView.updatePolygons(editorUi.selectedTexture.polygons);
-            polygonView.selectPolygon(polygon);
-            break;
-          }
+      getPolygons: () => {
+        return (editorUi && editorUi.selectedTexture) ? editorUi.selectedTexture.polygons : [];
+      },
+      onVertexDragEnd: () => {
+        if (editorUi) {
+          editorUi.onEditorDataUpdated();
         }
       },
-      onPolyClick: (poly) => {
-        polygonView.selectPolygon(poly);
-        editorUi.pendingMoveCoord = null;
+      onPolygonCreated: (poly) => {
+        if (editorUi && editorUi.selectedTexture) {
+          editorUi.selectedTexture.addPolygon(poly);
+          polygonView.updatePolygons();
+          editorUi.onEditorDataUpdated();
+        }
+      },
+      onPolygonDeleted: (poly) => {
+        if (editorUi && editorUi.selectedTexture) {
+          editorUi.selectedTexture.removePolygon(poly);
+          polygonView.updatePolygons();
+          editorUi.onEditorDataUpdated();
+        }
       },
     });
 
-    const editorUi = new EditorUI({
+    editorUi = new EditorUI({
       editorData,
       onAction: (action) => {
-        console.log(`Action: ${action}`);
         if (action === EditorAction.SAVE) {
           saveData(editorData);
         }
@@ -112,41 +58,30 @@
         }
       },
       onModeSelected: (mode) => {
-        console.log(`Mode selected: ${mode}`);
-        editorUi.pendingMoveCoord = null;
-        if (mode === EditorMode.SELECT) {
-          polygonView.selectPolygon(null);
-        }
+        polygonView.setMode(mode);
       },
       onColorSelected: (color) => {
-        console.log(`Color selected: ${color}`);
-        if (polygonView.selectedPolygon) {
-          polygonView.selectedPolygon.color = color;
-        }
-        polygonView.updatePolygons(editorUi.selectedTexture.polygons);
+        polygonView.setColor(color);
+        polygonView.updatePolygons();
       },
       onColorChanged: (oldColor, newColor) => {
-        console.log(`Color changed: ${oldColor} -> ${newColor}`);
         editorData.changeColor(oldColor, newColor);
         editorUi.updateColors(editorData);
-        polygonView.updatePolygons(editorUi.selectedTexture.polygons);
+        polygonView.updatePolygons();
       },
       onColorRemoved: (color) => {
-        console.log(`Color removed: ${color}`);
         editorData.removeColor(color);
         editorUi.updateColors(editorData);
-        polygonView.updatePolygons(editorUi.selectedTexture.polygons);
+        polygonView.updatePolygons();
       },
       onTextureSelected: (texture) => {
-        console.log(`Texture selected: ${texture.name}`);
-        polygonView.updatePolygons(editorUi.selectedTexture.polygons);
+        polygonView.selectPolygon(null);
+        polygonView.updatePolygons();
       },
       onEditorDataUpdated: () => {
-        console.log('Editor data updated');
-        polygonView.updatePolygons(editorUi.selectedTexture.polygons);
+        polygonView.updatePolygons();
       },
       onLayeringAction: (action) => {
-        console.log(`Layering action: ${action}`);
         if (!polygonView.selectedPolygon) return;
 
         switch (action) {
@@ -167,7 +102,10 @@
         editorUi.onEditorDataUpdated();
       },
     });
-  }
+
+    polygonView.setColor(editorUi.selectedColor);
+    polygonView.setMode(editorUi.selectedMode);
+  };
 
   refreshData();
 })();

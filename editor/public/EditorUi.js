@@ -1,8 +1,6 @@
 class EditorMode {
-  static SELECT = 'select';
+  static EDIT = 'edit';
   static DRAW = 'draw';
-  static ADD = 'add';
-  static MOVE = 'move';
   static DELETE = 'delete';
 }
 
@@ -30,7 +28,7 @@ class EditorUI {
     onEditorDataUpdated,
     onLayeringAction,
   }) {
-    this.selectedMode = EditorMode.SELECT;
+    this.selectedMode = EditorMode.EDIT;
     this.selectedColor = editorData.palette[0] || '#000';
     this.selectedTexture = editorData.getTexture(Object.keys(editorData.textures)[0]) || null;
     this.pendingMoveCoord = null;
@@ -97,24 +95,14 @@ class EditorUI {
   updateModes() {
     const modes = [
       {
-        text: 'Select',
-        classNames: ['mode', 'select'],
-        mode: EditorMode.SELECT,
+        text: 'Edit',
+        classNames: ['mode', 'edit'],
+        mode: EditorMode.EDIT,
       },
       {
         text: 'Draw',
         classNames: ['mode', 'draw'],
         mode: EditorMode.DRAW,
-      },
-      {
-        text: 'Add',
-        classNames: ['mode', 'add'],
-        mode: EditorMode.ADD,
-      },
-      {
-        text: 'Move',
-        classNames: ['mode', 'move'],
-        mode: EditorMode.MOVE,
       },
       {
         text: 'Delete',
@@ -162,21 +150,26 @@ class EditorUI {
   updateColors(editorData) {
     this.clearElement(this.colorsContainerEl);
 
-    editorData.palette.forEach((color) => {
+    editorData.palette.forEach((color, i) => {
       const colorEl = document.createElement('div');
       colorEl.classList.add('color');
       colorEl.style.backgroundColor = color;
+      if (this.selectedColor === color) {
+        colorEl.classList.add('active');
+      }
+      colorEl.title = color;
+
       this.colorsContainerEl.appendChild(colorEl);
-      colorEl.addEventListener('click', () => {
-        this.onColorSelected(color);
+      colorEl.addEventListener('click', (ev) => {
+        if (ev.target !== colorEl) return;
         this.selectedColor = color;
-        console.log(`Color clicked: ${color}`);
+        this.updateColors(editorData);
+        this.onColorSelected(color);
       });
 
-      const removeButton = this.createButton('✖', ['remove-color'], () => {
-        if (confirm(`Are you sure you want to remove the color "${color}"? This will change all polygons using this color to the first color in the palette.`)) {
-          this.onColorRemoved(color);
-        }
+      const removeButton = this.createButton('×', ['remove-color'], () => {
+        if (editorData.palette.length <= 1) return;
+        this.onColorRemoved(color);
       });
 
       const editButton = this.createButton('✎', ['edit-color'], () => {
@@ -224,9 +217,10 @@ class EditorUI {
           if (confirm(`Are you sure you want to delete the texture "${texture.name}"?`)) {
             editorData.removeTexture(texture.name);
             if (this.selectedTexture && this.selectedTexture.name === texture.name) {
-              this.selectedTexture = null;
+              this.selectedTexture = Object.values(editorData.textures)[0] || null;
             }
             this.updateTextures(editorData);
+            this.onTextureSelected(this.selectedTexture);
             this.onEditorDataUpdated(editorData);
           }
         }],
@@ -246,7 +240,9 @@ class EditorUI {
       if (newTextureName) {
         const newTexture = new Texture(newTextureName, []);
         editorData.addTexture(newTexture);
+        this.selectedTexture = newTexture;
         this.updateTextures(editorData);
+        this.onTextureSelected(newTexture);
         this.onEditorDataUpdated(editorData);
       }
     });

@@ -60,8 +60,7 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
   - `full_screen_quad.vs`, `post_blur.fs`, `post_noop.fs`: Full-screen quad post-processing pipeline.
 - **Procedural Vector Texture Atlas** (`src/core/assets/drawables.gen.ts` & `src/core/asset_library.ts`):
   - To save bundle size, binary image assets are not used.
-  - Textures are defined as procedural 2D canvas drawing instruction arrays in `drawables.gen.ts`.
-  - Polygon coordinates are stored as compact ASCII strings: `[colorIndex, style, "coordString"]` using an ASCII offset of 40 on a 50x50 grid (`String.fromCharCode(40 + Math.round(coord * 50))`), saving space by eliminating float decimal points, zeros, and comma separators.
+  - Polygon coordinates are stored as compact single strings: `"<colorChar><styleChar><coords>"` using an ASCII offset of 40 on a 50x50 grid (`String.fromCharCode(40 + Math.round(coord * 50))`), saving space by eliminating array brackets, commas, and numeric literals.
   - At startup (`AssetLibrary._preRenderTextures()`), these instructions are decoded, rasterized onto an offscreen canvas, and uploaded to a WebGL texture atlas.
 
 ---

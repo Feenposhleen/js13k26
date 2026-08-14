@@ -17,7 +17,10 @@ class EditorData {
   }
 
   changeColor(oldColor, newColor) {
-    this.palette.splice(this.palette.indexOf(oldColor), 1, newColor);
+    const idx = this.palette.indexOf(oldColor);
+    if (idx !== -1) {
+      this.palette.splice(idx, 1, newColor);
+    }
     Object.values(this.textures).forEach(texture => {
       texture.polygons.forEach((polygon) => {
         if (polygon.color === oldColor) {
@@ -28,7 +31,10 @@ class EditorData {
   }
 
   removeColor(color) {
-    this.palette.splice(this.palette.indexOf(color), 1);
+    const idx = this.palette.indexOf(color);
+    if (idx !== -1) {
+      this.palette.splice(idx, 1);
+    }
     Object.values(this.textures).forEach(texture => {
       texture.polygons.forEach((polygon) => {
         if (polygon.color === color) {
@@ -43,7 +49,7 @@ class EditorData {
   }
 
   addTexture(texture) {
-    this.textures[texture.name] = texture
+    this.textures[texture.name] = texture;
   }
 
   removeTexture(name) {
@@ -52,6 +58,7 @@ class EditorData {
 
   renameTexture(oldName, newName) {
     const texture = this.getTexture(oldName);
+    if (!texture) return null;
     texture.setName(newName);
     delete this.textures[oldName];
     this.textures[newName] = texture;
@@ -78,10 +85,19 @@ class EditorData {
   }
 
   loadSerialized(serializedData) {
-    this.palette = serializedData._palette;
-    const serializedTextures = serializedData._textures;
+    if (typeof serializedData._palette === 'string') {
+      const p = serializedData._palette;
+      this.palette = [];
+      for (let i = 0; i < p.length; i += 6) {
+        this.palette.push('#' + p.substr(i, 6));
+      }
+    } else {
+      this.palette = serializedData._palette || [];
+    }
 
+    const serializedTextures = serializedData._textures || {};
     this.textures = {};
+
     Object.keys(serializedTextures).forEach((name) => {
       const polygons = serializedTextures[name].map((data) => Polygon.deserialize(data, this.palette));
       const texture = new Texture(name, polygons);

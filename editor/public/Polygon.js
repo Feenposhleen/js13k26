@@ -2,7 +2,7 @@ class Polygon {
   constructor(points = [], color = "#000", style = 0) {
     this.points = points; // [x,y, x,y, x,y, ...] in 0..resolution grid
     this.color = color; // e.g. "#ff00aa" or "rgba(...)"
-    this.style = style; // e.g. 1=fill, 2=stroke, 3=both
+    this.style = style || 0; // e.g. 0=fill, 1=stroke
   }
 
   insertPoint(index, coords) {
@@ -66,22 +66,38 @@ class Polygon {
   }
 
   serialize(palette) {
-    let str = '';
+    let colorIdx = palette.indexOf(this.color);
+    if (colorIdx === -1) colorIdx = 0;
+
+    let str = String.fromCharCode(40 + colorIdx) + String.fromCharCode(40 + (this.style || 0));
     for (let i = 0; i < this.points.length; i += 2) {
       const px = Math.min(Math.max(0, Math.round(this.points[i])), SvgPolygonView.resolution);
       const py = Math.min(Math.max(0, Math.round(this.points[i + 1])), SvgPolygonView.resolution);
       str += String.fromCharCode(40 + px) + String.fromCharCode(40 + py);
     }
-    return [
-      palette.indexOf(this.color),
-      this.style,
-      str
-    ];
+    return str;
   }
 
   static deserialize(serializedData, palette) {
-    const color = palette[serializedData[0]];
-    const style = serializedData[1];
+    if (typeof serializedData === 'string') {
+      const colorIdx = serializedData.charCodeAt(0) - 40;
+      const style = serializedData.charCodeAt(1) - 40;
+      const color = palette[colorIdx] || palette[0] || '#000';
+      const points = [];
+
+      for (let i = 2; i < serializedData.length; i += 2) {
+        points.push(
+          serializedData.charCodeAt(i) - 40,
+          serializedData.charCodeAt(i + 1) - 40
+        );
+      }
+
+      return new Polygon(points, color, style);
+    }
+
+    // Legacy array format fallback ([colorIndex, style, coordStr])
+    const color = palette[serializedData[0]] || palette[0] || '#000';
+    const style = serializedData[1] || 0;
     const data = serializedData[2];
     const points = [];
 
@@ -90,7 +106,6 @@ class Polygon {
         points.push(data.charCodeAt(i) - 40, data.charCodeAt(i + 1) - 40);
       }
     } else {
-      // Backwards compatibility if old array format is loaded
       for (let i = 2; i < serializedData.length; i += 2) {
         points.push(
           Math.round(serializedData[i] * SvgPolygonView.resolution),

@@ -1,32 +1,37 @@
 /* Layout ----------- */
 
+* {
+  box-sizing: border-box;
+}
+
 body {
+  margin: 0;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: #444
-}
-
-#svg {
-  width: 700px;
-  height: 700px;
+  background: #181920;
+  color: #e2e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+  user-select: none;
+  min-height: 100vh;
 }
 
 #wrap {
   display: flex;
   flex-direction: row;
-  gap: 10px;
-  height: 800px;
+  gap: 16px;
+  max-height: 90vh;
 }
 
 #left,
 #right {
-  width: 160px;
-  height: 1000px;
+  width: 180px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  gap: 12px;
 }
 
 #center {
@@ -34,11 +39,26 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background: #20222c;
+  border-radius: 8px;
+  border: 1px solid #2d3142;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+#svg {
+  width: 650px;
+  height: 650px;
+  background: #16171e;
+  border-radius: 6px;
+  border: 1px solid #32374a;
+  cursor: crosshair;
 }
 
 #actions {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
 
 #colors {
@@ -50,20 +70,20 @@ body {
 }
 
 .panel {
-  border-radius: 5px;
-  padding: 5px;
-  margin-bottom: 10px;
-  background: #555;
-  color: white;
+  border-radius: 6px;
+  padding: 10px;
+  background: #232634;
+  border: 1px solid #31364a;
+  color: #cdd6f4;
   font-family: monospace;
-  font-size: 14px;
+  font-size: 13px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: stretch;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  gap: 5px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3b4256 transparent;
+  gap: 6px;
 }
 
 #left .panel:last-child {
@@ -74,48 +94,119 @@ body {
   flex: 1;
 }
 
-/* SVG stuff ----------- */
+/* SVG Performance & Styles ----------- */
 
-.poly.active {
-  stroke: aqua;
+.poly {
+  cursor: pointer;
+}
+
+.poly.active,
+.poly.selected {
+  stroke: #58a6ff;
   stroke-width: 2px;
+  stroke-linejoin: round;
 }
 
 .coord {
-  fill: #fff;
-  stroke: #333;
-  opacity: 0.3;
-  stroke-width: 2px;
-  paint-order: stroke fill;
-  mix-blend-mode: luminosity;
+  fill: #626880;
+  opacity: 0.35;
+  stroke: none;
+  pointer-events: none; /* Handled via delegation on svg container for 60fps */
 }
 
 .coord.center {
-  stroke: purple;
-  stroke-width: 8px;
-  paint-order: stroke fill;
+  fill: #f5c2e7;
+  opacity: 0.8;
+  r: 1.2;
 }
 
 .coord.active {
-  stroke: aqua;
-  stroke-width: 8px;
+  fill: #58a6ff;
+  opacity: 1;
+  r: 1.5;
 }
 
 .coord.over {
-  stroke-width: 8px;
-  stroke: #aaa;
+  fill: #a6e3a1;
+  opacity: 1;
+  r: 1.8;
 }
 
 .add .coord.over {
-  opacity: 0.8;
-  stroke: lime;
+  fill: #a6e3a1;
 }
 
 .move .coord.selected,
-.move .coord.selected,
 .add .coord.selected {
+  fill: #f9e2af;
+}
+
+.vertex-handle {
+  fill: #f9e2af;
+  stroke: #11111b;
+  stroke-width: 0.8px;
+  cursor: grab;
+  touch-action: none;
+  transition: transform 0.1s ease, fill 0.1s ease;
+}
+
+.vertex-handle:hover {
+  fill: #a6e3a1;
+  stroke: #ffffff;
+  stroke-width: 1.2px;
+  transform: scale(1.3);
+  transform-origin: center;
+}
+
+.vertex-handle.dragging {
+  fill: #89b4fa;
+  stroke: #ffffff;
+  stroke-width: 1.4px;
+  cursor: grabbing;
+}
+
+.vertex-handle.delete-mode {
+  fill: #f38ba8;
+  cursor: pointer;
+}
+
+.vertex-handle.delete-mode:hover {
+  fill: #ff5555;
+  stroke: #ffffff;
+  stroke-width: 1.4px;
+  transform: scale(1.4);
+  transform-origin: center;
+}
+
+.draw-handle {
+  fill: #f9e2af;
+  stroke: #11111b;
+  stroke-width: 0.8px;
+}
+
+.draw-handle.start-handle {
+  fill: #a6e3a1;
+  stroke: #ffffff;
+  stroke-width: 1.2px;
+  animation: pulse 1s infinite alternate;
+}
+
+.midpoint-handle {
+  fill: #89dceb;
+  stroke: #181920;
+  stroke-width: 0.6px;
+  cursor: copy;
   opacity: 0.8;
-  stroke: green;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.midpoint-handle:hover {
+  fill: #a6e3a1;
+  stroke: #ffffff;
+  stroke-width: 1px;
+  opacity: 1;
+  transform: scale(1.3);
+  transform-origin: center;
 }
 
 /* Components ----------- */
@@ -126,80 +217,93 @@ body {
   flex-direction: row;
   align-items: stretch;
   justify-content: flex-end;
-  border-radius: 3px;
-  margin-bottom: 4px;
+  border-radius: 4px;
+  gap: 4px;
 }
 
 #colors .button-container {
   padding: 0;
-  margin-bottom: 0px;
   margin-top: 4px;
   justify-content: flex-start;
 }
 
 .button-container.active {
-  background: rgb(69, 141, 111);
+  background: #2d4538;
 }
 
 button {
   flex: 1;
-  height: 24px;
+  height: 28px;
+  padding: 0 8px;
   text-align: left;
-  border: 2px solid #a2a2a2;
-  border-top: 2px solid #c2c2c2;
-  background: #555555;
+  border: 1px solid #3b4256;
+  background: #2a2e3f;
   cursor: pointer;
   font-family: monospace;
-  color: white;
-  border-radius: 3px;
+  color: #cdd6f4;
+  border-radius: 4px;
   overflow: hidden;
+  font-size: 12px;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 button:hover {
-  background: #666666;
+  background: #363c52;
+  border-color: #58a6ff;
 }
 
 button.extra,
 .add-color button,
 .add-texture button,
 #colors button {
-  height: 24px;
-  width: 24px;
+  height: 28px;
+  width: 28px;
   text-align: center;
-  font-size: 10px;
-  margin: 0;
+  font-size: 12px;
   padding: 0;
+  flex: none;
 }
 
 .color {
   width: auto;
-  height: 40px;
-  border: 2px solid #888;
-  border-top: 0px solid #888;
+  height: 32px;
+  border: 1px solid #3b4256;
+  border-radius: 3px;
   cursor: pointer;
   box-sizing: border-box;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-end;
+  padding: 2px;
+  margin-bottom: 2px;
+  transition: transform 0.1s ease;
 }
 
-.color:first-child {
-  border-top: 2px solid #888;
+.color:hover {
+  transform: scale(1.02);
 }
 
 .color.active {
-  border: 3px solid #444;
+  border: 2px solid #58a6ff;
+  box-shadow: 0 0 8px rgba(88, 166, 255, 0.4);
 }
 
 #backgrounds {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 #backgrounds div {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #888;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #454c64;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#backgrounds div:hover {
+  border-color: #58a6ff;
 }
