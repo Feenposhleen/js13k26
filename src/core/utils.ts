@@ -56,6 +56,11 @@ export const utils = {
     return utils._min(utils._max(num, min), max);
   },
 
+  _wrap: (num: number, min: number, max: number): number => {
+    var range = max - min;
+    return ((num - min) % range + range) % range + min;
+  },
+
   // Distances
 
   _numberDistance: (num1: number, num2: number): number => {

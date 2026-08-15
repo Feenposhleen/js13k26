@@ -13,7 +13,7 @@ export const createMainScene = () => {
     scene._rootSprite._addChild(bg);
 
     // Decorative floating stars
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 32; i++) {
       const star = createSprite(
         assetLibrary._textures._star,
         [utils._rndFloat(), utils._rndFloat()],
@@ -23,6 +23,7 @@ export const createMainScene = () => {
       const baseScale = 0.05 + utils._rndFloat() * 0.05;
       star._opacity = 0.4 + utils._rndFloat() * 0.4;
       star._updater = (s, g, delta) => {
+        s._position[0] = utils._wrap(s._position[0] - delta * 3 * s._scale[0], 0, 1);
         s._angle += delta * speed * 0.5;
         const pulse = 1 + 0.2 * utils._sin(g._worker._ticks * speed * 2);
         s._scale = [baseScale * pulse, baseScale * pulse];
@@ -30,25 +31,35 @@ export const createMainScene = () => {
       scene._rootSprite._addChild(star);
     }
 
-    // Main interactive player sprite
-    const player = createSprite(assetLibrary._textures._player, [0.5, 0.5], [0.25, 0.25]);
+    // Decorative floating clouds
+    let cloudCloseness = 0.2;
+    for (let i = 0; i < 32; i++) {
+      cloudCloseness += 0.02
+      const scale = cloudCloseness * 5;
+      const star = createSprite(
+        assetLibrary._textures._cloud_one,
+        [(utils._rndFloat() * 3) - 1, 0.1 + (cloudCloseness * 2) + (utils._rndFloat() * 0.1)],
+        [scale, scale + (utils._rndFloat() * 0.4)]
+      );
+      star._updater = (s, g, delta) => {
+        s._position[0] = utils._wrap(s._position[0] - delta * 1 * (s._scale[1] + 0.01), -1, 2);
+      };
+      scene._rootSprite._addChild(star);
+    }
 
-    // Satellite particle orbiting the player (demonstrates hierarchical transforms)
-    const orbiter = createSprite(assetLibrary._textures._particle, [0.4, 0], [0.35, 0.35]);
-    orbiter._updater = (s, g, delta) => {
-      s._angle += delta * 4;
-    };
-    player._addChild(orbiter);
+    // Main interactive player sprite
+    const player = createSprite(assetLibrary._textures._unicorn_one, [0.5, 0.5], [0.25, 0.25]);
 
     let lastPointerDown = false;
 
     player._updater = (sprite, g, delta) => {
+      sprite._texture = (game._state._ticks * 4) % 2 < 1 ? assetLibrary._textures._unicorn_two : assetLibrary._textures._unicorn_one;
       // Smoothly track pointer position
       const pointerCoord = g._input._pointer._coord;
       sprite._position = utils._vectorLerp(sprite._position, pointerCoord, delta * 8);
 
       // Rotate towards movement direction with gentle bobbing
-      const targetAngle = utils._sin(g._worker._ticks * 2) * 0.15;
+      const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
       sprite._angle += (targetAngle - sprite._angle) * utils._clamp(delta * 5, 0, 1);
 
       // Trigger SFX on pointer click
