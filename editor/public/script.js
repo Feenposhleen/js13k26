@@ -1,4 +1,32 @@
 (() => {
+  // --- Tab Switching ---
+  const tabBtnGraphics = document.getElementById('tab-btn-graphics');
+  const tabBtnAudio = document.getElementById('tab-btn-audio');
+  const wrapGraphics = document.getElementById('wrap-graphics');
+  const wrapAudio = document.getElementById('wrap-audio');
+  const audioContainer = document.getElementById('audio-app-container');
+
+  let audioEditorInstance = null;
+
+  tabBtnGraphics.onclick = () => {
+    tabBtnGraphics.classList.add('active');
+    tabBtnAudio.classList.remove('active');
+    wrapGraphics.classList.add('active');
+    wrapAudio.classList.remove('active');
+  };
+
+  tabBtnAudio.onclick = () => {
+    tabBtnAudio.classList.add('active');
+    tabBtnGraphics.classList.remove('active');
+    wrapAudio.classList.add('active');
+    wrapGraphics.classList.remove('active');
+
+    if (!audioEditorInstance) {
+      audioEditorInstance = new AudioEditor(audioContainer);
+    }
+  };
+
+  // --- Graphics Editor Setup ---
   const refreshData = async () => {
     const response = await fetch('/drawables');
     const data = await response.json();

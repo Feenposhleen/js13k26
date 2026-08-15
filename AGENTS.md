@@ -69,9 +69,13 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 
 - **Procedural Synthesizer & Sequencer** (`src/core/sound.ts`):
   - Built entirely on the Web Audio API without audio files.
-  - Synthesizes musical instruments using basic waveforms (sine, square, sawtooth, triangle), biquad filters, and exponential gain envelopes.
-  - Instruments available: `_kick`, `_snare`, `_bass`, `_beep`, `_boop`, `_bang`, and detuned polyphonic `_chords`.
-  - Supports synchronized multi-track musical loops (`playLoop`) and one-shot sound effects (`playSingle`).
+  - Unified parametric synthesizer voice (`_playVoice`) supporting 5 waveform modes (sine, triangle, sawtooth, square, white noise), exponential pitch sweeps, biquad filter sweeps (lowpass, highpass, bandpass), and ADSR gain envelopes.
+  - Multi-track step sequencer (`playSong`) stepping through compact track strings with zero per-frame garbage collection.
+- **Procedural Audio Asset Bank** (`src/core/assets/audio.gen.ts` & `src/core/asset_library.ts`):
+  - **SFX Wire Format**: Compact 8-character ASCII strings using an offset of 40:
+    `"<wave><pitchStart><pitchEnd><attack><decay><filterType><filterCutoff><volume>"`
+  - **Song Track Format**: Multi-channel arrays where notes are encoded as semitones (`c.charCodeAt(0) - 40`) and `.` denotes a rest: `["_kick", "(.......(......."]`.
+  - Lookups support both integer IDs (`1..N`) and string keys (`_kick`, `_main`).
 
 ---
 
@@ -90,11 +94,15 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 
 ## 5. Development & Asset Tooling
 
-- **Visual Asset Editor Server** (`editor/server.js`):
+- **Visual Asset & Audio Studio Server** (`editor/server.js`):
   - Local Node.js HTTP server running on port `7362`.
   - Automatically launched during `npm run dev`.
-  - Interacts with `src/core/assets/drawables.gen.ts` by reading and writing to the `/*GEN*/ ... /*/GEN*/` delimited block.
-  - Serves an interactive vector asset editor UI from `editor/public`.
+  - Endpoints:
+    - `GET /drawables` / `POST /drawables`: Reads & writes vector polygons inside `src/core/assets/drawables.gen.ts`.
+    - `GET /audio` / `POST /audio`: Reads & writes SFX patches and music tracks inside `src/core/assets/audio.gen.ts`.
+  - Serves an interactive dual-studio Web UI (`editor/public`) with tabs for:
+    - **Vector Art**: Polygon vector editor with color palette management.
+    - **Audio & Music**: SFX synthesizer designer with preset generators, live auditioning, and multi-track step tracker sequencer.
 
 ---
 

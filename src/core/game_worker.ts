@@ -8,8 +8,8 @@ import { Vec } from "./utils";
 export type TransferDataFromWorker = {
   _renderArray: Float32Array;
   _spriteCount: number;
-  _music: number | null;
-  _sfx: number[] | null;
+  _music: number | string | null;
+  _sfx: (number | string)[] | null;
 }
 
 export const defaultWorkerTransferData = (): TransferDataFromWorker => ({
@@ -33,8 +33,8 @@ const createGameWorker = () => {
   var _lastTs: number = 0;
   var _state: FullState | undefined = undefined;
   var _input: InputState = { _keys: _keys, _pointer: _pointer };
-  var _pendingMusic: number | null = null;
-  var _pendingSfx: number[] = [];
+  var _pendingMusic: number | string | null = null;
+  var _pendingSfx: (number | string)[] = [];
 
   self.onmessage = ({ data }: { data: TransferDataFromWindow }) => {
     if (!_state) return;
@@ -98,10 +98,10 @@ const createGameWorker = () => {
     _removeScene(scene: Scene) {
       _sceneTree = _sceneTree.filter((existingScene) => existingScene !== scene);
     },
-    _setMusic(musicId: number) {
+    _setMusic(musicId: number | string) {
       _pendingMusic = musicId;
     },
-    _playSfx(sfxId: number) {
+    _playSfx(sfxId: number | string) {
       _pendingSfx.push(sfxId);
     },
   };

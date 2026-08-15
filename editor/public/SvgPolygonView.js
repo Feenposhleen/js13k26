@@ -9,6 +9,7 @@ class SvgPolygonView {
 
   getPolygons = null;
   selectedPolygon = null;
+  selectedPolyEl = null;
   activeColor = '#88c0d0';
   mode = 'edit';
 
@@ -133,25 +134,18 @@ class SvgPolygonView {
         return;
       }
 
-      // 3. EDIT MODE (Select / Move / Add via edge midpoints)
-      // Check if clicking on a vertex handle
+      // 3. EDIT MODE
+      // Clicked directly on a vertex handle
       if (ev.target && ev.target.classList.contains('vertex-handle') && this.selectedPolygon) {
         const index = parseInt(ev.target.getAttribute('data-index'), 10);
         if (!isNaN(index)) {
-          this.draggingVertex = {
-            polygon: this.selectedPolygon,
-            index: index,
-            pointerId: ev.pointerId,
-          };
-          try {
-            ev.target.setPointerCapture(ev.pointerId);
-          } catch (_) { }
+          this.startDraggingVertex(index, ev.target, ev.pointerId);
           ev.stopPropagation();
           return;
         }
       }
 
-      // Check if clicking on an edge midpoint handle (instant split & drag)
+      // Clicked on a midpoint handle (instant split & drag)
       if (ev.target && ev.target.classList.contains('midpoint-handle') && this.selectedPolygon) {
         const insertIdx = parseInt(ev.target.getAttribute('data-insert-index'), 10);
         const mx = parseInt(ev.target.getAttribute('data-x'), 10);
@@ -159,19 +153,17 @@ class SvgPolygonView {
 
         if (!isNaN(insertIdx) && !isNaN(mx) && !isNaN(my)) {
           this.selectedPolygon.insertPoint(insertIdx, [mx, my]);
-          this.draggingVertex = {
-            polygon: this.selectedPolygon,
-            index: insertIdx,
-            pointerId: ev.pointerId,
-          };
           this.updatePolygons();
+          const newHandle = this.handlesContainerEl.querySelector(`.vertex-handle[data-index="${insertIdx}"]`);
+          if (newHandle) {
+            this.startDraggingVertex(insertIdx, newHandle, ev.pointerId);
+          }
           ev.stopPropagation();
           return;
         }
       }
 
-      // Check if clicking on a polygon body
-      const polys = this.getPolygons();
+      // Clicked on a polygon body
       const clickedPoly = this.findPolygonAtEvent(ev);
       if (clickedPoly) {
         this.selectPolygon(clickedPoly);
@@ -180,7 +172,7 @@ class SvgPolygonView {
         return;
       }
 
-      // Clicking on empty grid space deselects
+      // Clicking on empty space deselects
       this.selectPolygon(null);
       if (this.onPolyClick) this.onPolyClick(null);
     });
@@ -188,14 +180,16 @@ class SvgPolygonView {
     this.svgEl.addEventListener('pointermove', (ev) => {
       const coord = this.getCoordFromEvent(ev);
 
-      // Vertex dragging
+      // Vertex dragging (smooth in-place updates)
       if (this.draggingVertex) {
         if (coord) {
           const poly = this.draggingVertex.polygon;
           const idx = this.draggingVertex.index;
           if (poly.points[idx] !== coord[0] || poly.points[idx + 1] !== coord[1]) {
             poly.setPoint(idx, coord);
-            this.updatePolygons();
+            this.updateActivePolygonPath();
+            this.updateActiveHandlePosition(coord);
+            this.highlightPolygonCoords(poly);
           }
         }
         return;
@@ -225,6 +219,12 @@ class SvgPolygonView {
 
     const finishDrag = () => {
       if (this.draggingVertex) {
+        if (this.draggingVertex.handleEl) {
+          this.draggingVertex.handleEl.classList.remove('dragging');
+          try {
+            this.draggingVertex.handleEl.releasePointerCapture(this.draggingVertex.pointerId);
+          } catch (_) { }
+        }
         this.draggingVertex = null;
         this.updatePolygons();
         if (this.onVertexDragEnd) {
@@ -269,6 +269,35 @@ class SvgPolygonView {
         }
       }
     });
+  }
+
+  startDraggingVertex(index, handleEl, pointerId) {
+    this.draggingVertex = {
+      polygon: this.selectedPolygon,
+      index: index,
+      handleEl: handleEl,
+      pointerId: pointerId,
+    };
+    handleEl.classList.add('dragging');
+    try {
+      handleEl.setPointerCapture(pointerId);
+    } catch (_) { }
+  }
+
+  updateActiveHandlePosition(coord) {
+    if (this.draggingVertex && this.draggingVertex.handleEl) {
+      this.draggingVertex.handleEl.setAttribute('cx', coord[0] * 10);
+      this.draggingVertex.handleEl.setAttribute('cy', coord[1] * 10);
+    }
+  }
+
+  updateActivePolygonPath() {
+    if (!this.selectedPolygon || !this.selectedPolyEl) return;
+    let pointString = '';
+    for (let i = 0; i < this.selectedPolygon.points.length; i += 2) {
+      pointString += `${this.selectedPolygon.points[i] * 10},${this.selectedPolygon.points[i + 1] * 10} `;
+    }
+    this.selectedPolyEl.setAttribute('points', pointString.trim());
   }
 
   findPolygonAtEvent(ev) {
@@ -386,7 +415,6 @@ class SvgPolygonView {
           if (this.onVertexDragEnd) this.onVertexDragEnd();
           return;
         } else {
-          // Polygon has <= 3 points, delete the entire polygon
           if (this.onPolygonDeleted) this.onPolygonDeleted(this.selectedPolygon);
           this.selectPolygon(null);
           return;
@@ -446,10 +474,13 @@ class SvgPolygonView {
       this.selectedPolygon = null;
     }
 
+    this.selectedPolyEl = null;
+
     polys.forEach((poly) => {
       const el = this.renderPolygon(poly);
       if (poly === this.selectedPolygon) {
         el.classList.add('selected');
+        this.selectedPolyEl = el;
       }
     });
 
@@ -483,7 +514,7 @@ class SvgPolygonView {
           midHandle.classList.add('midpoint-handle');
           midHandle.setAttribute('cx', mx * 10);
           midHandle.setAttribute('cy', my * 10);
-          midHandle.setAttribute('r', 1.2);
+          midHandle.setAttribute('r', 1.4);
           midHandle.setAttribute('data-insert-index', 2 * (i + 1));
           midHandle.setAttribute('data-x', mx);
           midHandle.setAttribute('data-y', my);
@@ -505,12 +536,8 @@ class SvgPolygonView {
 
       handle.setAttribute('cx', x * 10);
       handle.setAttribute('cy', y * 10);
-      handle.setAttribute('r', 2.0);
+      handle.setAttribute('r', 2.2);
       handle.setAttribute('data-index', i);
-
-      if (this.draggingVertex && this.draggingVertex.index === i) {
-        handle.classList.add('dragging');
-      }
 
       this.handlesContainerEl.appendChild(handle);
     }

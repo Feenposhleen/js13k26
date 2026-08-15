@@ -3,51 +3,71 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Vector Asset Editor</title>
+  <title>Game Asset Studio</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <div id="wrap">
-    <div id="left">
-      <div class="panel">
-        Modes
-        <div id="modes"></div>
-      </div>
-      <div class="panel">
-        Z
-        <div id="layering"></div>
-      </div>
-      <div class="panel">
-        Palette
-        <div id="colors"></div>
-      </div>
-    </div>
-    <div id="center">
-      <svg viewBox="-10, -10, 10, 10" id="svg">
-        <g id="polys"></g>
-        <g id="coords"></g>
-        <g id="preview"></g>
-        <g id="handles"></g>
-      </svg>
-      <div class="panel">
-        Editor background
-        <div id="backgrounds"></div>
-      </div>
-    </div>
-    <div id="right">
-      <div class="panel">
-        Textures
-        <div id="textures"></div>
-      </div>
-      <div id="actions"></div>
+  <div id="top-nav">
+    <div class="nav-brand">🎮 Asset Studio</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tab-btn-graphics">Graphics</button>
+      <button class="nav-tab" id="tab-btn-audio">Audio</button>
     </div>
   </div>
+
+  <div id="app-body">
+    <!-- Vector Graphics App -->
+    <div id="wrap-graphics" class="tab-view active">
+      <div id="wrap">
+        <div id="left">
+          <div class="panel">
+            Modes
+            <div id="modes"></div>
+          </div>
+          <div class="panel">
+            Z
+            <div id="layering"></div>
+          </div>
+          <div class="panel">
+            Palette
+            <div id="colors"></div>
+          </div>
+        </div>
+        <div id="center">
+          <svg viewBox="-10, -10, 10, 10" id="svg">
+            <g id="polys"></g>
+            <g id="coords"></g>
+            <g id="preview"></g>
+            <g id="handles"></g>
+          </svg>
+          <div class="panel">
+            Editor background
+            <div id="backgrounds"></div>
+          </div>
+        </div>
+        <div id="right">
+          <div class="panel">
+            Textures
+            <div id="textures"></div>
+          </div>
+          <div id="actions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio & Music App -->
+    <div id="wrap-audio" class="tab-view">
+      <div id="audio-app-container"></div>
+    </div>
+  </div>
+
   <script src="EditorData.js"></script>
   <script src="EditorUi.js"></script>
   <script src="Polygon.js"></script>
   <script src="Texture.js"></script>
   <script src="SvgPolygonView.js"></script>
+  <script src="AudioEditor.js"></script>
   <script src="script.js"></script>
 </body>
 

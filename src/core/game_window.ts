@@ -54,12 +54,14 @@ const createGameWindow = () => {
     }
 
     if (data._music !== null && _sound) {
-      _sound!.playLoop(assetLibrary._getMusic(data._music));
+      const song = assetLibrary._getMusic(data._music);
+      if (song) _sound.playSong(song, assetLibrary._audioData);
     }
 
     if (data._sfx && _sound) {
       data._sfx.forEach(sfxId => {
-        _sound!.playSingle(assetLibrary._getSfx(sfxId));
+        const patch = assetLibrary._getSfx(sfxId);
+        if (patch) _sound!.playSfx(patch);
       });
     }
   };
