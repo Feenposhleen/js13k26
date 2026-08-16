@@ -54,7 +54,7 @@ export const createMainScene = () => {
         assetLibrary._textures._particle,
         [
           utils._rndRange(-0.2, game._state._playerPosition[0]),
-          game._state._playerPosition[1] + utils._rndFloat() * 0.01,
+          game._state._playerPosition[1] - utils._rndRange(-0.01, 0.01),
         ],
         [scale, scale],
       );
@@ -63,7 +63,7 @@ export const createMainScene = () => {
         if (s._scale[0] < 0.04) {
           s._position = [
             game._state._playerPosition[0] - 0.04,
-            game._state._playerPosition[1] - utils._rndRange(-0.02, 0.02),
+            game._state._playerPosition[1] - utils._rndRange(-0.01, 0.01),
           ];
           s._scale = [scale, scale];
         }
@@ -76,6 +76,8 @@ export const createMainScene = () => {
 
     // Main interactive player sprite
     const player = createSprite(assetLibrary._textures._unicorn_one, [0.5, 0.5], [0.25, 0.25]);
+    const unicornZooka = createSprite(assetLibrary._textures._unicorn_zooka, [-0.045, -0.15], [0.5, 0.7]);
+    player._addChild(unicornZooka);
 
     let lastPointerDown = false;
 
