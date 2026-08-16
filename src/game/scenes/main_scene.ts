@@ -17,7 +17,7 @@ export const createMainScene = () => {
       const star = createSprite(
         assetLibrary._textures._star,
         [utils._rndFloat(), utils._rndFloat()],
-        [0.08, 0.08]
+        [0.08, 0.08],
       );
       const speed = 0.5 + utils._rndFloat() * 1.5;
       const baseScale = 0.05 + utils._rndFloat() * 0.05;
@@ -34,15 +34,42 @@ export const createMainScene = () => {
     // Decorative floating clouds
     let cloudCloseness = 0.2;
     for (let i = 0; i < 32; i++) {
-      cloudCloseness += 0.02
+      cloudCloseness += 0.02;
       const scale = cloudCloseness * 5;
       const star = createSprite(
         assetLibrary._textures._cloud_one,
-        [(utils._rndFloat() * 3) - 1, 0.1 + (cloudCloseness * 2) + (utils._rndFloat() * 0.1)],
-        [scale, scale + (utils._rndFloat() * 0.4)]
+        [utils._rndFloat() * 3 - 1, 0.1 + cloudCloseness * 2 + utils._rndFloat() * 0.1],
+        [scale, scale + utils._rndFloat() * 0.4],
       );
       star._updater = (s, g, delta) => {
         s._position[0] = utils._wrap(s._position[0] - delta * 1 * (s._scale[1] + 0.01), -1, 2);
+      };
+      scene._rootSprite._addChild(star);
+    }
+
+    // Unicorn trail
+    for (let i = 0; i < 32; i++) {
+      const scale = 0.05 + utils._rndFloat() * 0.05;
+      const star = createSprite(
+        assetLibrary._textures._particle,
+        [
+          utils._rndRange(-0.2, game._state._playerPosition[0]),
+          game._state._playerPosition[1] + utils._rndFloat() * 0.01,
+        ],
+        [scale, scale],
+      );
+      star._updater = (s, g, delta) => {
+        s._position[0] -= delta * (1 + s._scale[0]);
+        if (s._scale[0] < 0.04) {
+          s._position = [
+            game._state._playerPosition[0] - 0.04,
+            game._state._playerPosition[1] - utils._rndRange(-0.02, 0.02),
+          ];
+          s._scale = [scale, scale];
+        }
+        s._scale[0] -= delta * 0.2;
+        s._scale[1] -= delta * 0.2;
+        s._angle += delta * s._scale[0];
       };
       scene._rootSprite._addChild(star);
     }
@@ -53,9 +80,13 @@ export const createMainScene = () => {
     let lastPointerDown = false;
 
     player._updater = (sprite, g, delta) => {
-      sprite._texture = (game._state._ticks * 4) % 2 < 1 ? assetLibrary._textures._unicorn_two : assetLibrary._textures._unicorn_one;
+      sprite._texture =
+        (game._state._ticks * 4) % 2 < 1
+          ? assetLibrary._textures._unicorn_two
+          : assetLibrary._textures._unicorn_one;
       // Smoothly track pointer position
       const pointerCoord = g._input._pointer._coord;
+      g._state._playerPosition = [...sprite._position];
       sprite._position = utils._vectorLerp(sprite._position, pointerCoord, delta * 8);
 
       // Rotate towards movement direction with gentle bobbing
