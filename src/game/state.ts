@@ -27,6 +27,6 @@ export const createState = (): GameState => ({
   _color: 0,
   _lastFire: 0,
   _ticks: 0,
-  _speed: 0.7,
+  _speed: 1.4,
   _paused: false,
 });
