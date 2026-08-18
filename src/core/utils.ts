@@ -41,7 +41,7 @@ export const utils = {
   },
 
   _rndRange: (min: number, max: number): number => {
-    return min + (max - min * utils._rndOne());
+    return min + ((max - min) * utils._rndOne());
   },
 
   _rndFromRange: (range: Vec): number => {

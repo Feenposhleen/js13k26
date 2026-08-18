@@ -18,14 +18,13 @@ export const createMainScene = () => {
     for (let i = 0; i < 32; i++) {
       const star = createSprite(
         assetLibrary._textures._star,
-        [utils._rndFloat(), utils._rndFloat()],
+        [utils._rndRange(-0.3, 1.3), utils._rndRange(-0.1, 0.6)],
         [0.08, 0.08],
       );
       const speed = 0.5 + utils._rndFloat() * 1.5;
-      const baseScale = 0.05 + utils._rndFloat() * 0.05;
-      star._opacity = 0.4 + utils._rndFloat() * 0.4;
+      const baseScale = 0.3 + (utils._rndFloat() * 0.1);
       star._updater = (s, g, delta) => {
-        s._position[0] = utils._wrap(s._position[0] - delta * 3 * s._scale[0], 0, 1);
+        s._position[0] = utils._wrap(s._position[0] - delta * 0.2 * s._scale[0], -0.3, 1.3);
         s._angle += delta * speed * 0.5;
         const pulse = 1 + 0.2 * utils._sin(g._worker._ticks * speed * 2);
         s._scale = [baseScale * pulse, baseScale * pulse];
@@ -34,19 +33,19 @@ export const createMainScene = () => {
     }
 
     // Decorative floating clouds
-    let cloudCloseness = 0.2;
-    for (let i = 0; i < 32; i++) {
-      cloudCloseness += 0.02;
-      const scale = cloudCloseness * 5;
-      const star = createSprite(
+    let cloudCloseness = 0.1;
+    for (let i = 0; i < 64; i++) {
+      cloudCloseness += 0.01;
+      const scale = cloudCloseness * 6;
+      const cloud = createSprite(
         assetLibrary._textures._cloud_one,
-        [utils._rndFloat() * 3 - 1, 0.1 + cloudCloseness * 2 + utils._rndFloat() * 0.1],
-        [scale, scale + utils._rndFloat() * 0.4],
+        [utils._rndFloat() * 3 - 1, 0.3 + (cloudCloseness * 2) + (utils._rndFloat() * 0.1)],
+        [(scale * 2), scale],
       );
-      star._updater = (s, g, delta) => {
-        s._position[0] = utils._wrap(s._position[0] - delta * 1 * (s._scale[1] + 0.01), -1, 2);
+      cloud._updater = (s, g, delta) => {
+        s._position[0] = utils._wrap(s._position[0] - delta * 1.2 * (s._scale[1] + 0.1), -1, 2);
       };
-      scene._rootSprite._addChild(star);
+      scene._rootSprite._addChild(cloud);
     }
 
     // Main interactive player sprite
@@ -55,8 +54,12 @@ export const createMainScene = () => {
       32,
       true,
       unicorn,
-      [(utils._pi / 2) - 1.4, (utils._pi / 2) + 1.4],
+      [-utils._pi - 0.05, -utils._pi + 0.05,],
+      [0.4, 0.6],
+      [0.4, 0.8],
+      [0.1, 0.2]
     );
+    trail._position = [-0.02, 0];
 
     scene._rootSprite._addChild(trail);
     scene._rootSprite._addChild(unicorn);

@@ -30,6 +30,18 @@ unicorn._updater = (sprite, game, delta) => {
     game._state._score++;
     game._worker._playSfx(1);
     sprite._scale = [0.32, 0.32];
+    game._state._lastFire = game._state._ticks;
+
+    const color = utils._wrap(game._state._color + 1, 0, 4);
+    game._state._color = color;
+    selected._texture = color == 0
+      ? assetLibrary._textures._rainbow_red
+      : color == 1
+        ? assetLibrary._textures._rainbow_yellow
+        : color == 2
+          ? assetLibrary._textures._rainbow_green
+          : assetLibrary._textures._rainbow_blue;
+
   } else {
     sprite._scale = utils._vectorLerp(sprite._scale, [0.25, 0.25], delta * 10);
   }
