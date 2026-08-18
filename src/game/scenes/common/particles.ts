@@ -1,16 +1,17 @@
 import { RawTexture } from "../../../core/assets/drawables.gen";
-import createSprite from "../../../core/sprite";
+import createSprite, { Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 
 export const createParticles = (
   texture: RawTexture,
   count: number,
   repeat: boolean = false,
-  speedRange: Vec = [0.2, 0.4],
+  positioningTarget: Sprite | null = null,
+  directionRange: Vec = [-utils._pi, utils._pi],
   lifetimeRange: Vec = [0.2, 0.4],
+  speedRange: Vec = [0.2, 0.4],
   scaleRange: Vec = [0.05, 0.06],
   angleRange: Vec = [-utils._pi, utils._pi],
-  directionRange: Vec = [-utils._pi, utils._pi],
   angularVelocityRange: Vec = [-3, 3],
 ) => {
   const emitter = createSprite(null, [0, 0]);
@@ -25,7 +26,7 @@ export const createParticles = (
 
     const particle = createSprite(
       texture,
-      [0, 0],
+      positioningTarget ? [...positioningTarget._position] : [0, 0],
       [particleScale, particleScale],
       utils._vectorRotate([particleSpeed, 0], particleDirection),
     );

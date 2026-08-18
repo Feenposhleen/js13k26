@@ -36,6 +36,4 @@ unicorn._updater = (sprite, game, delta) => {
   lastPointerDown = game._input._pointer._down;
 };
 
-const trail = createParticles(assetLibrary._textures._particle, 32, true);
-unicorn._addChild(trail);
 export default unicorn;

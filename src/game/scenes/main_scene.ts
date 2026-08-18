@@ -2,6 +2,7 @@ import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
 import createSprite from "../../core/sprite";
 import { utils } from "../../core/utils";
+import { createParticles } from "./common/particles";
 import unicorn from "./gameplay/unicorn";
 
 export const createMainScene = () => {
@@ -49,6 +50,15 @@ export const createMainScene = () => {
     }
 
     // Main interactive player sprite
+    const trail = createParticles(
+      assetLibrary._textures._particle,
+      32,
+      true,
+      unicorn,
+      [(utils._pi / 2) - 1.4, (utils._pi / 2) + 1.4],
+    );
+
+    scene._rootSprite._addChild(trail);
     scene._rootSprite._addChild(unicorn);
   });
 
