@@ -17,11 +17,7 @@ export const createMainScene = () => {
     const layerFxFront = game._state._layerFxFront;
     const layerUi = game._state._layerUi;
 
-    scene._rootSprite._addChild(layerBg);
-    scene._rootSprite._addChild(layerFxBack);
-    scene._rootSprite._addChild(layerEntities);
-    scene._rootSprite._addChild(layerFxFront);
-    scene._rootSprite._addChild(layerUi);
+    scene._rootSprite._addChildren([layerBg, layerFxBack, layerEntities, layerFxFront, layerUi]);
 
     const bg = createBackground();
     layerBg._addChild(bg);

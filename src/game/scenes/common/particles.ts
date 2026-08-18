@@ -35,7 +35,6 @@ export const createParticles = (
 
     particle._updater = (sprite, _game, delta) => {
       if (sprite._lifetime > particleLifetime && !sprite._dead) {
-        console.log("Setting dead");
         sprite._dead = true;
 
         if (repeat) {
@@ -50,7 +49,6 @@ export const createParticles = (
       );
 
       if (sprite._lifetime > particleLifetime) {
-        console.log("Setting dead");
         sprite._dead = true;
 
         if (repeat) {
