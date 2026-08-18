@@ -18,6 +18,7 @@ export type Sprite = {
   _updater: SpriteUpdater;
   _update: (state: FullState, dt: number) => void;
   _addChild: (sprite: Sprite) => void;
+  _addChildren: (sprites: Array<Sprite>) => void;
   _removeChild: (sprite: Sprite) => void;
   _setUniformScale: (scale: number) => void;
   _copy: () => Sprite;
@@ -47,6 +48,12 @@ const createSprite = (
 
     _addChild: (sprite: Sprite): void => {
       _sprite._children.push(sprite);
+    },
+
+    _addChildren: (sprites: Array<Sprite>): void => {
+      for (const sprite of sprites) {
+        _sprite._children.push(sprite);
+      }
     },
 
     _removeChild: (sprite: Sprite): void => {

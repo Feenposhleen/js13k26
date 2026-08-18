@@ -41,7 +41,7 @@ export const utils = {
   },
 
   _rndRange: (min: number, max: number): number => {
-    return min + ((max - min) * utils._rndOne());
+    return min + (max - min) * utils._rndOne();
   },
 
   _rndFromRange: (range: Vec): number => {
@@ -63,6 +63,13 @@ export const utils = {
   _wrap: (num: number, min: number, max: number): number => {
     var range = max - min;
     return ((((num - min) % range) + range) % range) + min;
+  },
+
+  // Ranges
+
+  _lerpRange: (range: Vec, fraction: number) => {
+    const extent = range[1] - range[0];
+    return range[0] + extent * fraction;
   },
 
   // Distances
