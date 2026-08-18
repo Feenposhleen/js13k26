@@ -65,6 +65,15 @@ class EditorData {
     return texture;
   }
 
+  duplicateTexture(oldName, newName) {
+    const original = this.getTexture(oldName);
+    if (!original) return null;
+    const clonedPolygons = original.polygons.map(p => new Polygon([...p.points], p.color, p.style));
+    const newTexture = new Texture(newName, clonedPolygons);
+    this.addTexture(newTexture);
+    return newTexture;
+  }
+
   clear() {
     this.textures = {};
     this.palette = [];

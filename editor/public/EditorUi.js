@@ -204,11 +204,24 @@ class EditorUI {
         // Renaming
         ['✎', () => {
           const newName = prompt('Enter a valid name for the texture (e.g. "_name", "_another_name")', texture.name);
-          if (!/^_[a-z_]+$/.test(newName)) return;
+          if (!/^_[a-z0-9_]+$/i.test(newName)) return;
 
           if (newName && newName !== texture.name) {
             editorData.renameTexture(texture.name, newName);
             this.updateTextures(editorData);
+            this.onEditorDataUpdated(editorData);
+          }
+        }],
+        // Duplicating
+        ['📋', () => {
+          const newName = prompt('Enter a valid name for the duplicated texture (e.g. "_name", "_another_name")', texture.name + '_copy');
+          if (!/^_[a-z0-9_]+$/i.test(newName)) return;
+
+          if (newName && !editorData.getTexture(newName)) {
+            const duplicated = editorData.duplicateTexture(texture.name, newName);
+            this.selectedTexture = duplicated;
+            this.updateTextures(editorData);
+            this.onTextureSelected(duplicated);
             this.onEditorDataUpdated(editorData);
           }
         }],
@@ -275,6 +288,17 @@ class EditorUI {
     }
 
     return container;
+  }
+
+  setEditorData(editorData) {
+    this.editorData = editorData;
+    if (!this.selectedTexture || !editorData.getTexture(this.selectedTexture.name)) {
+      this.selectedTexture = editorData.getTexture(Object.keys(editorData.textures)[0]) || null;
+    } else {
+      this.selectedTexture = editorData.getTexture(this.selectedTexture.name);
+    }
+    this.updateColors(editorData);
+    this.updateTextures(editorData);
   }
 
   clearElement(el) {

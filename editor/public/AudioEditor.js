@@ -216,8 +216,10 @@ class AudioEditor {
           <div class="panel-header">
             <h3>Sound Effects (SFX)</h3>
             <div class="header-btns">
-              <button id="add-sfx-btn" title="Add SFX">+ Add</button>
-              <button id="del-sfx-btn" title="Delete SFX">- Del</button>
+              <button id="add-sfx-btn" title="Add new sound effect">+ Add</button>
+              <button id="dup-sfx-btn" title="Duplicate selected sound effect">📋 Copy</button>
+              <button id="rename-sfx-btn" title="Rename selected sound effect">✎ Name</button>
+              <button id="del-sfx-btn" title="Delete selected sound effect">- Del</button>
             </div>
           </div>
           <div class="list-container" id="sfx-list"></div>
@@ -283,14 +285,30 @@ class AudioEditor {
           <div class="panel-header">
             <h3>Music Tracker</h3>
             <div class="header-btns">
-              <button id="add-song-btn">+ Song</button>
-              <button id="add-track-btn">+ Track</button>
+              <button id="add-song-btn" title="Add new song">+ Song</button>
+              <button id="dup-song-btn" title="Duplicate selected song">📋 Copy Song</button>
+              <button id="rename-song-btn" title="Rename selected song">✎ Name</button>
+              <button id="del-song-btn" title="Delete selected song">- Del</button>
+              <button id="add-track-btn" title="Add track to current song">+ Track</button>
             </div>
           </div>
 
           <div class="song-meta-row">
             <div class="list-container-inline" id="song-list"></div>
-            <label>BPM: <input type="number" id="song-bpm" min="40" max="300" value="130" style="width:60px;" /></label>
+            <label>BPM: <input type="number" id="song-bpm" min="40" max="300" value="130" style="width:52px;" /></label>
+            <label>Length: 
+              <select id="song-length-select" style="width:115px;">
+                <option value="16">16 (1 bar)</option>
+                <option value="32">32 (2 bars)</option>
+                <option value="48">48 (3 bars)</option>
+                <option value="64">64 (4 bars)</option>
+                <option value="96">96 (6 bars)</option>
+                <option value="128">128 (8 bars)</option>
+                <option value="256">256 (16 bars)</option>
+              </select>
+            </label>
+            <button id="add-bar-btn" title="Add 1 bar (+16 steps)">+ Bar</button>
+            <button id="del-bar-btn" title="Remove 1 bar (-16 steps)">- Bar</button>
             <button id="song-play-btn" class="play-action-btn">▶ Play Song</button>
             <button id="save-audio-btn" class="save-all-btn">💾 Save Audio Assets</button>
           </div>
@@ -329,28 +347,83 @@ class AudioEditor {
     };
 
     this.container.querySelector('#add-sfx-btn').onclick = () => {
-      const name = prompt('SFX Name (e.g., _jump, _hit):', '_sfx' + (Object.keys(this.audioData._sfx).length + 1));
+      const name = prompt('SFX Name (must start with _, e.g., _jump):', '_sfx' + (Object.keys(this.audioData._sfx).length + 1));
       if (name) {
         const cleanName = name.startsWith('_') ? name : '_' + name;
+        if (this.audioData._sfx[cleanName]) {
+          alert('An SFX with that name already exists.');
+          return;
+        }
         this.audioData._sfx[cleanName] = '0,( %01(4';
         this.selectedSfxKey = cleanName;
         this.renderAll();
       }
     };
 
+    this.container.querySelector('#dup-sfx-btn').onclick = () => {
+      if (!this.selectedSfxKey) return;
+      const oldName = this.selectedSfxKey;
+      const newName = prompt('Enter duplicated SFX Name (must start with _):', oldName + '_copy');
+      if (!newName) return;
+      const cleanName = newName.startsWith('_') ? newName : '_' + newName;
+      if (this.audioData._sfx[cleanName]) {
+        alert('An SFX with that name already exists.');
+        return;
+      }
+      this.audioData._sfx[cleanName] = this.audioData._sfx[oldName];
+      this.selectedSfxKey = cleanName;
+      this.renderAll();
+    };
+
+    this.container.querySelector('#rename-sfx-btn').onclick = () => {
+      if (!this.selectedSfxKey) return;
+      const oldName = this.selectedSfxKey;
+      const newName = prompt('Enter new SFX Name (must start with _):', oldName);
+      if (!newName || newName === oldName) return;
+      const cleanName = newName.startsWith('_') ? newName : '_' + newName;
+      if (this.audioData._sfx[cleanName]) {
+        alert('An SFX with that name already exists.');
+        return;
+      }
+      this.audioData._sfx[cleanName] = this.audioData._sfx[oldName];
+      delete this.audioData._sfx[oldName];
+
+      // Update references in all song tracks
+      Object.values(this.audioData._songs).forEach(song => {
+        song._tracks.forEach(track => {
+          if (track[0] === oldName) {
+            track[0] = cleanName;
+          }
+        });
+      });
+
+      this.selectedSfxKey = cleanName;
+      this.renderAll();
+    };
+
     this.container.querySelector('#del-sfx-btn').onclick = () => {
       if (this.selectedSfxKey) {
-        delete this.audioData._sfx[this.selectedSfxKey];
-        this.selectedSfxKey = Object.keys(this.audioData._sfx)[0] || null;
-        this.renderAll();
+        if (Object.keys(this.audioData._sfx).length <= 1) {
+          alert('Cannot delete the last sound effect.');
+          return;
+        }
+        if (confirm(`Delete sound effect "${this.selectedSfxKey}"?`)) {
+          delete this.audioData._sfx[this.selectedSfxKey];
+          this.selectedSfxKey = Object.keys(this.audioData._sfx)[0] || null;
+          this.renderAll();
+        }
       }
     };
 
     // Song buttons
     this.container.querySelector('#add-song-btn').onclick = () => {
-      const name = prompt('Song Name (e.g., _battle):', '_song' + (Object.keys(this.audioData._songs).length + 1));
+      const name = prompt('Song Name (must start with _, e.g., _battle):', '_song' + (Object.keys(this.audioData._songs).length + 1));
       if (name) {
         const cleanName = name.startsWith('_') ? name : '_' + name;
+        if (this.audioData._songs[cleanName]) {
+          alert('A song with that name already exists.');
+          return;
+        }
         const sfxKeys = Object.keys(this.audioData._sfx);
         this.audioData._songs[cleanName] = {
           _bpm: 130,
@@ -364,17 +437,92 @@ class AudioEditor {
       }
     };
 
+    this.container.querySelector('#dup-song-btn').onclick = () => {
+      if (!this.selectedSongKey) return;
+      const oldName = this.selectedSongKey;
+      const original = this.audioData._songs[oldName];
+      if (!original) return;
+
+      const newName = prompt('Enter duplicated Song Name (must start with _):', oldName + '_copy');
+      if (!newName) return;
+      const cleanName = newName.startsWith('_') ? newName : '_' + newName;
+      if (this.audioData._songs[cleanName]) {
+        alert('A song with that name already exists.');
+        return;
+      }
+
+      this.audioData._songs[cleanName] = {
+        _bpm: original._bpm,
+        _tracks: original._tracks.map(t => [t[0], t[1]])
+      };
+      this.selectedSongKey = cleanName;
+      this.renderAll();
+    };
+
+    this.container.querySelector('#rename-song-btn').onclick = () => {
+      if (!this.selectedSongKey) return;
+      const oldName = this.selectedSongKey;
+      const newName = prompt('Enter new Song Name (must start with _):', oldName);
+      if (!newName || newName === oldName) return;
+      const cleanName = newName.startsWith('_') ? newName : '_' + newName;
+      if (this.audioData._songs[cleanName]) {
+        alert('A song with that name already exists.');
+        return;
+      }
+      this.audioData._songs[cleanName] = this.audioData._songs[oldName];
+      delete this.audioData._songs[oldName];
+      this.selectedSongKey = cleanName;
+      this.renderAll();
+    };
+
+    this.container.querySelector('#del-song-btn').onclick = () => {
+      if (!this.selectedSongKey) return;
+      const keys = Object.keys(this.audioData._songs);
+      if (keys.length <= 1) {
+        alert('Cannot delete the last song.');
+        return;
+      }
+      if (confirm(`Delete song "${this.selectedSongKey}"?`)) {
+        if (this.isPlayingSong) this.stopSong();
+        delete this.audioData._songs[this.selectedSongKey];
+        this.selectedSongKey = Object.keys(this.audioData._songs)[0] || null;
+        this.renderAll();
+      }
+    };
+
     this.container.querySelector('#add-track-btn').onclick = () => {
       if (!this.selectedSongKey) return;
       const song = this.audioData._songs[this.selectedSongKey];
       const sfxKeys = Object.keys(this.audioData._sfx);
-      song._tracks.push([sfxKeys[0] || '_kick', '................']);
+      const currentLen = song._tracks[0] ? song._tracks[0][1].length : 16;
+      song._tracks.push([sfxKeys[0] || '_kick', '.'.repeat(currentLen)]);
       this.renderTracker();
     };
 
     this.container.querySelector('#song-bpm').onchange = (e) => {
       if (this.selectedSongKey && this.audioData._songs[this.selectedSongKey]) {
         this.audioData._songs[this.selectedSongKey]._bpm = parseInt(e.target.value, 10) || 120;
+      }
+    };
+
+    this.container.querySelector('#song-length-select').onchange = (e) => {
+      const len = parseInt(e.target.value, 10) || 16;
+      this.setSongLength(len);
+    };
+
+    this.container.querySelector('#add-bar-btn').onclick = () => {
+      if (!this.selectedSongKey || !this.audioData._songs[this.selectedSongKey]) return;
+      const song = this.audioData._songs[this.selectedSongKey];
+      const curLen = Math.max(...song._tracks.map(t => t[1].length), 16);
+      this.setSongLength(curLen + 16);
+    };
+
+    this.container.querySelector('#del-bar-btn').onclick = () => {
+      if (!this.selectedSongKey || !this.audioData._songs[this.selectedSongKey]) return;
+      const song = this.audioData._songs[this.selectedSongKey];
+      const curLen = Math.max(...song._tracks.map(t => t[1].length), 16);
+      if (curLen > 16) {
+        this.setSongLength(curLen - 16);
       }
     };
 
@@ -390,6 +538,24 @@ class AudioEditor {
         }
       }
     });
+  }
+
+  setSongLength(newLength) {
+    if (!this.selectedSongKey || !this.audioData._songs[this.selectedSongKey]) return;
+    const song = this.audioData._songs[this.selectedSongKey];
+    const targetLen = Math.max(16, newLength);
+
+    song._tracks.forEach(track => {
+      let notes = track[1];
+      if (notes.length < targetLen) {
+        notes = notes.padEnd(targetLen, '.');
+      } else if (notes.length > targetLen) {
+        notes = notes.substring(0, targetLen);
+      }
+      track[1] = notes;
+    });
+
+    this.renderTracker();
   }
 
   updateFromSliders() {
@@ -470,6 +636,7 @@ class AudioEditor {
       btn.className = 'song-tab-btn' + (k === this.selectedSongKey ? ' active' : '');
       btn.textContent = k;
       btn.onclick = () => {
+        if (this.isPlayingSong) this.stopSong();
         this.selectedSongKey = k;
         this.renderSongList();
         this.renderTracker();
@@ -489,7 +656,55 @@ class AudioEditor {
 
     const song = this.audioData._songs[this.selectedSongKey];
     const sfxKeys = Object.keys(this.audioData._sfx);
+    const maxSteps = Math.max(...song._tracks.map(t => t[1].length), 16);
 
+    // Update length select dropdown
+    const lengthSelect = this.container.querySelector('#song-length-select');
+    if (lengthSelect) {
+      lengthSelect.value = String(maxSteps);
+      if (lengthSelect.value !== String(maxSteps)) {
+        // Custom length option
+        const opt = document.createElement('option');
+        opt.value = String(maxSteps);
+        opt.textContent = `${maxSteps} (${(maxSteps / 16).toFixed(1)} bars)`;
+        lengthSelect.appendChild(opt);
+        lengthSelect.value = String(maxSteps);
+      }
+    }
+
+    // 1. Timeline Header Row
+    const timelineRow = document.createElement('div');
+    timelineRow.className = 'tracker-timeline-row';
+    timelineRow.innerHTML = `<div class="track-header-spacer">Bars / Beats</div>`;
+
+    const timelineSteps = document.createElement('div');
+    timelineSteps.className = 'tracker-steps-timeline';
+
+    for (let i = 0; i < maxSteps; i++) {
+      const marker = document.createElement('div');
+      marker.className = 'timeline-step-marker';
+      marker.dataset.step = i;
+
+      const isBarStart = (i % 16 === 0);
+      const isBeatStart = (i % 4 === 0);
+
+      if (isBarStart) {
+        marker.classList.add('bar-start');
+        marker.textContent = `B${Math.floor(i / 16) + 1}`;
+      } else if (isBeatStart) {
+        marker.classList.add('beat-start');
+        marker.textContent = `${Math.floor((i % 16) / 4) + 1}`;
+      } else {
+        marker.textContent = '·';
+      }
+
+      timelineSteps.appendChild(marker);
+    }
+
+    timelineRow.appendChild(timelineSteps);
+    container.appendChild(timelineRow);
+
+    // 2. Track Rows
     song._tracks.forEach((track, trackIdx) => {
       const [sfxKey, notes] = track;
       const trackRow = document.createElement('div');
@@ -516,22 +731,29 @@ class AudioEditor {
       // Steps
       const stepsRow = document.createElement('div');
       stepsRow.className = 'tracker-steps-row';
-      const stepCount = Math.max(16, notes.length);
 
-      for (let i = 0; i < stepCount; i++) {
+      for (let i = 0; i < maxSteps; i++) {
         const stepChar = notes[i] || '.';
         const isNote = stepChar !== '.';
         const stepBtn = document.createElement('button');
-        stepBtn.className = 'tracker-step-btn' + (isNote ? ' on' : '') + (i % 4 === 0 ? ' beat-start' : '');
+        stepBtn.className = 'tracker-step-btn' + (isNote ? ' on' : '');
+
+        if (i % 16 === 0) {
+          stepBtn.classList.add('bar-start');
+        } else if (i % 4 === 0) {
+          stepBtn.classList.add('beat-start');
+        }
+
         stepBtn.dataset.step = i;
         stepBtn.dataset.track = trackIdx;
+        stepBtn.title = `Bar ${Math.floor(i / 16) + 1}, Beat ${Math.floor((i % 16) / 4) + 1}.${(i % 4) + 1}`;
 
         const semitone = isNote ? stepChar.charCodeAt(0) - 40 : 0;
         stepBtn.textContent = isNote ? this.scaleNotes[semitone % 12] + Math.floor(semitone / 12) : '·';
 
         stepBtn.onclick = () => {
           let newNotes = song._tracks[trackIdx][1].split('');
-          while (newNotes.length < stepCount) newNotes.push('.');
+          while (newNotes.length < maxSteps) newNotes.push('.');
 
           if (newNotes[i] === '.') {
             // Add note default pitch (0 semitone = '(' in ascii base 40)
@@ -579,14 +801,19 @@ class AudioEditor {
     const song = this.audioData._songs[this.selectedSongKey];
     const bpm = song._bpm || 130;
     const stepDurMs = ((60 / bpm) / 4) * 1000;
+    const maxSteps = Math.max(...song._tracks.map(t => t[1].length), 16);
 
     const tick = () => {
       if (!this.isPlayingSong) return;
       const t = this.ctx.currentTime;
+      const activeStepIndex = this.currentStep % maxSteps;
 
-      // Highlight step column
+      // Highlight step buttons and timeline markers
       this.container.querySelectorAll('.tracker-step-btn').forEach(btn => {
-        btn.classList.toggle('active-playhead', parseInt(btn.dataset.step, 10) === (this.currentStep % 16));
+        btn.classList.toggle('active-playhead', parseInt(btn.dataset.step, 10) === activeStepIndex);
+      });
+      this.container.querySelectorAll('.timeline-step-marker').forEach(marker => {
+        marker.classList.toggle('active-playhead', parseInt(marker.dataset.step, 10) === activeStepIndex);
       });
 
       // Play notes
@@ -616,6 +843,9 @@ class AudioEditor {
     this.container.querySelector('#song-play-btn').classList.remove('playing');
     this.container.querySelectorAll('.tracker-step-btn').forEach(btn => {
       btn.classList.remove('active-playhead');
+    });
+    this.container.querySelectorAll('.timeline-step-marker').forEach(marker => {
+      marker.classList.remove('active-playhead');
     });
   }
 }

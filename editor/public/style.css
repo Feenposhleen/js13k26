@@ -417,14 +417,17 @@ button.extra,
 
 .header-btns {
   display: flex;
-  gap: 6px;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .header-btns button {
   height: 24px;
-  padding: 0 8px;
+  padding: 0 6px;
   font-size: 11px;
-  min-width: 80px;
+  flex: none;
+  width: auto;
 }
 
 .list-container {
@@ -605,13 +608,95 @@ button.extra,
   color: #ffffff;
 }
 
+.song-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #181920;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #31364a;
+  flex-wrap: wrap;
+}
+
+.song-meta-row select,
+.song-meta-row input {
+  background: #282c3c;
+  color: #cdd6f4;
+  border: 1px solid #3b4256;
+  border-radius: 4px;
+  height: 26px;
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+.song-meta-row button {
+  height: 26px;
+  padding: 0 8px;
+  font-size: 11px;
+  flex: none;
+  width: auto;
+}
+
 #tracker-grid-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   max-height: 520px;
   overflow-y: auto;
-  padding-right: 4px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.tracker-timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+}
+
+.track-header-spacer {
+  width: 140px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #89b4fa;
+  flex-shrink: 0;
+}
+
+.tracker-steps-timeline {
+  display: flex;
+  gap: 3px;
+}
+
+.timeline-step-marker {
+  width: 32px;
+  height: 18px;
+  text-align: center;
+  font-size: 9px;
+  font-family: monospace;
+  color: #585b70;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeline-step-marker.beat-start {
+  border-left: 1px solid #45475a;
+  color: #a6adc8;
+}
+
+.timeline-step-marker.bar-start {
+  border-left: 2px solid #89b4fa;
+  font-weight: bold;
+  color: #89dceb;
+  background: rgba(137, 180, 250, 0.08);
+  border-radius: 2px 2px 0 0;
+}
+
+.timeline-step-marker.active-playhead {
+  color: #a6e3a1;
+  font-weight: bold;
 }
 
 .tracker-track-row {
@@ -659,7 +744,6 @@ button.extra,
   display: flex;
   gap: 3px;
   flex: 1;
-  overflow: hiden;
 }
 
 .tracker-step-btn {
@@ -678,7 +762,11 @@ button.extra,
 }
 
 .tracker-step-btn.beat-start {
-  border-left: 2px solid #58a6ff;
+  border-left: 1px solid #45475a;
+}
+
+.tracker-step-btn.bar-start {
+  border-left: 2px solid #89b4fa;
 }
 
 .tracker-step-btn.on {

@@ -105,14 +105,11 @@ class SvgPolygonView {
     pt.y = ev.clientY;
     const svgPoint = pt.matrixTransform(ctm.inverse());
 
-    const gx = Math.round(svgPoint.x / 10);
-    const gy = Math.round(svgPoint.y / 10);
     const res = SvgPolygonView.resolution;
+    const gx = Math.min(res, Math.max(0, Math.round(svgPoint.x / 10)));
+    const gy = Math.min(res, Math.max(0, Math.round(svgPoint.y / 10)));
 
-    if (gx >= 0 && gx <= res && gy >= 0 && gy <= res) {
-      return [gx, gy];
-    }
-    return null;
+    return [gx, gy];
   }
 
   bindEvents() {
