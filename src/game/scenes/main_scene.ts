@@ -4,6 +4,7 @@ import createSprite from "../../core/sprite";
 import { utils } from "../../core/utils";
 import { createParticles } from "./common/particles";
 import { createBackground } from "./gameplay/background";
+import { createEnemyOne } from "./gameplay/enemyOne";
 import unicorn from "./gameplay/unicorn";
 
 export const createMainScene = () => {
@@ -37,6 +38,8 @@ export const createMainScene = () => {
 
     layerFxBack._addChild(trail);
     layerEntities._addChild(unicorn);
+
+    layerEntities._addChild(createEnemyOne(layerFxBack, -0.4, 0.4));
   });
 
   scene._updater = (scene, game, delta) => {

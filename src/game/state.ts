@@ -14,6 +14,7 @@ export type GameState = {
   _speed: number;
   _ticks: number;
   _paused: boolean;
+  _projectiles: Array<Sprite>;
 };
 
 export const createState = (): GameState => ({
@@ -29,4 +30,5 @@ export const createState = (): GameState => ({
   _ticks: 0,
   _speed: 1.4,
   _paused: false,
+  _projectiles: [],
 });
