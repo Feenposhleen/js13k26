@@ -36,7 +36,7 @@ unicorn._updater = (sprite, game, delta) => {
     const projectile = createProjectile(unicorn._position, game._state._color);
     game._state._layerFxBack._addChild(projectile);
 
-    game._worker._playSfx(1);
+    game._worker._playSfx(6);
     sprite._scale = [0.32, 0.32];
     game._state._lastFire = game._state._ticks;
 
