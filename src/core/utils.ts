@@ -157,7 +157,12 @@ export const utils = {
     out[8] = a20 * b02 + a21 * b12 + a22 * b22;
     return out;
   },
-
+  _easeCubicIn: (value: number): number => {
+    return utils._clamp(value * value * value, 0, 1);
+  },
+  _easeCubicOut: (value: number): number => {
+    return utils._clamp(--value * value * value + 1, 0, 1);
+  },
   _mat3FromTRS: (
     tx: number,
     ty: number,

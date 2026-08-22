@@ -5,8 +5,12 @@ import { createParticles } from "../common/particles";
 
 export const createEnemyOne = (fxLayer: Sprite, startY: number, finalY: number) => {
   const enemy = createSprite(assetLibrary._textures._enemy_one, [0, startY], [0.2, 0.2]);
+  const rand = utils._rndFloat();
+
   enemy._updater = (s, g, d) => {
-    s._position = utils._vectorLerp([0, startY], [0.7, finalY], s._lifetime / 4);
+    const addend: Vec = [utils._cos(g._worker._ticks * 2 + rand) * 0.05, utils._sin(g._worker._ticks + rand) * 0.02]
+    s._position = utils._vectorLerp([0, startY], [0.7 + (rand * 0.1), finalY + (rand * 0.05)], utils._easeCubicOut(s._lifetime * 0.4));
+    s._position = utils._vectorAdd(s._position, addend);
     const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
     s._angle += (targetAngle - s._angle) * utils._clamp(d * 5, 0, 1);
   };
