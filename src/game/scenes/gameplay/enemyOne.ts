@@ -13,6 +13,16 @@ export const createEnemyOne = (fxLayer: Sprite, startY: number, finalY: number) 
     s._position = utils._vectorAdd(s._position, addend);
     const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
     s._angle += (targetAngle - s._angle) * utils._clamp(d * 5, 0, 1);
+
+    // Check projectile collisions
+    let [projectile, distance] = utils._nearestSprite(s._position, g._state._projectiles);
+    if (projectile && (distance < 0.04)) {
+      enemy._dead = true;
+      trail._dead = true;
+
+      projectile._dead = true;
+      g._state._projectiles = g._state._projectiles.filter((x) => x != projectile);
+    }
   };
 
   const trail = createParticles(

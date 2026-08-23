@@ -34,6 +34,7 @@ unicorn._updater = (sprite, game, delta) => {
   // Trigger SFX on pointer click
   if (game._input._pointer._down && !lastPointerDown) {
     const projectile = createProjectile(unicorn._position, game._state._color);
+    game._state._projectiles.push(projectile);
     game._state._layerFxBack._addChild(projectile);
 
     game._worker._playSfx(6);

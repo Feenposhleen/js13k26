@@ -65,6 +65,19 @@ export const utils = {
     return ((((num - min) % range) + range) % range) + min;
   },
 
+  _numberDistance: (num1: number, num2: number): number => {
+    return utils._abs(num1 - num2);
+  },
+
+  // Easing
+
+  _easeCubicIn: (value: number): number => {
+    return utils._clamp(value * value * value, 0, 1);
+  },
+  _easeCubicOut: (value: number): number => {
+    return utils._clamp(--value * value * value + 1, 0, 1);
+  },
+
   // Ranges
 
   _lerpRange: (range: Vec, fraction: number) => {
@@ -72,30 +85,26 @@ export const utils = {
     return range[0] + extent * fraction;
   },
 
-  // Distances
+  // Vector operations
 
-  _numberDistance: (num1: number, num2: number): number => {
-    return Math.abs(num1 - num2);
+  _vectorDistance: (pos1: Vec, pos2: Vec): number => {
+      return Math.sqrt((Math.pow(pos1[0] - pos2[0], 2)) + (Math.pow(pos1[1] - pos2[1], 2)));
   },
 
-  _simpleDistance: (pos1: Vec, pos2: Vec): number => {
-    return utils._max(
-      utils._numberDistance(pos1[0], pos2[0]),
-      utils._numberDistance(pos1[1], pos2[1]),
-    );
+  _vectorManhattanDistance: (pos1: Vec, pos2: Vec): number => {
+    return utils._numberDistance(pos1[0], pos2[0]) +
+      utils._numberDistance(pos1[1], pos2[1]);
   },
 
-  _dampenedApproach: (from: Vec, to: Vec, damp: number): Vec => {
+  _vectorDampenedApproach: (from: Vec, to: Vec, damp: number): Vec => {
     return [
       from[0] + (to[0] - from[0]) * Math.min(damp, 1),
       from[1] + (to[1] - from[1]) * Math.min(damp, 1),
     ];
   },
 
-  // Vector operations
-
   _vectorIntersects: (subjectPos: Vec, boxPos: Vec, boxRadius: number): boolean => {
-    const dist = utils._simpleDistance(subjectPos, boxPos);
+    const dist = utils._vectorManhattanDistance(subjectPos, boxPos);
     return dist < boxRadius;
   },
 
@@ -108,7 +117,7 @@ export const utils = {
   },
 
   _vectorLength: (vector: Vec): number => {
-    return Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
+    return Math.sqrt((vector[0] * vector[0]) + (vector[1] * vector[1]));
   },
 
   _vectorRotate: (vector: Vec, rotation: number): Vec => {
@@ -125,7 +134,7 @@ export const utils = {
     ];
   },
 
-  // mat3 helpers (column-major)
+  // Matrix helpers (column-major)
 
   _mat3Multiply: (out: Float32Array, a: Float32Array, b: Float32Array) => {
     const a00 = a[0],
@@ -157,12 +166,6 @@ export const utils = {
     out[8] = a20 * b02 + a21 * b12 + a22 * b22;
     return out;
   },
-  _easeCubicIn: (value: number): number => {
-    return utils._clamp(value * value * value, 0, 1);
-  },
-  _easeCubicOut: (value: number): number => {
-    return utils._clamp(--value * value * value + 1, 0, 1);
-  },
   _mat3FromTRS: (
     tx: number,
     ty: number,
@@ -191,12 +194,26 @@ export const utils = {
 
   // Engine things
 
-  _resolvePosition: (...nodes: Sprite[]): Vec => {
+  _nearestSprite: (position: Vec, sprites: Sprite[]): [Sprite | null, number] => {
+    let nearestDistance = 999;
+    let nearestSprite: Sprite | null = null;
+    for (let sprite of sprites) {
+      let distance = utils._vectorDistance(position, sprite._position);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestSprite = sprite;
+      }
+    }
+
+    return [nearestSprite, nearestDistance];
+  },
+
+  _resolvePosition: (...nodeChain: Sprite[]): Vec => {
     const coord: Vec = [0, 0];
     const scale: Vec = [1, 1];
     let angle = 0;
 
-    for (const node of nodes) {
+    for (const node of nodeChain) {
       const lx = node._position[0] * scale[0];
       const ly = node._position[1] * scale[1];
 

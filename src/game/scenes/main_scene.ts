@@ -39,8 +39,17 @@ export const createMainScene = () => {
     layerFxBack._addChild(trail);
     layerEntities._addChild(unicorn);
 
-    setInterval(() =>
-    layerEntities._addChild(createEnemyOne(layerFxBack, utils._rndRange(-1, -0.4), utils._rndRange(0.2, 0.8))), 4000);
+    setInterval(() => {
+      layerEntities._addChild(
+        createEnemyOne(
+          layerFxBack,
+          utils._rndRange(-1, -0.4),
+          utils._rndRange(0.2, 0.8)
+        )
+      );
+    },
+      4000
+    );
   });
 
   scene._updater = (scene, game, delta) => {
