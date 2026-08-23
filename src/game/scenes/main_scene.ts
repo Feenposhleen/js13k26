@@ -48,7 +48,7 @@ export const createMainScene = () => {
         )
       );
     },
-      4000
+      1000
     );
   });
 

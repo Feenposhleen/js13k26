@@ -22,6 +22,22 @@ export const createEnemyOne = (fxLayer: Sprite, startY: number, finalY: number) 
 
       projectile._dead = true;
       g._state._projectiles = g._state._projectiles.filter((x) => x != projectile);
+
+      const explosion = createParticles(
+        projectile._texture!,
+        4,
+        false,
+        null,
+        [-0.1, 0.1],
+        [0.6, 0.8],
+        [0.4, 0.6],
+        [0.1, 0.2],
+        [-0.1, 0.1],
+        [-0.05, 0.05],
+      );
+      explosion._position = [...enemy._position];
+
+      fxLayer._addChild(explosion);
     }
   };
 
