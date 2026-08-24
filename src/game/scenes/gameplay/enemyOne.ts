@@ -24,6 +24,36 @@ export const createEnemyOne = (fxLayer: Sprite, startY: number, finalY: number) 
       g._state._projectiles = g._state._projectiles.filter((x) => x != projectile);
 
       const explosion = createParticles(
+        assetLibrary._textures._explosion,
+        6,
+        false,
+        null,
+        [-utils._pi, utils._pi],
+        [0.2, 0.3],
+        [0.1, 0.3],
+        [0.4, 0.6],
+        [-utils._pi, utils._pi],
+        [-0.2, 1.2],
+      );
+      explosion._position = [...enemy._position];
+      fxLayer._addChild(explosion);
+
+      const shrapnel = createParticles(
+        assetLibrary._textures._particle,
+        16,
+        false,
+        null,
+        [-utils._pi, utils._pi],
+        [0.3, 0.5],
+        [0.4, 0.6],
+        [0.1, 0.2],
+        [-utils._pi, utils._pi],
+        [-0.2, 0.2],
+      );
+      shrapnel._position = [...enemy._position];
+      fxLayer._addChild(shrapnel);
+
+      const projectileSplash = createParticles(
         projectile._texture!,
         4,
         false,
@@ -35,9 +65,9 @@ export const createEnemyOne = (fxLayer: Sprite, startY: number, finalY: number) 
         [-0.1, 0.1],
         [-0.05, 0.05],
       );
-      explosion._position = [...enemy._position];
+      projectileSplash._position = [...enemy._position];
 
-      fxLayer._addChild(explosion);
+      fxLayer._addChild(projectileSplash);
     }
   };
 
