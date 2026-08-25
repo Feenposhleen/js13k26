@@ -5,6 +5,7 @@ import { utils } from "../../core/utils";
 import { createParticles } from "./common/particles";
 import { createBackground } from "./gameplay/background";
 import { createEnemyOne } from "./gameplay/enemyOne";
+import { createEnemyTwo } from "./gameplay/enemyTwo";
 import unicorn from "./gameplay/unicorn";
 
 export const createMainScene = () => {
@@ -41,11 +42,16 @@ export const createMainScene = () => {
 
     setInterval(() => {
       layerEntities._addChild(
-        createEnemyOne(
+        utils._rndBool() ? createEnemyTwo(
+          utils._rndInt(0,4),
           layerFxBack,
           utils._rndRange(-1, -0.4),
           utils._rndRange(0.2, 0.8)
-        )
+        ) : createEnemyOne(
+                  layerFxBack,
+                  utils._rndRange(-1, -0.4),
+                  utils._rndRange(0.2, 0.8)
+                )
       );
     },
       1000

@@ -14,8 +14,10 @@ export const createBackground = () => {
     32,
     [0.5, 0.8],
     [-0.1, 0.4],
-    [0.4, 0.2],
-    (s, g, d) => (s._angle += d * 0.3),
+    [0.8, 0.2],
+    (s, g, d) => {
+      s._angle += d * (s._scale[0] - 0.3) * 4;
+    },
   );
   bg._addChild(stars);
 
