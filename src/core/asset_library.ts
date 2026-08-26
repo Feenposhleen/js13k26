@@ -1,5 +1,6 @@
 import audioData, { RawAudioData, RawSfx, RawSong } from "./assets/audio.gen";
 import drawables, { RawDrawableData, RawTexture } from "./assets/drawables.gen";
+import { fontB64 } from "./assets/fontb64";
 import { RENDERER_SPRITE_RESOLUTION } from "./config";
 
 const assetLibrary = {
@@ -11,8 +12,9 @@ const assetLibrary = {
   _songs: audioData._songs,
 
   async _preRenderTextures(): Promise<void> {
-    let i = 0;
+    this._preRenderFont();
 
+    let i = 0;
     for (const textureKey of Object.keys(assetLibrary._textures)) {
       this._textureCache.set(
         textureKey,
@@ -24,6 +26,18 @@ const assetLibrary = {
 
       i++;
     }
+  },
+
+  async _preRenderFont(): Promise<void> {
+    const bytes = Uint8Array.from(atob(fontB64), c => c.charCodeAt(0));
+    const blob = new Blob([bytes], { type: "image/gif" });
+    const bitmap = await createImageBitmap(blob);
+    const ctx = (new OffscreenCanvas(bitmap.width, bitmap.height)).getContext('2d')!;
+    ctx.drawImage(bitmap, 0, 0);
+      this._textureCache.set(
+        "__font",
+        ctx.getImageData(0, 0, bitmap.width, bitmap.height)
+      );
   },
 
   async _preRenderTexture(
