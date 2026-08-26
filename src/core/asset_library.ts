@@ -1,7 +1,7 @@
 import audioData, { RawAudioData, RawSfx, RawSong } from "./assets/audio.gen";
 import drawables, { RawDrawableData, RawTexture } from "./assets/drawables.gen";
 import { fontB64 } from "./assets/fontb64";
-import { RENDERER_SPRITE_RESOLUTION } from "./config";
+import { FONT_GLYPH_LIST, FONT_GLYPH_SIZE, RENDERER_SPRITE_RESOLUTION } from "./config";
 
 const assetLibrary = {
   _textures: drawables._textures,
@@ -28,26 +28,53 @@ const assetLibrary = {
     }
   },
 
-  async _preRenderFont(): Promise<void> {
-    const bytes = Uint8Array.from(atob(fontB64), c => c.charCodeAt(0));
-    const blob = new Blob([bytes], { type: "image/gif" });
-    const bitmap = await createImageBitmap(blob);
-    const ctx = (new OffscreenCanvas(bitmap.width, bitmap.height)).getContext('2d')!;
-    ctx.drawImage(bitmap, 0, 0);
-      this._textureCache.set(
-        "__font",
-        ctx.getImageData(0, 0, bitmap.width, bitmap.height)
-      );
+  glyphPrefix() {
+    return "__font_";
   },
 
-  async _preRenderTexture(
-    palette: string[],
-    textureData: RawTexture,
-  ): Promise<ImageData> {
+  glyphKey(glyph: string): string {
+    return `${assetLibrary.glyphPrefix()}${glyph}`;
+  },
+
+  async _preRenderFont(): Promise<void> {
+    const scale = RENDERER_SPRITE_RESOLUTION / FONT_GLYPH_SIZE;
+    const bytes = Uint8Array.from(atob(fontB64), (c) => c.charCodeAt(0));
+    const blob = new Blob([bytes], { type: "image/gif" });
+    const bitmap = await createImageBitmap(blob);
+    const ctx = new OffscreenCanvas(
+      RENDERER_SPRITE_RESOLUTION,
+      RENDERER_SPRITE_RESOLUTION,
+    ).getContext("2d")!;
+
+    for (var i = 0; i < FONT_GLYPH_LIST.length; i++) {
+      const glyph = FONT_GLYPH_LIST[i];
+      const glyphKey: string = assetLibrary.glyphKey(glyph);
+      ctx.fillStyle = "rgba(0, 0, 0, 0)";
+      ctx.clearRect(0, 0, RENDERER_SPRITE_RESOLUTION, RENDERER_SPRITE_RESOLUTION);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(
+        bitmap,
+        i * (FONT_GLYPH_SIZE + 1), // sx
+        0, // sy
+        FONT_GLYPH_SIZE, // sw
+        FONT_GLYPH_SIZE, // sh
+        0, // dx
+        0, // dy
+        RENDERER_SPRITE_RESOLUTION, //dw
+        RENDERER_SPRITE_RESOLUTION, //dh
+      );
+      this._textureCache.set(
+        glyphKey,
+        ctx.getImageData(0, 0, RENDERER_SPRITE_RESOLUTION, RENDERER_SPRITE_RESOLUTION),
+      );
+    }
+  },
+
+  async _preRenderTexture(palette: string[], textureData: RawTexture): Promise<ImageData> {
     const canvas = new OffscreenCanvas(RENDERER_SPRITE_RESOLUTION, RENDERER_SPRITE_RESOLUTION);
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext("2d")!;
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillStyle = "rgba(0, 0, 0, 0)";
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = 0; i < textureData.length; i++) {
@@ -85,7 +112,7 @@ const assetLibrary = {
   },
 
   _getMusic(idOrKey: number | string): RawSong | null {
-    if (typeof idOrKey === 'string') {
+    if (typeof idOrKey === "string") {
       return (this._songs as Record<string, RawSong>)[idOrKey] || null;
     }
     const keys = Object.keys(this._songs);
@@ -94,7 +121,7 @@ const assetLibrary = {
   },
 
   _getSfx(idOrKey: number | string): RawSfx | null {
-    if (typeof idOrKey === 'string') {
+    if (typeof idOrKey === "string") {
       return (this._sfx as Record<string, RawSfx>)[idOrKey] || null;
     }
     const keys = Object.keys(this._sfx);

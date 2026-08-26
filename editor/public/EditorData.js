@@ -1,3 +1,5 @@
+const FONT_GLYPH_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.!";
+
 class EditorData {
   constructor(serializedData = null) {
     this.textures = {};
@@ -90,6 +92,13 @@ class EditorData {
       output._textures[textureName] = texture.serialize(this.palette);
     });
 
+    // These are sideloaded from the bitmap source
+    for (var i = 0; i < FONT_GLYPH_LIST.length; i++) {
+      const glyph = FONT_GLYPH_LIST[i];
+      const glyphKey = `__font_${ glyph }`;
+      output._textures[glyphKey] = [];
+    }
+
     return output;
   }
 
@@ -108,6 +117,9 @@ class EditorData {
     this.textures = {};
 
     Object.keys(serializedTextures).forEach((name) => {
+      // Skip parsing sideloaded font glyphs
+      if (name.includes("__font")) return;
+
       const polygons = serializedTextures[name].map((data) => Polygon.deserialize(data, this.palette));
       const texture = new Texture(name, polygons);
       this.addTexture(texture);
