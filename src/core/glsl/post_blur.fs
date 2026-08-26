@@ -3,28 +3,33 @@ precision mediump float;
 uniform float t;
 in vec2 vUV;
 out vec4 fragColor;
-uniform sampler2D ut;        // with mipmaps
+uniform sampler2D ut;
+
+const float or = 0.0015;
+const vec2 ofs[9] = vec2[9](
+    vec2(-or,-or),
+    vec2(.0,-or),
+    vec2(or,-or),
+    vec2(-or,.0),
+    vec2(.0,.0),
+    vec2(or,.0),
+    vec2(-or,or),
+    vec2(.0,or),
+    vec2(or,or)
+);
 
 void main(){
   vec3 base = texture(ut, vUV).rgb;
+  vec3 col = vec3(.0,.0,.0);
 
-  // Mip bloom
-  vec3 mb =
-      textureLod(ut, vUV, 2.0).rgb * 0.60 +
-      textureLod(ut, vUV, 3.0).rgb * 0.30 +
-      textureLod(ut, vUV, 4.0).rgb * 0.10;
-
-  float tx = mod(t * 0.01, 1.0);
-
-  // Noise
-  float noise = min((mod(vUV.x - tx, 0.001) * 999.), (mod(vUV.y + tx, 0.001) * 999.));
-  noise = step(0.2, noise) * 0.01;
+  for (int i = 0; i < 9; ++i) {
+    vec4 sc = texture(ut, vUV + ofs[i]);
+    col += sc.rgb;
+  }
 
   // Combine
-  vec3 col = (base + (mb * 0.4)) - noise;
-
-  // Tone
-  col = col * vec3(1., 0.9, .85);
+  col = col / 9.0;
+  col = (base * .85) + (col * .15);
 
   // Output
   fragColor = vec4(col, 1.0);

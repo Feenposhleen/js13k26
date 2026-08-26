@@ -115,7 +115,7 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
     const sh = gl.createShader(type)!;
     gl.shaderSource(sh, src);
     gl.compileShader(sh);
-    //if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh) || 'shader compile failed');
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh) || 'shader compile failed');
     return sh;
   };
 
@@ -124,8 +124,8 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
     attachShader(p, _compileShader(gl.VERTEX_SHADER, vs));
     attachShader(p, _compileShader(gl.FRAGMENT_SHADER, fs));
     gl.linkProgram(p);
-    //const progLog = gl.getProgramInfoLog(p);
-    //if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(progLog || undefined);
+    const progLog = gl.getProgramInfoLog(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(progLog || undefined);
     return p;
   };
 
@@ -165,7 +165,11 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
   const locOpacity = getAttribLocation(spriteProgram, "ao");
   _instAttrib(locOpacity, 1, 40);
 
-  const postPrograms: WebGLProgram[] = [_createProgram(fsQuadVs, postBlurFs), _createProgram(fsQuadVs, postBlurFs), _createProgram(fsQuadVs, postNoopFs),];
+  const postPrograms: WebGLProgram[] = [
+    _createProgram(fsQuadVs, postBlurFs),
+    _createProgram(fsQuadVs, postBlurFs),
+    _createProgram(fsQuadVs, postNoopFs),
+  ];
 
   let targetA: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
   let targetB: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
