@@ -4,20 +4,30 @@ import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
 import { createExplosion } from "./fxPacks";
 
-export const createEnemyOne = (fxLayer: Sprite, startY: number, finalY: number) => {
-  const enemy = createSprite(assetLibrary._textures._enemy_one, [0, startY], [0.2, 0.2]);
+const enemyOrigin: Vec = [0.5, -2];
+
+export const createEnemyOne = (fxLayer: Sprite, targetPosition: Vec) => {
+  const enemy = createSprite(assetLibrary._textures._enemy_one, [0, -2], [0.2, 0.2]);
   const rand = utils._rndFloat();
 
   enemy._updater = (s, g, d) => {
-    const addend: Vec = [utils._cos(g._worker._ticks * 2 + rand) * 0.05, utils._sin(g._worker._ticks + rand) * 0.02]
-    s._position = utils._vectorLerp([0, startY], [0.7 + (rand * 0.1), finalY + (rand * 0.05)], utils._easeCubicOut(s._lifetime * 0.4));
-    s._position = utils._vectorAdd(s._position, addend);
+    s._position = utils._vectorLerp(
+      enemyOrigin,
+      utils._vectorAdd(targetPosition, [rand * 0.1, rand * 0.05]),
+      utils._easeCubicOut(s._lifetime * 0.4),
+    );
+
+    s._position = utils._vectorAdd(s._position, [
+      utils._cos(g._worker._ticks * 2 + rand) * 0.01,
+      utils._sin(g._worker._ticks + rand) * 0.01,
+    ]);
+
     const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
     s._angle += (targetAngle - s._angle) * utils._clamp(d * 5, 0, 1);
 
     // Check projectile collisions
     let [projectile, distance] = utils._nearestSprite(s._position, g._state._projectiles);
-    if (projectile && (distance < 0.04)) {
+    if (projectile && distance < 0.04) {
       enemy._dead = true;
       trail._dead = true;
 

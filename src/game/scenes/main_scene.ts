@@ -1,12 +1,32 @@
 import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
-import createSprite from "../../core/sprite";
-import { utils } from "../../core/utils";
+import createSprite, { Sprite } from "../../core/sprite";
+import { utils, Vec } from "../../core/utils";
 import { createParticles } from "./common/particles";
 import { createBackground } from "./gameplay/background";
 import { createEnemyOne } from "./gameplay/enemyOne";
 import { createEnemyTwo } from "./gameplay/enemyTwo";
 import unicorn from "./gameplay/unicorn";
+
+const createSpawn = (delay: number, type: number, finalPosition: Vec) => ({
+  _delay: delay,
+  _type: type,
+  _finalPosition: finalPosition,
+});
+
+type Spawn = ReturnType<typeof createSpawn>;
+
+const spawns: Array<Spawn> = [
+  createSpawn(3, 0, [0.5, 0.2]),
+  createSpawn(0.1, 1, [0.6, 0.4]),
+  createSpawn(0.1, 2, [0.6, 0.6]),
+  createSpawn(0.1, 3, [0.5, 0.8]),
+
+  createSpawn(6, 4, [0.8, 0.2]),
+  createSpawn(0.1, 4, [0.8, 0.4]),
+  createSpawn(0.1, 4, [0.8, 0.6]),
+  createSpawn(0.1, 4, [0.8, 0.8]),
+];
 
 export const createMainScene = () => {
   const scene = createScene((scene, game) => {
@@ -39,26 +59,21 @@ export const createMainScene = () => {
 
     layerFxBack._addChild(trail);
     layerEntities._addChild(unicorn);
-
-    setInterval(() => {
-      layerEntities._addChild(
-        utils._rndBool() ? createEnemyTwo(
-          utils._rndInt(0,4),
-          layerFxBack,
-          utils._rndRange(-1, -0.4),
-          utils._rndRange(0.2, 0.8)
-        ) : createEnemyOne(
-                  layerFxBack,
-                  utils._rndRange(-1, -0.4),
-                  utils._rndRange(0.2, 0.8)
-                )
-      );
-    },
-      1000
-    );
   });
 
   scene._updater = (scene, game, delta) => {
+    if (spawns.length > 0 && (spawns[0]._delay -= delta) < 0) {
+      const spawn = spawns.shift()!;
+
+      let enemy: Sprite | null = null;
+      if (spawn._type < 4) {
+        enemy = createEnemyTwo(spawn._type, game._state._layerFxBack, spawn._finalPosition);
+      } else if (spawn._type == 4) {
+        enemy = createEnemyOne(game._state._layerFxBack, spawn._finalPosition);
+      }
+
+      if (enemy) game._state._layerEntities._addChild(enemy);
+    }
     game._state._ticks += delta;
   };
 

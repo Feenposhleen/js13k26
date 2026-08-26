@@ -31,15 +31,15 @@ unicorn._updater = (sprite, game, delta) => {
   const targetAngle = utils._sin(game._worker._ticks * 6) * 0.15;
   sprite._angle += (targetAngle - sprite._angle) * utils._clamp(delta * 5, 0, 1);
 
-  // Trigger SFX on pointer click
-  if (game._input._pointer._down && !lastPointerDown) {
+  // Fire on pointer click
+  if (game._input._pointer._down && !lastPointerDown && game._state._cooldown < 0) {
     const projectile = createProjectile(unicorn._position, game._state._color);
     game._state._projectiles.push(projectile);
     game._state._layerFxBack._addChild(projectile);
 
     game._worker._playSfx(6);
     sprite._scale = [0.32, 0.32];
-    game._state._lastFire = game._state._ticks;
+    game._state._cooldown = 1;
 
     const color = utils._wrap(game._state._color + 1, 0, 4);
     game._state._color = color;
@@ -52,7 +52,9 @@ unicorn._updater = (sprite, game, delta) => {
     flash._angle += delta * 6;
     zooka._position = utils._vectorLerp(zooka._position, zookaPos, delta * 10);
   }
+
   lastPointerDown = game._input._pointer._down;
+  game._state._cooldown -= delta;
 };
 
 export default unicorn;

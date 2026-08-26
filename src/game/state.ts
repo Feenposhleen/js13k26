@@ -10,7 +10,7 @@ export type GameState = {
   _playerPosition: Vec;
   _score: number;
   _color: number;
-  _lastFire: number;
+  _cooldown: number;
   _speed: number;
   _ticks: number;
   _paused: boolean;
@@ -26,7 +26,7 @@ export const createState = (): GameState => ({
   _playerPosition: [0, 0],
   _score: 0,
   _color: 0,
-  _lastFire: 0,
+  _cooldown: 0,
   _ticks: 0,
   _speed: 1.4,
   _paused: false,
