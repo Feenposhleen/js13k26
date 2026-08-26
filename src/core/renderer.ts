@@ -2,7 +2,6 @@ import spriteVS_src from './glsl/sprite_shader.vs';
 import spriteFS_src from './glsl/sprite_shader.fs';
 import fsQuadVs from './glsl/full_screen_quad.vs';
 import postBlurFs from './glsl/post_blur.fs';
-import postNoopFs from './glsl/post_noop.fs';
 
 import { utils } from './utils';
 import { Sprite } from './sprite';
@@ -168,7 +167,6 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
   const postPrograms: WebGLProgram[] = [
     _createProgram(fsQuadVs, postBlurFs),
     _createProgram(fsQuadVs, postBlurFs),
-    _createProgram(fsQuadVs, postNoopFs),
   ];
 
   let targetA: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);

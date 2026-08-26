@@ -2,6 +2,7 @@ import assetLibrary from "../../../core/asset_library";
 import createSprite, { Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
+import { createText } from "../common/text";
 import { createExplosion } from "./fxPacks";
 
 const enemyOrigin: Vec = [0.5, -2];
@@ -64,6 +65,10 @@ export const createEnemyOne = (fxLayer: Sprite, targetPosition: Vec) => {
     [0.08, 0.1],
   );
   fxLayer._addChild(trail);
+
+  const text = createText('HELLO WORLD');
+  text._setUniformScale(0.2);
+  enemy._addChild(text);
 
   return enemy;
 };
