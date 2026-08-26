@@ -3,16 +3,16 @@ precision mediump float;
 uniform float t;
 in vec2 vUV;
 out vec4 fragColor;
-uniform sampler2D uTexture;        // with mipmaps
+uniform sampler2D ut;        // with mipmaps
 
 void main(){
-  vec3 base = texture(uTexture, vUV).rgb;
+  vec3 base = texture(ut, vUV).rgb;
 
   // Mip bloom
   vec3 mb =
-      textureLod(uTexture, vUV, 2.0).rgb * 0.60 +
-      textureLod(uTexture, vUV, 3.0).rgb * 0.30 +
-      textureLod(uTexture, vUV, 4.0).rgb * 0.10;
+      textureLod(ut, vUV, 2.0).rgb * 0.60 +
+      textureLod(ut, vUV, 3.0).rgb * 0.30 +
+      textureLod(ut, vUV, 4.0).rgb * 0.10;
 
   float tx = mod(t * 0.01, 1.0);
 

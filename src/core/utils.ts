@@ -1,5 +1,4 @@
-import { FullState } from "./game_worker";
-import { Sprite, SpriteUpdater } from "./sprite";
+import { Sprite } from "./sprite";
 
 export type Vec = [number, number];
 
@@ -104,7 +103,7 @@ export const utils = {
   },
 
   _vectorIntersects: (subjectPos: Vec, boxPos: Vec, boxRadius: number): boolean => {
-    const dist = utils._vectorManhattanDistance(subjectPos, boxPos);
+    const dist = utils._vectorDistance(subjectPos, boxPos);
     return dist < boxRadius;
   },
 
@@ -206,71 +205,6 @@ export const utils = {
     }
 
     return [nearestSprite, nearestDistance];
-  },
-
-  _resolvePosition: (...nodeChain: Sprite[]): Vec => {
-    const coord: Vec = [0, 0];
-    const scale: Vec = [1, 1];
-    let angle = 0;
-
-    for (const node of nodeChain) {
-      const lx = node._position[0] * scale[0];
-      const ly = node._position[1] * scale[1];
-
-      const cos = utils._cos(angle);
-      const sin = utils._sin(angle);
-      const rx = lx * cos - ly * sin;
-      const ry = lx * sin + ly * cos;
-
-      coord[0] += rx;
-      coord[1] += ry;
-
-      scale[0] *= node._scale[0];
-      scale[1] *= node._scale[1];
-      angle += node._angle;
-    }
-
-    return coord;
-  },
-
-  _tweenUpdater: (
-    sprite: Sprite,
-    updaterTo: SpriteUpdater,
-    duration: number,
-    onDone?: (game: FullState) => void,
-  ): Promise<void> => {
-    const updaterFrom = sprite._updater;
-    let elapsed = 0;
-
-    const fromSprite = sprite._copy();
-    const toSprite = sprite._copy();
-
-    return new Promise((resolve) => {
-      sprite._updater = (sprite, game, delta) => {
-        elapsed = utils._min(duration, elapsed + delta);
-
-        updaterFrom(fromSprite, game, delta);
-        updaterTo(toSprite, game, delta);
-
-        const t = elapsed / duration;
-        sprite._position[0] =
-          fromSprite._position[0] + (toSprite._position[0] - fromSprite._position[0]) * t;
-        sprite._position[1] =
-          fromSprite._position[1] + (toSprite._position[1] - fromSprite._position[1]) * t;
-        sprite._scale[0] = fromSprite._scale[0] + (toSprite._scale[0] - fromSprite._scale[0]) * t;
-        sprite._scale[1] = fromSprite._scale[1] + (toSprite._scale[1] - fromSprite._scale[1]) * t;
-        sprite._angle = fromSprite._angle + (toSprite._angle - fromSprite._angle) * t;
-        sprite._opacity = fromSprite._opacity + (toSprite._opacity - fromSprite._opacity) * t;
-
-        if (elapsed >= duration) {
-          sprite._updater = updaterTo;
-          if (onDone) {
-            onDone(game);
-          }
-          resolve();
-        }
-      };
-    });
   },
 
   _wait: (duration: number): Promise<void> => {

@@ -28,13 +28,7 @@ const assetLibrary = {
     }
   },
 
-  glyphPrefix() {
-    return "__font_";
-  },
 
-  glyphKey(glyph: string): string {
-    return `${assetLibrary.glyphPrefix()}${glyph}`;
-  },
 
   async _preRenderFont(): Promise<void> {
     const scale = RENDERER_SPRITE_RESOLUTION / FONT_GLYPH_SIZE;
@@ -48,7 +42,7 @@ const assetLibrary = {
 
     for (var i = 0; i < FONT_GLYPH_LIST.length; i++) {
       const glyph = FONT_GLYPH_LIST[i];
-      const glyphKey: string = assetLibrary.glyphKey(glyph);
+      const glyphKey: string = `__font_${glyph}`;
       ctx.fillStyle = "rgba(0, 0, 0, 0)";
       ctx.clearRect(0, 0, RENDERER_SPRITE_RESOLUTION, RENDERER_SPRITE_RESOLUTION);
       ctx.imageSmoothingEnabled = false;

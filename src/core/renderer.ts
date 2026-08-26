@@ -149,23 +149,23 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
   // instance state
   const spriteProgram = _createProgram(spriteVS_src, spriteFS_src);
   useProgram(spriteProgram);
-  uniform1i(getUniformLocation(spriteProgram, "uTexArray"), 0);
+  uniform1i(getUniformLocation(spriteProgram, "uta"), 0);
 
   const instanceBuffer = createBuffer();
   bindBuffer(ARRAY_BUFFER, instanceBuffer);
 
-  const locTransform = getAttribLocation(spriteProgram, "aTransform");
+  const locTransform = getAttribLocation(spriteProgram, "at");
   _instAttrib(locTransform, 3, 0);
   _instAttrib(locTransform + 1, 3, 12);
   _instAttrib(locTransform + 2, 3, 24);
 
-  const locLayer = getAttribLocation(spriteProgram, "aLayer");
+  const locLayer = getAttribLocation(spriteProgram, "al");
   _instAttrib(locLayer, 1, 36);
 
-  const locOpacity = getAttribLocation(spriteProgram, "aOpacity");
+  const locOpacity = getAttribLocation(spriteProgram, "ao");
   _instAttrib(locOpacity, 1, 40);
 
-  const postPrograms: WebGLProgram[] = [_createProgram(fsQuadVs, postBlurFs), _createProgram(fsQuadVs, postNoopFs)];
+  const postPrograms: WebGLProgram[] = [_createProgram(fsQuadVs, postBlurFs), _createProgram(fsQuadVs, postBlurFs), _createProgram(fsQuadVs, postNoopFs),];
 
   let targetA: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
   let targetB: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
@@ -203,7 +203,7 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
     for (let i = 0; i < postPrograms.length; i++) {
       const prog = postPrograms[i];
       useProgram(prog);
-      uniform1i(getUniformLocation(prog, "uTexture"), 0);
+      uniform1i(getUniformLocation(prog, "ut"), 0);
       gl.uniform1f(getUniformLocation(prog, "t"), performance.now() / 1000);
       activeTexture(gl.TEXTURE0);
       bindTexture(TEXTURE_2D, readTex);
