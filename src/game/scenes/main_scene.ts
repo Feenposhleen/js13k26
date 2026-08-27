@@ -62,6 +62,11 @@ export const createMainScene = () => {
   });
 
   scene._updater = (scene, game, delta) => {
+    let bloomValue = game._worker._getPostProgramValue(0);
+    if (bloomValue > 0) {
+      game._worker._setPostProgramValue(0, utils._max(0, bloomValue - (delta * 1.5)));
+    }
+
     if (spawns.length > 0 && (spawns[0]._delay -= delta) < 0) {
       const spawn = spawns.shift()!;
 

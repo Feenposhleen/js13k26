@@ -49,7 +49,7 @@ const createGameWindow = () => {
 
   const _receiveFrame = (data: TransferDataFromWorker) => {
     if (data._renderArray) {
-      _drawFrame(data._renderArray, data._spriteCount);
+      _drawFrame(data._renderArray, data._spriteCount, data._postProgramValues);
       _freeRenderBuffer = data._renderArray;
     }
 
@@ -78,8 +78,8 @@ const createGameWindow = () => {
     _keyTaps = {};
   };
 
-  const _drawFrame = (buffer: Float32Array, spriteCount: number) => {
-    _renderer!._draw(buffer, spriteCount);
+  const _drawFrame = (buffer: Float32Array, spriteCount: number, postProgramValues: number[]) => {
+    _renderer!._draw(buffer, spriteCount, postProgramValues);
     _freeRenderBuffer = buffer;
   };
 

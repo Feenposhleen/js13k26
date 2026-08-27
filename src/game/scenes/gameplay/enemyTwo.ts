@@ -54,6 +54,7 @@ export const createEnemyTwo = (color: number, fxLayer: Sprite, targetPosition: V
         trail._dead = true;
 
         createExplosion(fxLayer, enemy._position, 0.8);
+        g._worker._setPostProgramValue(0, 1);
 
         g._worker._playSfx(7);
       } else {

@@ -3,18 +3,20 @@ import { FLOATS_PER_INSTANCE, MAX_SPRITE_COUNT } from "./config";
 import { InputState, TransferDataFromWindow } from "./game_window";
 import { _buildRenderData } from "./renderer";
 import { Scene } from "./scene";
-import { Vec } from "./utils";
+import { utils, Vec } from "./utils";
 
 export type TransferDataFromWorker = {
   _renderArray: Float32Array;
   _spriteCount: number;
   _music: number | string | null;
   _sfx: (number | string)[] | null;
+  _postProgramValues: number[];
 }
 
 export const defaultWorkerTransferData = (): TransferDataFromWorker => ({
   _renderArray: new Float32Array(MAX_SPRITE_COUNT * FLOATS_PER_INSTANCE),
   _spriteCount: 0,
+  _postProgramValues: [],
   _music: null,
   _sfx: null,
 });
@@ -35,6 +37,7 @@ const createGameWorker = () => {
   var _input: InputState = { _keys: _keys, _pointer: _pointer };
   var _pendingMusic: number | string | null = null;
   var _pendingSfx: (number | string)[] = [];
+  var _postProgramValues: (number)[] = [];
 
   self.onmessage = ({ data }: { data: TransferDataFromWindow }) => {
     if (!_state) return;
@@ -48,6 +51,7 @@ const createGameWorker = () => {
       _spriteCount: spriteCount,
       _music: _pendingMusic,
       _sfx: _pendingSfx.length ? _pendingSfx : null,
+      _postProgramValues: _postProgramValues,
     };
 
     (self as any).postMessage(data, [renderBuffer.buffer]);
@@ -100,6 +104,12 @@ const createGameWorker = () => {
     },
     _setMusic(musicId: number | string) {
       _pendingMusic = musicId;
+    },
+    _setPostProgramValue(idx: number, value: number) {
+      _postProgramValues[idx] = value;
+    },
+    _getPostProgramValue(idx: number): number {
+      return _postProgramValues[idx];
     },
     _playSfx(sfxId: number | string) {
       _pendingSfx.push(sfxId);
