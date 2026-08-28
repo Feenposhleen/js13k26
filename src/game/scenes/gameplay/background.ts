@@ -9,12 +9,21 @@ export const createBackground = () => {
   const fill = createSprite(assetLibrary._textures._ui_square_bg, [0.5, 0.5], [10, 10]);
   bg._addChild(fill);
 
+  const mountains = createParallax(
+    assetLibrary._textures._mountain_one,
+    32,
+    [0.8, 0.9],
+    [0.6, 0.8],
+    [1.4, 0.8],
+  );
+  bg._addChild(mountains);
+
   const stars = createParallax(
     assetLibrary._textures._star,
     32,
-    [0.5, 0.8],
+    [0.5, 0.9],
     [-0.1, 0.4],
-    [0.8, 0.2],
+    [0.6, 0.2],
     (s, g, d) => {
       s._angle += d * (s._scale[0] - 0.3) * 4;
     },

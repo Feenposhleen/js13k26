@@ -5,17 +5,17 @@ import { createParticles } from "../common/particles";
 import { createText } from "../common/text";
 import { createExplosion } from "./fxPacks";
 
-const enemyOrigin: Vec = [0.5, -2];
+const enemyOrigin: Vec = [1.2, -1];
 
 export const createEnemyOne = (fxLayer: Sprite, targetPosition: Vec) => {
-  const enemy = createSprite(assetLibrary._textures._enemy_one, [0, -2], [0.2, 0.2]);
+  const enemy = createSprite(assetLibrary._textures._enemy_one, enemyOrigin, [0.2, 0.2]);
   const rand = utils._rndFloat();
 
   enemy._updater = (s, g, d) => {
     s._position = utils._vectorLerp(
       enemyOrigin,
       utils._vectorAdd(targetPosition, [rand * 0.1, rand * 0.05]),
-      utils._easeCubicOut(s._lifetime * 0.4),
+      utils._easeCubicOut(s._lifetime * 0.2),
     );
 
     s._position = utils._vectorAdd(s._position, [
@@ -66,10 +66,6 @@ export const createEnemyOne = (fxLayer: Sprite, targetPosition: Vec) => {
     [0.08, 0.1],
   );
   fxLayer._addChild(trail);
-
-  const text = createText('HELLO WORLD');
-  text._setUniformScale(0.2);
-  enemy._addChild(text);
 
   return enemy;
 };

@@ -5,7 +5,7 @@ import { createParticles } from "../common/particles";
 import { createExplosion } from "./fxPacks";
 import { colorByTexture, textureByColor } from "./projectile";
 
-const enemyOrigin: Vec = [0.2, -1];
+const enemyOrigin: Vec = [1.2, -1];
 
 export const createEnemyTwo = (color: number, fxLayer: Sprite, targetPosition: Vec) => {
   const enemy = createSprite(assetLibrary._textures._enemy_two, enemyOrigin, [0.2, 0.2]);
