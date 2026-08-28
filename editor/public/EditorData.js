@@ -1,4 +1,4 @@
-const FONT_GLYPH_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.!";
+const FONT_GLYPH_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!";
 
 class EditorData {
   constructor(serializedData = null) {

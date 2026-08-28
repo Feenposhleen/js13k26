@@ -2,7 +2,7 @@
 precision mediump float;
 uniform float v;
 uniform float t;
-in vec2 vUV;
+in vec2 vuv;
 out vec4 fragColor;
 uniform sampler2D ut;
 
@@ -15,18 +15,18 @@ const vec2 ofs[4] = vec2[4](
 );
 
 void main(){
-  vec3 base = texture(ut, vUV).rgb;
-  vec3 col = vec3(.0,.0,.0);
+  vec3 base = texture(ut, vuv).rgb;
+  float bright = 0.;
 
   for (int i = 0; i < 4; ++i) {
-    vec4 sc = texture(ut, vUV + (ofs[i]));
-    col += sc.rgb;
+    vec4 sc = texture(ut, vuv + (ofs[i]));
+    bright += length(sc.rgb);
   }
 
-  col = col / 4.;
+  bright = (bright / 4.) * v;
 
   // Combine
-  col = max(base, col * 1.4 * v);
+  vec3 col = base + (base * (bright * bright));
 
   // Output
   fragColor = vec4(col, 1.0);
