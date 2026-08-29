@@ -1,8 +1,6 @@
 import { Game } from "../core/game";
-import { createMainScene } from "./scenes/main_scene";
+import { createGameplayScene } from "./scenes/gameplayScene";
+import { createMenuScene } from "./scenes/menuScene";
 import { createState } from "./state";
 
-new Game(
-  createMainScene(),
-  createState(),
-);
+new Game(createMenuScene(), createState());

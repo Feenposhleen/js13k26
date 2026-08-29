@@ -20,10 +20,10 @@ export const createBackground = () => {
 
   const stars = createParallax(
     assetLibrary._textures._star,
-    32,
+    16,
     [0.5, 0.9],
     [-0.1, 0.4],
-    [0.6, 0.2],
+    [0.1, 0.05],
     (s, g, d) => {
       s._angle += d * (s._scale[0] - 0.3) * 4;
     },

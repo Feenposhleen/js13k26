@@ -11,7 +11,7 @@ export type TransferDataFromWorker = {
   _music: number | string | null;
   _sfx: (number | string)[] | null;
   _postProgramValues: number[];
-}
+};
 
 export const defaultWorkerTransferData = (): TransferDataFromWorker => ({
   _renderArray: new Float32Array(MAX_SPRITE_COUNT * FLOATS_PER_INSTANCE),
@@ -25,7 +25,7 @@ export type FullState = {
   _worker: GameWorker;
   _state: GameState;
   _input: InputState;
-}
+};
 
 const createGameWorker = () => {
   const _sceneRemoveList = new Set<Scene>();
@@ -37,7 +37,7 @@ const createGameWorker = () => {
   var _input: InputState = { _keys: _keys, _pointer: _pointer };
   var _pendingMusic: number | string | null = null;
   var _pendingSfx: (number | string)[] = [];
-  var _postProgramValues: (number)[] = [];
+  var _postProgramValues: number[] = [];
 
   self.onmessage = ({ data }: { data: TransferDataFromWindow }) => {
     if (!_state) return;
@@ -75,10 +75,15 @@ const createGameWorker = () => {
         scene._update(_state, delta);
       }
 
-      if (scene._done) { _sceneRemoveList.add(scene); }
+      if (scene._done) {
+        _sceneRemoveList.add(scene);
+      }
     }
 
-    const spriteCount = _buildRenderData(_sceneTree.map((scene) => scene._rootSprite), renderBuffer);
+    const spriteCount = _buildRenderData(
+      _sceneTree.map((scene) => scene._rootSprite),
+      renderBuffer,
+    );
     _updateWindow(renderBuffer, spriteCount);
   };
 
@@ -92,6 +97,9 @@ const createGameWorker = () => {
       };
 
       gameWorker._pushScene(initialScene);
+    },
+    _setScene(scene: Scene) {
+      _sceneTree = [scene];
     },
     _pushScene(scene: Scene) {
       _sceneTree.push(scene);
@@ -117,7 +125,7 @@ const createGameWorker = () => {
   };
 
   return gameWorker;
-}
+};
 
 export default createGameWorker;
 

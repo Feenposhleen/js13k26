@@ -87,19 +87,11 @@ export const utils = {
   // Vector operations
 
   _vectorDistance: (pos1: Vec, pos2: Vec): number => {
-      return Math.sqrt((Math.pow(pos1[0] - pos2[0], 2)) + (Math.pow(pos1[1] - pos2[1], 2)));
+    return Math.sqrt(Math.pow(pos1[0] - pos2[0], 2) + Math.pow(pos1[1] - pos2[1], 2));
   },
 
   _vectorManhattanDistance: (pos1: Vec, pos2: Vec): number => {
-    return utils._numberDistance(pos1[0], pos2[0]) +
-      utils._numberDistance(pos1[1], pos2[1]);
-  },
-
-  _vectorDampenedApproach: (from: Vec, to: Vec, damp: number): Vec => {
-    return [
-      from[0] + (to[0] - from[0]) * Math.min(damp, 1),
-      from[1] + (to[1] - from[1]) * Math.min(damp, 1),
-    ];
+    return utils._numberDistance(pos1[0], pos2[0]) + utils._numberDistance(pos1[1], pos2[1]);
   },
 
   _vectorIntersects: (subjectPos: Vec, boxPos: Vec, boxRadius: number): boolean => {
@@ -107,8 +99,16 @@ export const utils = {
     return dist < boxRadius;
   },
 
-  _vectorAdd: (pos1: Vec, pos2: Vec): Vec => {
-    return [pos1[0] + pos2[0], pos1[1] + pos2[1]];
+  _vectorAdd: (vec1: Vec, vec2: Vec): Vec => {
+    return [vec1[0] + vec2[0], vec1[1] + vec2[1]];
+  },
+
+  _vectorSub: (vec1: Vec, vec2: Vec): Vec => {
+    return [vec1[0] - vec2[0], vec1[1] - vec2[1]];
+  },
+
+  _vectorMul: (vec: Vec, multiplier: number): Vec => {
+    return [vec[0] * multiplier, vec[1] * multiplier];
   },
 
   _vectorAngle: (pos1: Vec, pos2: Vec): number => {
@@ -116,7 +116,7 @@ export const utils = {
   },
 
   _vectorLength: (vector: Vec): number => {
-    return Math.sqrt((vector[0] * vector[0]) + (vector[1] * vector[1]));
+    return Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
   },
 
   _vectorRotate: (vector: Vec, rotation: number): Vec => {

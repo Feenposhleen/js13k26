@@ -1,15 +1,12 @@
 import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
-import createSprite, { Sprite } from "../../core/sprite";
-import { utils, Vec } from "../../core/utils";
+import { utils } from "../../core/utils";
 import { createParticles } from "./common/particles";
 import { createBackground } from "./gameplay/background";
-import { createEnemyOne } from "./gameplay/enemyOne";
-import { createEnemyTwo } from "./gameplay/enemyTwo";
 import { createSpawner, level1 } from "./gameplay/spawner";
 import unicorn from "./gameplay/unicorn";
 
-export const createMainScene = () => {
+export const createGameplayScene = () => {
   const scene = createScene((scene, game) => {
     // Start background music loop (1)
     game._worker._setMusic(1);
@@ -33,7 +30,7 @@ export const createMainScene = () => {
       [-utils._pi - 0.05, -utils._pi + 0.05],
       [0.4, 0.6],
       [0.4, 0.8],
-      [0.1, 0.2],
+      [0.1, 0.3],
     );
     trail._position = [-0.02, 0];
 
@@ -45,7 +42,7 @@ export const createMainScene = () => {
   scene._updater = (scene, game, delta) => {
     let bloomValue = game._worker._getPostProgramValue(0);
     if (bloomValue > 0) {
-      game._worker._setPostProgramValue(0, utils._max(0, bloomValue - (delta * 2)));
+      game._worker._setPostProgramValue(0, utils._max(0, bloomValue - delta * 2));
     }
 
     game._state._ticks += delta;

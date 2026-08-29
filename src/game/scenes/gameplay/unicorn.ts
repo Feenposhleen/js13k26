@@ -1,7 +1,6 @@
 import assetLibrary from "../../../core/asset_library";
 import createSprite from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
-import { createParticles } from "../common/particles";
 import { createProjectile, textureByColor } from "./projectile";
 
 const zookaPos: Vec = [-0.045, -0.15];
@@ -24,8 +23,9 @@ unicorn._updater = (sprite, game, delta) => {
       : assetLibrary._textures._unicorn_one;
   // Smoothly track pointer position
   const pointerCoord = game._input._pointer._coord;
+  const targetCoord: Vec = [0.1 + pointerCoord[0] * 0.1, utils._clamp(pointerCoord[1], 0.1, 0.8)];
   game._state._playerPosition = [...sprite._position];
-  sprite._position = utils._vectorLerp(sprite._position, pointerCoord, delta * 8);
+  sprite._position = utils._vectorLerp(sprite._position, targetCoord, delta * 8);
 
   // Rotate towards movement direction with gentle bobbing
   const targetAngle = utils._sin(game._worker._ticks * 6) * 0.15;
