@@ -1,8 +1,8 @@
 import spriteVS_src from "./glsl/sprite_shader.vs";
 import spriteFS_src from "./glsl/sprite_shader.fs";
 import fsQuadVs from "./glsl/full_screen_quad.vs";
-import postBlurFs from "./glsl/post_blur.fs";
-import postBloomFs from "./glsl/post_bloom.fs";
+import boxBlurFs from "./glsl/box_blur.fs";
+import boxBloomFs from "./glsl/box_bloom.fs";
 
 import { utils } from "./utils";
 import { Sprite } from "./sprite";
@@ -22,8 +22,8 @@ export type RenderTarget = {
 };
 
 type WrappedProgram = {
-  _updater(v: number): number,
-  _program: WebGLProgram
+  _updater(v: number): number;
+  _program: WebGLProgram;
 };
 
 type RenderDataItem = { _mat: Float32Array; _layer: number; _opacity: number };
@@ -197,8 +197,8 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
   _instAttrib(locOpacity, 1, 40);
 
   const postPrograms: WebGLProgram[] = [
-    _createProgram(fsQuadVs, postBloomFs),
-    _createProgram(fsQuadVs, postBlurFs),
+    _createProgram(fsQuadVs, boxBloomFs),
+    _createProgram(fsQuadVs, boxBlurFs),
   ];
 
   let targetA: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
@@ -260,7 +260,12 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
     };
   };
 
-  const runPostChain = (srcTex: WebGLTexture | null, width: number, height: number, postProgramValues: number[]) => {
+  const runPostChain = (
+    srcTex: WebGLTexture | null,
+    width: number,
+    height: number,
+    postProgramValues: number[],
+  ) => {
     let readTex = srcTex,
       write = targetB!;
     for (let i = 0; i < postPrograms.length; i++) {

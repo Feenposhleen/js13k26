@@ -10,7 +10,6 @@ out vec4 outColor;
 void main(){
   vec4 col = texture(uta, vec3(vuv, float(vl)));
   if (col.a < 0.9) discard;
-  //col.rgb *= vo;
   col.a *= vo;
   outColor = col;
 }

@@ -27,14 +27,14 @@ export const level1: Array<Spawn> = [
   createSpawn(2, 4, [0.5, 0.4]),
 
   createSpawn(4, 4, [0.4, 0.8]),
-  createSpawn(.5, 4, [0.55, 0.8]),
-  createSpawn(.5, 4, [0.4, 0.6]),
-  createSpawn(.5, 4, [0.55, 0.6]),
+  createSpawn(0.5, 4, [0.55, 0.8]),
+  createSpawn(0.5, 4, [0.4, 0.6]),
+  createSpawn(0.5, 4, [0.55, 0.6]),
 
   createSpawn(4, 4, [0.4, 0.4]),
-  createSpawn(.5, 4, [0.55, 0.4]),
-  createSpawn(.5, 4, [0.7, 0.4]),
-  createSpawn(.5, 4, [0.85, 0.4]),
+  createSpawn(0.5, 4, [0.55, 0.4]),
+  createSpawn(0.5, 4, [0.7, 0.4]),
+  createSpawn(0.5, 4, [0.85, 0.4]),
 
   createSpawn(4, 4, [0.8, 0.2]),
   createSpawn(0.1, 4, [0.8, 0.4]),
@@ -48,13 +48,14 @@ export const createSpawner = (game: FullState, level: Array<Spawn>) => {
   const textContainer = createSprite(null, [0, 0]);
   const enemyContainer = createSprite(null, [0, 0]);
   let enemyCount = spawns.length;
+  let textScale = 0.05;
 
   const setText = (remainingEnemies: number) => {
     textContainer._children = [];
     const text = createText(`${remainingEnemies} ENEMIES LEFT`);
     textContainer._addChild(text);
+    textScale = 0.4;
   };
-
 
   spawner._updater = (s, g, d) => {
     if (spawns.length > 0 && (spawns[0]._delay -= d) < 0) {
@@ -77,11 +78,16 @@ export const createSpawner = (game: FullState, level: Array<Spawn>) => {
       enemyCount = newEnemyCount;
       setText(enemyCount);
     }
+
+    if (textScale > 0.05) {
+      textScale = utils._max(0.05, textScale - d);
+      textContainer._setUniformScale(textScale);
+    }
   };
 
   spawner._addChild(enemyContainer);
 
-  const textBg = createSprite(assetLibrary._textures._ui_square, [0.2, 0.9], [1., 0.3], [0,0], 0.8);
+  const textBg = createSprite(assetLibrary._textures._ui_square, [0.2, 0.9], [1, 0.3], [0, 0], 0.8);
   spawner._addChild(textBg);
 
   textContainer._position = [0.05, 0.9];

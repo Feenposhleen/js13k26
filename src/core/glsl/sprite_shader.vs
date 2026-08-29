@@ -10,7 +10,6 @@ out float vo;
 flat out int vl;
 
 void main(){
-  // transform POS (x,y,1) by the instance mat3 (already in clip-space)
   vec3 p = at * vec3(POS[gl_VertexID], 1.0);
   gl_Position = vec4(p.xy, 0.0, 1.0);
   vuv = UVS[gl_VertexID];

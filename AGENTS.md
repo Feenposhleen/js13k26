@@ -42,8 +42,9 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
   - Manages the Web Audio context and sound playback.
   - **Self-Bootstrapping Worker**: Reads the inline `<script id="j">` content from the DOM and creates a `Blob` URL (`URL.createObjectURL(new Blob([...]))`) to launch the worker without requiring external bundle files.
 - **Game Worker** (`src/core/game_worker.ts`):
-  - Maintains the active scene stack (`_pushScene`, `_popScene`) and entity scene graph.
-  - Serializes sprite instance data (position, scale, rotation, texture coords, opacity) into a shared `Float32Array`.
+  - Maintains the active scene stack (`_pushScene`, `_popScene`, `_removeScene`) and entity scene graph.
+  - Serializes sprite instance data (transformed clip-space 3x3 matrix, texture layer index, opacity) into a shared `Float32Array`.
+  - Dispatches post-processing parameter updates (`_postProgramValues`) and queued audio playback requests to the main thread.
 - **Zero-Allocation Ping-Ponging**:
   - The render buffer `Float32Array` is transferred across threads via `postMessage([buffer.buffer])`.
   - Once drawn by WebGL on the main thread, the same buffer is transferred back to the worker for the next frame, eliminating per-frame GC allocations.
@@ -52,23 +53,27 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 
 ## 2. Rendering Subsystem
 
-- **WebGL Instanced Renderer** (`src/core/renderer.ts`):
-  - Uses instanced quad rendering to draw all visible sprites in a single batch.
-  - Instance layout defined in `src/core/config.ts` (`FLOATS_PER_INSTANCE`, `MAX_SPRITE_COUNT`).
+- **WebGL2 Instanced Renderer** (`src/core/renderer.ts`):
+  - Uses instanced quad rendering with `gl.drawArraysInstanced` to draw all visible sprites in a single batch.
+  - Instance layout defined in `src/core/config.ts` (`FLOATS_PER_INSTANCE = 11`, `MAX_SPRITE_COUNT = 10000`):
+    - `at`: 3x3 instance transformation matrix (9 floats: offsets 0, 12, 24).
+    - `al`: Texture layer index (1 float: offset 36).
+    - `ao`: Opacity (1 float: offset 40).
 - **GLSL Shaders** (`src/core/glsl/`):
-  - `sprite_shader.vs` / `sprite_shader.fs`: Processes sprite transforms, atlas UV slicing, tinting, and opacity.
-  - `full_screen_quad.vs`, `post_blur.fs`, `post_noop.fs`: Full-screen quad post-processing pipeline.
-- **Procedural Vector Texture Atlas** (`src/core/assets/drawables.gen.ts` & `src/core/asset_library.ts`):
-  - To save bundle size, binary image assets are not used.
-  - Polygon coordinates are stored as compact single strings: `"<colorChar><styleChar><coords>"` using an ASCII offset of 40 on a 50x50 grid (`String.fromCharCode(40 + Math.round(coord * 50))`), saving space by eliminating array brackets, commas, and numeric literals.
-  - At startup (`AssetLibrary._preRenderTextures()`), these instructions are decoded, rasterized onto an offscreen canvas, and uploaded to a WebGL texture atlas.
+  - `sprite_shader.vs` / `sprite_shader.fs`: Transforms quad vertices by instance matrix `at`, samples the `sampler2DArray` by layer index `al`, applies alpha cutoff (`col.a < 0.9` discard) and opacity modulation `ao`.
+  - `full_screen_quad.vs`, `box_bloom.fs`, `box_blur.fs`: Ping-pong framebuffer post-processing pipeline for bloom and blur effects.
+- **Procedural Vector Texture & Font Array** (`src/core/assets/drawables.gen.ts`, `src/core/assets/fontb64.ts`, & `src/core/asset_library.ts`):
+  - To save bundle size, binary image assets are avoided or tightly compressed:
+    - **Vector Art**: Polygons stored as compact strings: `"<colorChar><styleChar><coords>"` using an ASCII offset of 40 on a 50x50 grid (`String.fromCharCode(40 + Math.round(coord * 50))`).
+    - **Bitmap Font**: Base64-encoded GIF (`fontB64`) sliced into individual glyph textures (`__font_<glyph>`).
+  - At startup (`AssetLibrary._preRenderTextures()`), vector polygons and font glyphs are rasterized onto offscreen canvases and uploaded as layers into a WebGL `TEXTURE_2D_ARRAY`.
 
 ---
 
 ## 3. Audio Subsystem
 
 - **Procedural Synthesizer & Sequencer** (`src/core/sound.ts`):
-  - Built entirely on the Web Audio API without audio files.
+  - Built entirely on the Web Audio API without external audio files.
   - Unified parametric synthesizer voice (`_playVoice`) supporting 5 waveform modes (sine, triangle, sawtooth, square, white noise), exponential pitch sweeps, biquad filter sweeps (lowpass, highpass, bandpass), and ADSR gain envelopes.
   - Multi-track step sequencer (`playSong`) stepping through compact track strings with zero per-frame garbage collection.
 - **Procedural Audio Asset Bank** (`src/core/assets/audio.gen.ts` & `src/core/asset_library.ts`):
@@ -82,13 +87,15 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 ## 4. Scene Graph & Entity System
 
 - **Scene Management** (`src/core/scene.ts`):
-  - Hierarchical scene stack. Scenes define async initializers (`(scene, game) => Promise<void> | void`) and frame updaters (`(scene, game, delta) => void`).
+  - Hierarchical scene stack. Scenes define one-time initializers (`(scene, state) => void`) and frame updaters (`(scene, state, delta) => void`).
 - **Sprite Node Tree** (`src/core/sprite.ts`):
-  - Hierarchical transform tree (`_position`, `_scale`, `_angle`, `_opacity`, `_children`).
-  - Supports per-sprite `_updater` callbacks and tweening helpers (`utils._tweenUpdater`).
+  - Hierarchical transform tree (`_position`, `_velocity`, `_scale`, `_angle`, `_opacity`, `_children`, `_lifetime`, `_dead`, `_seed`).
+  - Position updates automatically apply velocity per frame (`_position += _velocity * delta`).
+  - Supports per-sprite `_updater` callbacks and tree operations (`_addChild`, `_removeChild`, `_copy`, `_setUniformScale`).
 - **Utilities** (`src/core/utils.ts`):
-  - Vector math (`_vectorAdd`, `_vectorLerp`, `_vectorAngle`, `_simpleDistance`).
-  - Easing, clamping, random number generation, and timer helpers.
+  - Vector math (`_vectorAdd`, `_vectorLerp`, `_vectorAngle`, `_vectorDistance`, `_vectorManhattanDistance`, `_vectorDampenedApproach`, `_vectorIntersects`, `_vectorLength`, `_vectorRotate`).
+  - Matrix transforms (`_mat3Multiply`, `_mat3FromTRS`).
+  - Easing (`_easeCubicIn`, `_easeCubicOut`), clamping, wrapping, random generation (`_rndFloat`, `_rndRange`, `_rndInt`, etc.), and timer helpers (`_wait`).
 
 ---
 
