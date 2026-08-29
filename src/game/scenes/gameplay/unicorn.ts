@@ -37,6 +37,7 @@ unicorn._updater = (sprite, game, delta) => {
     game._state._projectiles.push(projectile);
     game._state._layerFxBack._addChild(projectile);
 
+    game._worker._setPostProgramValue(0, 0.2);
     game._worker._playSfx(6);
     sprite._scale = [0.32, 0.32];
     game._state._cooldown = 1;
