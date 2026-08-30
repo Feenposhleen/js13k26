@@ -1,17 +1,31 @@
 import assetLibrary from "../../../core/asset_library";
+import { RawTexture } from "../../../core/assets/drawables.gen";
 import createSprite, { Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
 import { createExplosion } from "./fxPacks";
 import { colorByTexture, textureByColor } from "./projectile";
 
-const enemyOrigin: Vec = [1.2, -1];
+const enemyOriginAddend: Vec = [1, -0.5];
 
-export const createEnemyTwo = (color: number, fxLayer: Sprite, targetPosition: Vec) => {
-  const enemy = createSprite(assetLibrary._textures._enemy_two, enemyOrigin, [0.2, 0.2]);
-  const colorTexture = createSprite(textureByColor(color), [-0.09, -0.06], [0.5, 0.5]);
-  colorTexture._angle = -utils._pi / 2;
-  enemy._addChild(colorTexture);
+export const createEnemy = (
+  texture: RawTexture,
+  color: number | null,
+  fxLayer: Sprite,
+  targetPosition: Vec,
+) => {
+  const enemyOrigin = utils._vectorAdd(targetPosition, enemyOriginAddend);
+  const enemy = createSprite(
+    texture,
+    utils._vectorAdd(targetPosition, enemyOriginAddend),
+    [0.2, 0.2],
+  );
+
+  if (color) {
+    const colorTexture = createSprite(textureByColor(color), [-0.09, -0.06], [0.5, 0.5]);
+    colorTexture._angle = -utils._pi / 2;
+    enemy._addChild(colorTexture);
+  }
 
   const rand = utils._rndFloat();
 
@@ -23,8 +37,8 @@ export const createEnemyTwo = (color: number, fxLayer: Sprite, targetPosition: V
     );
 
     s._position = utils._vectorAdd(s._position, [
-      utils._cos(g._worker._ticks * 2 + rand) * 0.05,
-      utils._sin(g._worker._ticks + rand) * 0.02,
+      utils._cos(g._worker._ticks * 2 + rand) * 0.02,
+      utils._sin(g._worker._ticks + rand) * 0.01,
     ]);
 
     const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
@@ -49,7 +63,7 @@ export const createEnemyTwo = (color: number, fxLayer: Sprite, targetPosition: V
 
       g._state._layerFxFront._addChild(projectileSplash);
 
-      if (colorByTexture(projectile._texture!) === color) {
+      if (!color || colorByTexture(projectile._texture!) === color) {
         enemy._dead = true;
         trail._dead = true;
 

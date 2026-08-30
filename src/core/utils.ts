@@ -111,6 +111,10 @@ export const utils = {
     return [vec[0] * multiplier, vec[1] * multiplier];
   },
 
+  _vectorVectorMul: (vec: Vec, multiplier: Vec): Vec => {
+    return [vec[0] * multiplier[0], vec[1] * multiplier[1]];
+  },
+
   _vectorAngle: (pos1: Vec, pos2: Vec): number => {
     return Math.atan2(pos2[1] - pos1[1], pos2[0] - pos1[0]);
   },
