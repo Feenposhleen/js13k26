@@ -29,7 +29,7 @@ export const createParallax = (
 
     sprite._updater = (s, g, delta) => {
       s._position[0] = utils._wrap(
-        s._position[0] - delta * (1 - distance),
+        s._position[0] - delta * g._state._unicornState._speed * (1 - distance),
         -scaleRange[1],
         1 + scaleRange[1],
       );

@@ -1,3 +1,4 @@
+import { EnemySprite } from "../game/scenes/gameplay/level";
 import { Sprite } from "./sprite";
 
 export type Vec = [number, number];
@@ -14,6 +15,8 @@ export const utils = {
   _keyOf: <T>(obj: Record<string, T>, val: T): string => {
     return utils._keys(obj).find((key) => obj[key] === val) || "";
   },
+
+  _deepCopy: (obj: Object) => JSON.parse(JSON.stringify(obj)),
 
   _sin: Math.sin,
 
@@ -197,10 +200,10 @@ export const utils = {
 
   // Engine things
 
-  _nearestSprite: (position: Vec, sprites: Sprite[]): [Sprite | null, number] => {
+  _nearestEnemySprite: (position: Vec, enemySprites: EnemySprite[]): [EnemySprite, number] => {
     let nearestDistance = 999;
-    let nearestSprite: Sprite | null = null;
-    for (let sprite of sprites) {
+    let nearestSprite: EnemySprite | null = null;
+    for (let sprite of enemySprites) {
       let distance = utils._vectorDistance(position, sprite._position);
       if (distance < nearestDistance) {
         nearestDistance = distance;

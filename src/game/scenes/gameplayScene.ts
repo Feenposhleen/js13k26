@@ -3,40 +3,24 @@ import createScene from "../../core/scene";
 import { utils } from "../../core/utils";
 import { createParticles } from "./common/particles";
 import { createBackground } from "./gameplay/background";
-import { createSpawner, level1 } from "./gameplay/spawner";
-import unicorn from "./gameplay/unicorn";
+import { createLayersState } from "./gameplay/layers";
+import { createLevel } from "./gameplay/level";
+import { createUnicorn } from "./gameplay/unicorn";
 
 export const createGameplayScene = () => {
   const scene = createScene((scene, game) => {
-    // Start background music loop (1)
-    game._worker._setMusic(1);
+    const layerState = createLayersState();
+    game._state._layersState = layerState;
 
-    const layerBg = game._state._layerBg;
-    const layerFxBack = game._state._layerFxBack;
-    const layerEntities = game._state._layerEntities;
-    const layerFxFront = game._state._layerFxFront;
-    const layerUi = game._state._layerUi;
-
-    scene._rootSprite._addChildren([layerBg, layerFxBack, layerEntities, layerFxFront, layerUi]);
+    scene._rootSprite._addChildren(Object.values(game._state._layersState));
 
     const bg = createBackground();
-    layerBg._addChild(bg);
+    layerState._bg._addChild(bg);
 
-    const trail = createParticles(
-      assetLibrary._textures._particle,
-      32,
-      true,
-      unicorn,
-      [-utils._pi - 0.05, -utils._pi + 0.05],
-      [0.4, 0.6],
-      [0.4, 0.8],
-      [0.1, 0.3],
-    );
-    trail._position = [-0.02, 0];
+    game._state._layersState._entities._addChild(createUnicorn(game));
+    game._state._layersState._entities._addChild(createLevel(game, 1));
 
-    layerFxBack._addChild(trail);
-    layerEntities._addChild(unicorn);
-    layerEntities._addChild(createSpawner(game, level1));
+    game._worker._setMusic(1);
   });
 
   scene._updater = (scene, game, delta) => {
