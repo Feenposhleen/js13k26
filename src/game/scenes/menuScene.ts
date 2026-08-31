@@ -9,8 +9,8 @@ export const createMenuScene = () => {
   const scene = createScene((scene, game) => {
     game._worker._setMusic(2);
 
-    const layerBg = game._state._layerBg;
-    const layerUi = game._state._layerUi;
+    const layerBg = game._state._layersState._bg;
+    const layerUi = game._state._layersState._ui;
 
     scene._rootSprite._addChildren([layerBg, layerUi]);
 

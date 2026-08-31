@@ -1,4 +1,4 @@
-import { EnemySprite } from "../game/scenes/gameplay/level";
+import { EnemySprite } from "../game/scenes/gameplay/enemy";
 import { Sprite } from "./sprite";
 
 export type Vec = [number, number];
@@ -200,7 +200,10 @@ export const utils = {
 
   // Engine things
 
-  _nearestEnemySprite: (position: Vec, enemySprites: EnemySprite[]): [EnemySprite, number] => {
+  _nearestEnemySprite: (
+    position: Vec,
+    enemySprites: EnemySprite[],
+  ): [EnemySprite | null, number] => {
     let nearestDistance = 999;
     let nearestSprite: EnemySprite | null = null;
     for (let sprite of enemySprites) {

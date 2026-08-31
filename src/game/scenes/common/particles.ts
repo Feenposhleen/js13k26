@@ -65,7 +65,7 @@ export const createParticles = (
   }
 
   emitter._updater = (s, g, d) => {
-    if (s._children.length == 0) {
+    if ((positioningTarget !== null && positioningTarget._dead) || s._children.length == 0) {
       s._dead = true;
     }
   };

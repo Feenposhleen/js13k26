@@ -1,4 +1,5 @@
 import assetLibrary from "../../../core/asset_library";
+import { RawTexture } from "../../../core/assets/drawables.gen";
 import { FullState } from "../../../core/game_worker";
 import createSprite, { Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
@@ -169,13 +170,13 @@ export const spawns: Array<Array<Spawn>> = [
   ],
 ];
 
-export const createLevel = (g: FullState, level: number) => {
-  const remainingSpawns = utils._deepCopy(spawns[level]);
-  const spawner = createSprite(null, [0, 0]);
+export const createLevel = (g: FullState, levelNr: number) => {
+  const remainingSpawns = utils._deepCopy(spawns[levelNr]);
+  const level = createSprite(null, [0, 0]);
   const textContainer = createSprite(null, [0, 0]);
   const enemyContainer = createSprite(null, [0, 0]);
 
-  const levelState = createLevelState(level, (enemy, color) => {
+  const levelState = createLevelState(levelNr, (enemy, color) => {
     if (!color || enemy._color === color) {
       enemy._dead = true;
       levelState._enemies = levelState._enemies.filter((x) => x != enemy);
@@ -200,7 +201,7 @@ export const createLevel = (g: FullState, level: number) => {
     textScale = 0.4;
   };
 
-  spawner._updater = (s, g, d) => {
+  level._updater = (s, g, d) => {
     if (remainingSpawns.length > 0 && (remainingSpawns[0]._delay -= d) < 0) {
       const spawn = remainingSpawns.shift()!;
 
@@ -209,11 +210,11 @@ export const createLevel = (g: FullState, level: number) => {
         utils._vectorVectorMul(spawn._finalPosition, safezoneWH),
       );
 
-      const texture =
+      const texture: RawTexture =
         spawn._type < 4 ? assetLibrary._textures._enemy_two : assetLibrary._textures._enemy_one;
 
       const enemy = createEnemy(
-        assetLibrary._textures._enemy_two,
+        texture,
         spawn._type < 4 ? spawn._type : null,
         g._state._layersState._fxBack,
         finalPosition,
@@ -236,16 +237,16 @@ export const createLevel = (g: FullState, level: number) => {
     }
   };
 
-  spawner._addChild(enemyContainer);
+  level._addChild(enemyContainer);
 
   const textBg = createSprite(assetLibrary._textures._ui_square, [0.2, 0.9], [1, 0.3], [0, 0], 0.8);
-  spawner._addChild(textBg);
+  level._addChild(textBg);
 
   textContainer._position = [0.05, 0.9];
   textContainer._setUniformScale(0.05);
-  spawner._addChild(textContainer);
+  level._addChild(textContainer);
 
   setText(enemyCount);
 
-  return spawner;
+  return level;
 };

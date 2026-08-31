@@ -4,6 +4,7 @@ import createSprite, { Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
 import { EnemySprite } from "./enemy";
+import { createExplosion } from "./fxPacks";
 
 const projectileTextures = [
   assetLibrary._textures._rainbow_red,
@@ -47,19 +48,18 @@ export const createProjectile = (position: Vec, color: number) => {
         enemy._dead = true;
         particles._dead = true;
 
-        createExplosion(fxLayer, enemy._position, 0.8);
+        createExplosion(g._state._layersState._fxFront, enemy._position, 0.8);
         g._worker._setPostProgramValue(0, 1);
 
         g._worker._playSfx(7);
       } else {
         projectile._dead = true;
-        g._state._projectiles = g._state._projectiles.filter((x) => x != projectile);
-
         g._worker._playSfx(8);
       }
     }
+
+    s._dead = s._position[0] > 1.5;
   };
-  s._dead = s._position[0] > 1.5;
 
   const particles = createParticles(
     texture,

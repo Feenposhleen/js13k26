@@ -1,7 +1,5 @@
-import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
 import { utils } from "../../core/utils";
-import { createParticles } from "./common/particles";
 import { createBackground } from "./gameplay/background";
 import { createLayersState } from "./gameplay/layers";
 import { createLevel } from "./gameplay/level";
@@ -12,13 +10,19 @@ export const createGameplayScene = () => {
     const layerState = createLayersState();
     game._state._layersState = layerState;
 
-    scene._rootSprite._addChildren(Object.values(game._state._layersState));
+    scene._rootSprite._addChildren([
+      layerState._bg,
+      layerState._fxBack,
+      layerState._entities,
+      layerState._fxFront,
+      layerState._ui,
+    ]);
 
     const bg = createBackground();
     layerState._bg._addChild(bg);
 
-    game._state._layersState._entities._addChild(createUnicorn(game));
-    game._state._layersState._entities._addChild(createLevel(game, 1));
+    layerState._entities._addChild(createUnicorn(game));
+    layerState._entities._addChild(createLevel(game, 1));
 
     game._worker._setMusic(1);
   });
