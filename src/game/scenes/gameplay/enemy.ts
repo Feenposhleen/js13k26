@@ -6,6 +6,8 @@ import { createParticles } from "../common/particles";
 import { createExplosion } from "./fxPacks";
 import { colorByTexture, textureByColor } from "./projectile";
 
+export type EnemySprite = Sprite & { _color: number };
+
 const enemyOriginAddend: Vec = [1, -0.5];
 
 export const createEnemy = (
@@ -13,7 +15,7 @@ export const createEnemy = (
   color: number | null,
   fxLayer: Sprite,
   targetPosition: Vec,
-) => {
+): EnemySprite => {
   const enemyOrigin = utils._vectorAdd(targetPosition, enemyOriginAddend);
   const enemy = createSprite(
     texture,
@@ -43,56 +45,6 @@ export const createEnemy = (
 
     const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
     s._angle += (targetAngle - s._angle) * utils._clamp(d * 5, 0, 1);
-
-    // Check projectile collisions
-    let [projectile, distance] = utils._nearestSprite(s._position, g._state._projectiles);
-    if (projectile && distance < 0.06) {
-      const projectileSplash = createParticles(
-        projectile._texture!,
-        4,
-        false,
-        null,
-        [-0.1, 0.1],
-        [0.6, 0.8],
-        [0.4, 0.6],
-        [0.1, 0.2],
-        [-0.1, 0.1],
-        [-0.05, 0.05],
-      );
-      projectileSplash._position = [...enemy._position];
-
-      g._state._layerFxFront._addChild(projectileSplash);
-
-      if (!color || colorByTexture(projectile._texture!) === color) {
-        enemy._dead = true;
-        trail._dead = true;
-
-        createExplosion(fxLayer, enemy._position, 0.8);
-        g._worker._setPostProgramValue(0, 1);
-
-        g._worker._playSfx(7);
-      } else {
-        projectile._dead = true;
-        g._state._projectiles = g._state._projectiles.filter((x) => x != projectile);
-
-        const dingSplash = createParticles(
-          assetLibrary._textures._particle,
-          4,
-          false,
-          null,
-          [-utils._pi, utils._pi],
-          [0.6, 0.8],
-          [0.4, 0.6],
-          [0.1, 0.2],
-          [-0.1, 0.1],
-          [-0.05, 0.05],
-        );
-        dingSplash._position = [...projectile._position];
-        g._state._layerFxFront._addChild(dingSplash);
-
-        g._worker._playSfx(8);
-      }
-    }
   };
 
   const trail = createParticles(
@@ -107,5 +59,5 @@ export const createEnemy = (
   );
   fxLayer._addChild(trail);
 
-  return enemy;
+  return { ...enemy, _color: color || -1 };
 };
