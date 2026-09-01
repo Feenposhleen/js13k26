@@ -1,6 +1,6 @@
 import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
-import createSprite, { Sprite, SpriteUpdater } from "../../../core/sprite";
+import { createSprite, createEmptySprite, Sprite, SpriteUpdater } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 
 export const createParallax = (
@@ -11,7 +11,7 @@ export const createParallax = (
   scaleRange: Vec | undefined = [0.05, 0.06],
   updater: SpriteUpdater | undefined = undefined,
 ) => {
-  const parallax = createSprite(null, [0, 0]);
+  const parallax = createEmptySprite();
   const step = 1 / count;
 
   // Individual sprites
@@ -29,7 +29,7 @@ export const createParallax = (
 
     sprite._updater = (s, g, delta) => {
       s._position[0] = utils._wrap(
-        s._position[0] - delta * g._state._unicornState._speed * (1 - distance),
+        s._position[0] - delta * g._state._gameplay._playerSpeed * (1 - distance),
         -scaleRange[1],
         1 + scaleRange[1],
       );

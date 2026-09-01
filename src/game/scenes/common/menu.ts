@@ -1,4 +1,4 @@
-import createSprite from "../../../core/sprite";
+import { createSprite, createEmptySprite } from "../../../core/sprite";
 import { utils } from "../../../core/utils";
 import { createText } from "./text";
 
@@ -9,7 +9,7 @@ type MenuOption = {
 
 // Expects the anchor to be in a clean viewport space (not a child to a transformed sprite)
 export const createMenu = (options: Array<MenuOption>) => {
-  const anchor = createSprite(null, [0, 0]);
+  const anchor = createEmptySprite();
 
   let clickIndex = -1;
   let hoverIndex = -1;

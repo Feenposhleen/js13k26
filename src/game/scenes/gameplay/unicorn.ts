@@ -1,6 +1,6 @@
 import assetLibrary from "../../../core/asset_library";
 import { FullState } from "../../../core/game_worker";
-import createSprite, { Sprite } from "../../../core/sprite";
+import { createSprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
 import { createProjectile, textureByColor } from "./projectile";
@@ -8,24 +8,8 @@ import { createProjectile, textureByColor } from "./projectile";
 const zookaPos: Vec = [-0.045, -0.15];
 const zookaRecoilPos: Vec = [-0.1, -0.16];
 
-export type UnicornState = {
-  _color: number;
-  _position: Vec;
-  _cooldown: number;
-  _speed: number;
-};
-
-export const createUnicornState = (): UnicornState => ({
-  _color: 0,
-  _position: [0, 0],
-  _cooldown: 0,
-  _speed: 1.4,
-});
-
 export const createUnicorn = (game: FullState): Sprite => {
-  const unicornState = createUnicornState();
-  game._state._unicornState = unicornState;
-
+  const gameplayState = game._state._gameplay;
   let lastPointerDown = false;
 
   const unicorn = createSprite(assetLibrary._textures._unicorn_one, [0.5, 0.5], [0.25, 0.25]);
@@ -48,7 +32,7 @@ export const createUnicorn = (game: FullState): Sprite => {
     [0.1, 0.3],
   );
   trail._position = [-0.02, 0];
-  game._state._layersState._fxBack._addChild(trail);
+  gameplayState._layerFxBack._addChild(trail);
 
   unicorn._updater = (sprite, game, delta) => {
     // Switch sprite continuously
@@ -60,7 +44,7 @@ export const createUnicorn = (game: FullState): Sprite => {
     // Smoothly track pointer position
     const pointerCoord = game._input._pointer._coord;
     const targetCoord: Vec = [0.1 + pointerCoord[0] * 0.1, utils._clamp(pointerCoord[1], 0.1, 0.8)];
-    unicornState._position = [...sprite._position];
+    gameplayState._playerPosition = [...sprite._position];
     sprite._position = utils._vectorLerp(sprite._position, targetCoord, delta * 8);
 
     // Rotate towards movement direction with gentle bobbing
@@ -68,17 +52,17 @@ export const createUnicorn = (game: FullState): Sprite => {
     sprite._angle += (targetAngle - sprite._angle) * utils._clamp(delta * 5, 0, 1);
 
     // Fire on pointer click
-    if (game._input._pointer._down && !lastPointerDown && unicornState._cooldown < 0) {
-      const projectile = createProjectile(unicorn._position, unicornState._color);
-      game._state._layersState._fxFront._addChild(projectile);
+    if (game._input._pointer._down && !lastPointerDown && gameplayState._playerCooldown < 0) {
+      const projectile = createProjectile(game, unicorn._position, gameplayState._playerColor);
+      gameplayState._layerFxFront._addChild(projectile);
 
       game._worker._setPostProgramValue(0, 0.2);
       game._worker._playSfx(6);
       sprite._scale = [0.32, 0.32];
-      unicornState._cooldown = 1;
+      gameplayState._playerCooldown = 1;
 
-      const color = utils._wrap(unicornState._color + 1, 0, 4);
-      unicornState._color = color;
+      const color = utils._wrap(gameplayState._playerColor + 1, 0, 4);
+      gameplayState._playerColor = color;
       zooka._position = [...zookaRecoilPos];
       flash._setUniformScale(1.4);
       selected._texture = textureByColor(color);
@@ -90,7 +74,7 @@ export const createUnicorn = (game: FullState): Sprite => {
     }
 
     lastPointerDown = game._input._pointer._down;
-    unicornState._cooldown -= delta;
+    gameplayState._playerCooldown -= delta;
   };
 
   return unicorn;

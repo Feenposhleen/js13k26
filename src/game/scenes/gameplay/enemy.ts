@@ -1,27 +1,29 @@
 import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
-import createSprite, { Sprite } from "../../../core/sprite";
+import { FullState } from "../../../core/game_worker";
+import { createSprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
 import { createExplosion } from "./fxPacks";
 import { colorByTexture, textureByColor } from "./projectile";
 
-export type EnemySprite = Sprite & { _color: number };
+export type ColorSprite = Sprite & { _color: number };
 
 const enemyOriginAddend: Vec = [1, -0.5];
 
 export const createEnemy = (
+  game: FullState,
   texture: RawTexture,
   color: number | null,
-  fxLayer: Sprite,
   targetPosition: Vec,
-): EnemySprite => {
+): ColorSprite => {
   const enemyOrigin = utils._vectorAdd(targetPosition, enemyOriginAddend);
   const enemy = createSprite(
     texture,
     utils._vectorAdd(targetPosition, enemyOriginAddend),
     [0.2, 0.2],
   );
+  enemy._setTrackedMemberOf(game._state._gameplay._projectiles);
 
   if (color) {
     const colorTexture = createSprite(textureByColor(color), [-0.09, -0.06], [0.5, 0.5]);
@@ -57,7 +59,7 @@ export const createEnemy = (
     [0.3, 0.6],
     [0.08, 0.1],
   );
-  fxLayer._addChild(trail);
+  game._state._gameplay._layerFxBack._addChild(trail);
 
   return { ...enemy, _color: color || -1 };
 };

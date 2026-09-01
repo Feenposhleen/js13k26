@@ -1,5 +1,5 @@
 import { RawTexture } from "../../../core/assets/drawables.gen";
-import createSprite, { Sprite } from "../../../core/sprite";
+import { createSprite, createEmptySprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 
 export const createParticles = (
@@ -14,7 +14,7 @@ export const createParticles = (
   angleRange: Vec = [-utils._pi, utils._pi],
   angularVelocityRange: Vec = [-3, 3],
 ) => {
-  const emitter = createSprite(null, [0, 0]);
+  const emitter = createEmptySprite();
 
   function addParticle() {
     const particleScale = utils._rndFromRange(scaleRange);

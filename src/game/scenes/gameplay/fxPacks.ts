@@ -1,9 +1,7 @@
 import assetLibrary from "../../../core/asset_library";
-import createSprite, { Sprite } from "../../../core/sprite";
+import { createSprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
-
-
 
 export const createExplosion = (layer: Sprite, position: Vec, size: number) => {
   const fireball = createParticles(
@@ -49,4 +47,4 @@ export const createExplosion = (layer: Sprite, position: Vec, size: number) => {
   layer._addChild(gore);
   layer._addChild(shrapnel);
   layer._addChild(fireball);
-}
+};

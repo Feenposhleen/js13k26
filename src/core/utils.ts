@@ -1,5 +1,4 @@
-import { EnemySprite } from "../game/scenes/gameplay/enemy";
-import { Sprite } from "./sprite";
+import { ColorSprite } from "../game/scenes/gameplay/enemy";
 
 export type Vec = [number, number];
 
@@ -17,6 +16,13 @@ export const utils = {
   },
 
   _deepCopy: (obj: Object) => JSON.parse(JSON.stringify(obj)),
+
+  _removeFromArray: <T>(arr: Array<T>, item: T): void => {
+    const index = arr.indexOf(item);
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+  },
 
   _sin: Math.sin,
 
@@ -202,10 +208,10 @@ export const utils = {
 
   _nearestEnemySprite: (
     position: Vec,
-    enemySprites: EnemySprite[],
-  ): [EnemySprite | null, number] => {
+    enemySprites: ColorSprite[],
+  ): [ColorSprite | null, number] => {
     let nearestDistance = 999;
-    let nearestSprite: EnemySprite | null = null;
+    let nearestSprite: ColorSprite | null = null;
     for (let sprite of enemySprites) {
       let distance = utils._vectorDistance(position, sprite._position);
       if (distance < nearestDistance) {

@@ -1,19 +1,17 @@
 import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
 import { FONT_GLYPH_LIST } from "../../../core/config";
-import createSprite, { Sprite } from "../../../core/sprite";
+import { createSprite, createEmptySprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 
-export const createText = (
-  text: string,
-) => {
-  const anchor = createSprite(null, [0, 0]);
+export const createText = (text: string) => {
+  const anchor = createEmptySprite();
 
   let offset = 0;
   for (let char of text) {
     offset += 0.38;
     if (FONT_GLYPH_LIST.includes(char)) {
-      const sprite = createSprite(assetLibrary._textures[`__font_${char}`], [offset, 0])
+      const sprite = createSprite(assetLibrary._textures[`__font_${char}`], [offset, 0]);
       anchor._addChild(sprite);
     }
   }

@@ -1,6 +1,6 @@
 import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
-import createSprite from "../../core/sprite";
+import { createEmptySprite, createSprite } from "../../core/sprite";
 import { createMenu } from "./common/menu";
 import { createParticles } from "./common/particles";
 import { createGameplayScene } from "./gameplayScene";
@@ -9,8 +9,8 @@ export const createMenuScene = () => {
   const scene = createScene((scene, game) => {
     game._worker._setMusic(2);
 
-    const layerBg = game._state._layersState._bg;
-    const layerUi = game._state._layersState._ui;
+    const layerBg = createEmptySprite();
+    const layerUi = createEmptySprite();
 
     scene._rootSprite._addChildren([layerBg, layerUi]);
 

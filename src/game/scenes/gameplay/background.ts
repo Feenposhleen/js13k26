@@ -1,10 +1,10 @@
 import assetLibrary from "../../../core/asset_library";
-import createSprite, { Sprite } from "../../../core/sprite";
+import { createSprite, createEmptySprite, Sprite } from "../../../core/sprite";
 import { utils } from "../../../core/utils";
 import { createParallax } from "../common/parallax";
 
 export const createBackground = () => {
-  const bg = createSprite(null, [0, 0]);
+  const bg = createEmptySprite();
 
   const fill = createSprite(assetLibrary._textures._ui_square_bg, [0.5, 0.5], [10, 10]);
   bg._addChild(fill);

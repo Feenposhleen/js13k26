@@ -1,7 +1,7 @@
 import { GameState } from "../game/state";
 import { TransferDataFromWindow } from "./game_window";
 import { FullState } from "./game_worker";
-import createSprite, { Sprite } from "./sprite";
+import { createSprite, createEmptySprite, Sprite } from "./sprite";
 
 export type Scene = {
   _paused: boolean;
@@ -19,8 +19,8 @@ export default (initializer?: SceneInitializer) => {
   const _scene: Scene = {
     _paused: false,
     _done: false,
-    _rootSprite: createSprite(null, [0, 0]),
-    _updater: (scene: Scene, game: FullState, delta: number): void => { },
+    _rootSprite: createEmptySprite(),
+    _updater: (scene: Scene, game: FullState, delta: number): void => {},
     _update: (state: FullState, delta: number): void => {
       if (initializer) {
         initializer(_scene, state);
@@ -32,7 +32,7 @@ export default (initializer?: SceneInitializer) => {
         _scene._rootSprite._update(state, delta);
       }
     },
-  }
+  };
 
   return _scene;
 };

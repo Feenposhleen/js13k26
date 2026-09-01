@@ -16,16 +16,18 @@ export type Sprite = {
   _opacity: number;
   _children: Sprite[];
   _updater: SpriteUpdater;
+  _trackedMemberOf: Array<Array<Sprite>>;
   _update: (state: FullState, dt: number) => void;
   _addChild: (sprite: Sprite) => void;
   _addChildren: (sprites: Array<Sprite>) => void;
   _removeChild: (sprite: Sprite) => void;
   _setUniformScale: (scale: number) => void;
+  _setTrackedMemberOf: (parentArray: Array<Sprite>, member?: boolean) => void;
   _copy: () => Sprite;
   ___r?: Array<Float32Array>;
 };
 
-const createSprite = (
+export const createSprite = (
   texture: RawTexture | null,
   position: Vec,
   scale: Vec = [1, 1],
@@ -44,10 +46,22 @@ const createSprite = (
     _opacity: opacity,
     _children: [] as Sprite[],
     _lifetime: 0,
+    _trackedMemberOf: [],
     _updater: () => {},
+
+    _setTrackedMemberOf: (parentArray: Array<Sprite>, member: boolean = true): void => {
+      if (member) {
+        parentArray.push(_sprite);
+      } else {
+        utils._removeFromArray(parentArray, _sprite);
+      }
+    },
 
     _addChild: (sprite: Sprite): void => {
       _sprite._children.push(sprite);
+      if (sprite._trackedMemberOf) {
+        sprite._trackedMemberOf.push(_sprite._children);
+      }
     },
 
     _addChildren: (sprites: Array<Sprite>): void => {
@@ -60,6 +74,9 @@ const createSprite = (
       const index = _sprite._children.indexOf(sprite);
       if (index !== -1) {
         _sprite._children.splice(index, 1);
+        if (sprite._trackedMemberOf.length > 0) {
+          sprite._trackedMemberOf.forEach((x) => utils._removeFromArray(x, _sprite));
+        }
       }
     },
 
@@ -107,4 +124,4 @@ const createSprite = (
   return _sprite;
 };
 
-export default createSprite;
+export const createEmptySprite = () => createSprite(null, [0, 0]);
