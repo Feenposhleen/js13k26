@@ -9,6 +9,7 @@ import { Sprite } from "./sprite";
 import assetLibrary from "./asset_library";
 import {
   BYTES_PER_INSTANCE,
+  DEBUG,
   RENDERER_HEIGHT,
   RENDERER_SPRITE_RESOLUTION,
   RENDERER_WIDTH,
@@ -141,8 +142,10 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
     gl.shaderSource(sh, src);
     gl.compileShader(sh);
 
-    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-      throw new Error(gl.getShaderInfoLog(sh) || "shader compile failed");
+    if (DEBUG) {
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        throw new Error(gl.getShaderInfoLog(sh) || "shader compile failed");
+      }
     }
 
     return sh;
@@ -153,8 +156,12 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
     attachShader(p, _compileShader(gl.VERTEX_SHADER, vs));
     attachShader(p, _compileShader(gl.FRAGMENT_SHADER, fs));
     gl.linkProgram(p);
-    const progLog = gl.getProgramInfoLog(p);
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(progLog || undefined);
+
+    if (DEBUG) {
+      const progLog = gl.getProgramInfoLog(p);
+      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(progLog || undefined);
+    }
+
     return p;
   };
 

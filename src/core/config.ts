@@ -10,3 +10,5 @@ export const FLOATS_PER_INSTANCE = 11; // mat3 (9) + layer (1) + opacity (1)
 export const BYTES_PER_INSTANCE = FLOATS_PER_INSTANCE * 4;
 export const FONT_GLYPH_SIZE = 6;
 export const FONT_GLYPH_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!";
+
+export const DEBUG = true;

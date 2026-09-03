@@ -10,10 +10,10 @@ const glslify = require("rollup-plugin-glslify");
 /** Very small CSS minifier (good enough for jam CSS) */
 function minifyCss(css) {
   return String(css || "")
-    .replace(/\/\*[\s\S]*?\*\//g, "")  // strip comments
-    .replace(/\s+/g, " ")              // collapse whitespace
+    .replace(/\/\*[\s\S]*?\*\//g, "") // strip comments
+    .replace(/\s+/g, " ") // collapse whitespace
     .replace(/\s*([{}:;,>~+])\s*/g, "$1") // trim around symbols
-    .replace(/;}/g, "}");              // drop last semicolons
+    .replace(/;}/g, "}"); // drop last semicolons
 }
 
 function inlineTemplate({
@@ -31,7 +31,7 @@ function inlineTemplate({
       this.addWatchFile(templatePath);
     },
     async generateBundle(_opts, bundle) {
-      const entry = Object.values(bundle).find(f => f.type === "chunk" && f.isEntry);
+      const entry = Object.values(bundle).find((f) => f.type === "chunk" && f.isEntry);
       let js = entry ? entry.code : "";
 
       if (isProduction && js) {
@@ -45,12 +45,10 @@ function inlineTemplate({
       const css = fs.readFileSync(path.resolve(cssPath), "utf8");
       const template = fs.readFileSync(templatePath, "utf8");
 
-      const html = template
-        .replace(jsToken, js)
-        .replace(cssToken, minifyCss(css));
+      const html = template.replace(jsToken, js).replace(cssToken, minifyCss(css));
 
       this.emitFile({ type: "asset", fileName: outFile, source: html });
-    }
+    },
   };
 }
 
@@ -65,7 +63,7 @@ function runScript({ script = "editor/server.js" } = {}) {
         const scriptPath = path.resolve(script);
         child = cp.spawn(process.execPath, [scriptPath], {
           stdio: "inherit",
-          windowsHide: true
+          windowsHide: true,
         });
 
         const killChild = (signal) => {
@@ -73,14 +71,22 @@ function runScript({ script = "editor/server.js" } = {}) {
           try {
             child.kill(signal || "SIGTERM");
           } catch (e) {
-            try { child.kill(); } catch (_) { }
+            try {
+              child.kill();
+            } catch (_) {}
           }
           child = null;
         };
 
         process.on("exit", () => killChild());
-        process.on("SIGINT", () => { killChild(); process.exit(0); });
-        process.on("SIGTERM", () => { killChild(); process.exit(0); });
+        process.on("SIGINT", () => {
+          killChild();
+          process.exit(0);
+        });
+        process.on("SIGTERM", () => {
+          killChild();
+          process.exit(0);
+        });
 
         child.on("exit", (code, sig) => {
           child = null;
@@ -92,7 +98,7 @@ function runScript({ script = "editor/server.js" } = {}) {
     closeBundle() {
       this.warn(`run-editor-server: watch mode — keeping ${script} running across rebuilds`);
       return;
-    }
+    },
   };
 }
 
@@ -104,26 +110,20 @@ module.exports = (cli) => {
     output: {
       file: "dist/game.js",
       format: "iife",
-      sourcemap: dev
+      sourcemap: dev,
     },
     treeshake: {
       moduleSideEffects: false,
       propertyReadSideEffects: false,
-      tryCatchDeoptimization: false
+      tryCatchDeoptimization: false,
     },
     plugins: [
       typescript({ tsconfig: "./tsconfig.json" }),
 
       // Support for GLSL shaders
       glslify({
-        include: [
-          '**/*.vs',
-          '**/*.fs',
-          '**/*.vert',
-          '**/*.frag',
-          '**/*.glsl'
-        ],
-        exclude: 'node_modules/**',
+        include: ["**/*.vs", "**/*.fs", "**/*.vert", "**/*.frag", "**/*.glsl"],
+        exclude: "node_modules/**",
       }),
 
       // Start editor/server.js in dev watch mode
@@ -134,54 +134,57 @@ module.exports = (cli) => {
         name: "const-to-var",
         renderChunk(code) {
           return {
-            code: code.replace(/\b(const|let)\b/g, "var")
+            code: code.replace(/\b(const|let)\b/g, "var").replace("#define GLSLIFY 1", ""),
           };
-        }
+        },
       },
 
       // Production-only minification (keep builds fast in dev)
       !dev &&
-      terser({
-        ecma: 2020,
-        toplevel: true,
-        compress: {
-          passes: 5,
-          unsafe: true,
-          unsafe_arrows: true,
-          unsafe_methods: true,
-          unsafe_math: true,
-          pure_getters: true,
-          drop_console: true,
-          module: true,
-          hoist_funs: true,
-          hoist_vars: true,
-          booleans_as_integers: true
-        },
-        mangle: {
+        terser({
+          ecma: 2020,
           toplevel: true,
-          properties: {
-            regex: /^_/
-          }
-        },
-        format: { comments: false }
-      }),
+          compress: {
+            passes: 5,
+            unsafe: true,
+            unsafe_arrows: true,
+            unsafe_methods: true,
+            unsafe_math: true,
+            pure_getters: true,
+            drop_console: true,
+            module: true,
+            hoist_funs: true,
+            hoist_vars: true,
+            booleans_as_integers: true,
+            global_defs: {
+              DEBUG: false
+            },
+          },
+          mangle: {
+            toplevel: true,
+            properties: {
+              regex: /^_/,
+            },
+          },
+          format: { comments: false },
+        }),
 
       // Inject into scaffold.template -> dist/index.html (with Roadroller in production)
       inlineTemplate({ isProduction: !dev }),
 
       // Dev server + live reload only when watching
       dev &&
-      serve({
-        contentBase: [".", "dist"],
-        port: 5173,
-        headers: { "Cache-Control": "no-store" },
-        open: false
-      }),
+        serve({
+          contentBase: [".", "dist"],
+          port: 5173,
+          headers: { "Cache-Control": "no-store" },
+          open: false,
+        }),
 
-      dev && livereload({ watch: "dist", verbose: false })
+      dev && livereload({ watch: "dist", verbose: false }),
     ].filter(Boolean),
     watch: {
       clearScreen: true,
-    }
+    },
   };
 };
