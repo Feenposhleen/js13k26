@@ -157,7 +157,7 @@ export const createLevel = (game: FullState, levelNr: number) => {
   const textContainer = createSprite(null, [0, 0]);
   const enemyContainer = createSprite(null, [0, 0]);
 
-  let enemyCount = spawns.length;
+  let enemyCount = spawns[levelNr].length;
   let textScale = 0.05;
 
   const setText = (remainingEnemies: number) => {
@@ -189,10 +189,10 @@ export const createLevel = (game: FullState, levelNr: number) => {
       );
     }
 
-    const newEnemyCount = spawns.length + enemyContainer._children.length;
+    const newEnemyCount = remainingSpawns.length + enemyContainer._children.length;
     if (newEnemyCount !== game._state._gameplay._levelRemainingEnemies) {
       game._state._gameplay._levelRemainingEnemies = newEnemyCount;
-      setText(enemyCount);
+      setText(newEnemyCount);
     }
 
     if (textScale > 0.05) {

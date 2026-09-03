@@ -20,7 +20,12 @@ export const colorByTexture = (texture: RawTexture) => projectileTextures.indexO
 
 export const createProjectile = (game: FullState, position: Vec, color: number): ColorSprite => {
   const texture = textureByColor(color);
-  const projectile = createSprite(texture, [position[0], position[1] - 0.04], [0.1, 0.1]);
+  const projectile = createSprite(
+    texture,
+    [position[0], position[1] - 0.04],
+    [0.1, 0.1],
+  ) as ColorSprite;
+  projectile._color = color;
   projectile._setTrackedMemberOf(game._state._gameplay._projectiles);
   projectile._velocity = [1, 0];
 
@@ -39,5 +44,5 @@ export const createProjectile = (game: FullState, position: Vec, color: number):
 
   projectile._addChild(particles);
 
-  return { ...projectile, _color: color };
+  return projectile;
 };

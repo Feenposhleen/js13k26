@@ -46,32 +46,17 @@ export const createUnicorn = (game: FullState): Sprite => {
     const targetCoord: Vec = [0.1 + pointerCoord[0] * 0.1, utils._clamp(pointerCoord[1], 0.1, 0.8)];
     gameplayState._playerPosition = [...sprite._position];
     sprite._position = utils._vectorLerp(sprite._position, targetCoord, delta * 8);
+    selected._texture = textureByColor(gameplayState._playerColor);
 
     // Rotate towards movement direction with gentle bobbing
     const targetAngle = utils._sin(game._worker._ticks * 6) * 0.15;
     sprite._angle += (targetAngle - sprite._angle) * utils._clamp(delta * 5, 0, 1);
 
-    // Fire on pointer click
-    if (game._input._pointer._down && !lastPointerDown && gameplayState._playerCooldown < 0) {
-      const projectile = createProjectile(game, unicorn._position, gameplayState._playerColor);
-      gameplayState._layerFxFront._addChild(projectile);
-
-      game._worker._setPostProgramValue(0, 0.2);
-      game._worker._playSfx(6);
-      sprite._scale = [0.32, 0.32];
-      gameplayState._playerCooldown = 1;
-
-      const color = utils._wrap(gameplayState._playerColor + 1, 0, 4);
-      gameplayState._playerColor = color;
-      zooka._position = [...zookaRecoilPos];
-      flash._setUniformScale(1.4);
-      selected._texture = textureByColor(color);
-    } else {
-      sprite._scale = utils._vectorLerp(sprite._scale, [0.25, 0.25], delta * 10);
-      flash._scale = utils._vectorLerp(flash._scale, [0.0, 0.0], delta * 10);
-      flash._angle += delta * 6;
-      zooka._position = utils._vectorLerp(zooka._position, zookaPos, delta * 10);
-    }
+    const inverseCooldownMod = utils._clamp(1 - gameplayState._playerCooldown, 0, 1);
+    sprite._scale = utils._vectorLerp([0.4, 0.4], [0.25, 0.25], inverseCooldownMod);
+    zooka._position = utils._vectorLerp(zookaRecoilPos, zookaPos, inverseCooldownMod);
+    flash._setUniformScale(utils._lerpRange([1.4, 0], inverseCooldownMod * 3));
+    flash._angle += delta * 6;
 
     lastPointerDown = game._input._pointer._down;
     gameplayState._playerCooldown -= delta;

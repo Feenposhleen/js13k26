@@ -6,6 +6,7 @@ import { createBackground } from "./gameplay/background";
 import { ColorSprite } from "./gameplay/enemy";
 import { createExplosion } from "./gameplay/fxPacks";
 import { createLevel } from "./gameplay/level";
+import { createProjectile } from "./gameplay/projectile";
 import { createUnicorn } from "./gameplay/unicorn";
 
 export type GameplayState = {
@@ -83,6 +84,7 @@ export const createGameplayScene = () => {
 
     game._state._ticks += delta;
 
+    // Check collisions
     game._state._gameplay._projectiles.forEach((projectile) => {
       const [enemy, distance] = utils._nearestEnemySprite(
         projectile._position,
@@ -119,8 +121,30 @@ export const createGameplayScene = () => {
         }
       }
 
-      projectile._dead = projectile._position[0] > 1.5;
+      if (projectile._position[0] > 1.5) {
+        projectile._dead = true;
+      }
     });
+
+    // Fire on pointer click
+    if (game._input._pointer._down && gameplayState._playerCooldown < 0) {
+      gameplayState._playerCooldown = 1;
+
+      const projectile = createProjectile(
+        game,
+        gameplayState._playerPosition,
+        gameplayState._playerColor,
+      );
+      gameplayState._layerFxFront._addChild(projectile);
+
+      game._worker._setPostProgramValue(0, 0.2);
+      game._worker._playSfx(6);
+
+      const color = utils._wrap(gameplayState._playerColor + 1, 0, 4);
+      gameplayState._playerColor = color;
+    }
+
+    gameplayState._playerCooldown -= delta;
   };
 
   return scene;

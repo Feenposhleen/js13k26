@@ -22,10 +22,11 @@ export const createEnemy = (
     texture,
     utils._vectorAdd(targetPosition, enemyOriginAddend),
     [0.2, 0.2],
-  );
-  enemy._setTrackedMemberOf(game._state._gameplay._projectiles);
+  ) as ColorSprite;
+  enemy._color = color !== null ? color : -1;
+  enemy._setTrackedMemberOf(game._state._gameplay._enemies);
 
-  if (color) {
+  if (color !== null) {
     const colorTexture = createSprite(textureByColor(color), [-0.09, -0.06], [0.5, 0.5]);
     colorTexture._angle = -utils._pi / 2;
     enemy._addChild(colorTexture);
@@ -61,5 +62,5 @@ export const createEnemy = (
   );
   game._state._gameplay._layerFxBack._addChild(trail);
 
-  return { ...enemy, _color: color || -1 };
+  return enemy;
 };

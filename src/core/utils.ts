@@ -90,7 +90,7 @@ export const utils = {
 
   _lerpRange: (range: Vec, fraction: number) => {
     const extent = range[1] - range[0];
-    return range[0] + extent * fraction;
+    return range[0] + extent * utils._clamp(fraction, 0, 1);
   },
 
   // Vector operations

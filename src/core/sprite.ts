@@ -52,8 +52,10 @@ export const createSprite = (
     _setTrackedMemberOf: (parentArray: Array<Sprite>, member: boolean = true): void => {
       if (member) {
         parentArray.push(_sprite);
+        _sprite._trackedMemberOf.push(parentArray);
       } else {
         utils._removeFromArray(parentArray, _sprite);
+        utils._removeFromArray(_sprite._trackedMemberOf, parentArray);
       }
     },
 
@@ -75,7 +77,7 @@ export const createSprite = (
       if (index !== -1) {
         _sprite._children.splice(index, 1);
         if (sprite._trackedMemberOf.length > 0) {
-          sprite._trackedMemberOf.forEach((x) => utils._removeFromArray(x, _sprite));
+          sprite._trackedMemberOf.forEach((x) => utils._removeFromArray(x, sprite));
         }
       }
     },
