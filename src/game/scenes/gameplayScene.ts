@@ -24,6 +24,7 @@ export type GameplayState = {
   _playerSpeed: number;
 
   // Level
+  _levelNumber: number;
   _levelTotalEnemies: number;
   _levelRemainingEnemies: number;
   _levelTimeLeft: number;
@@ -45,6 +46,7 @@ export const createGameplayState = (): GameplayState => ({
   _playerCooldown: 0,
   _playerSpeed: 1,
 
+  _levelNumber: 0,
   _levelTotalEnemies: 0,
   _levelRemainingEnemies: 0,
   _levelTimeLeft: 99, // To avoid countdown race condition
@@ -53,7 +55,7 @@ export const createGameplayState = (): GameplayState => ({
   _projectiles: [],
 });
 
-export const createGameplayScene = () => {
+export const createGameplayScene = (level: number) => {
   const gameplayState = createGameplayState();
 
   const scene = createScene((scene, game) => {
@@ -71,7 +73,7 @@ export const createGameplayScene = () => {
     gameplayState._layerBg._addChild(bg);
 
     gameplayState._layerEntities._addChild(createUnicorn(game));
-    gameplayState._layerEntities._addChild(createLevel(game, 1));
+    gameplayState._layerEntities._addChild(createLevel(game, level));
 
     game._worker._setMusic(1);
   });

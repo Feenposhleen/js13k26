@@ -1,12 +1,11 @@
 import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
 import { createEmptySprite, createSprite } from "../../core/sprite";
-import { utils } from "../../core/utils";
 import { createMenu } from "./common/menu";
 import { createParticles } from "./common/particles";
 import { createGameplayScene } from "./gameplayScene";
 
-export const createMenuScene = () => {
+export const createTransitionScene = (previousLevel: number, completed: boolean) => {
   const scene = createScene((scene, game) => {
     game._worker._setMusic(2);
 
@@ -19,31 +18,23 @@ export const createMenuScene = () => {
     const bg = createSprite(assetLibrary._textures._ui_square_bg, [1.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
-    let logo = createSprite(assetLibrary._textures._unicorn_one, [0.5, 0.2]);
-    scene._rootSprite._addChild(logo);
-
-    logo._updater = (s, g, d) => {
-      s._angle = s._angle + d;
-    };
-
-    let menuBg = createSprite(assetLibrary._textures._square_bg, [0.5, 0.5]);
-    scene._rootSprite._addChild(menuBg);
-
     const menu = createMenu([
       {
-        _text: "START GAME",
+        _text: completed ? "NEXT LEVEL" : "RETRY",
         _onSelected() {
-          game._worker._setScene(createGameplayScene(0));
+          game._worker._setScene(
+            createGameplayScene(completed ? previousLevel + 1 : previousLevel),
+          );
         },
       },
       {
-        _text: "LEVEL SELECT",
+        _text: "BACK TO MENU",
         _onSelected() {},
       },
     ]);
 
     menu._setUniformScale(0.05);
-    menu._position = [0.5, 0.45];
+    menu._position = [0.3, 0.4];
     scene._rootSprite._addChild(menu);
   });
 

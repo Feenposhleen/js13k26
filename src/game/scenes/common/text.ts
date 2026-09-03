@@ -7,13 +7,13 @@ import { utils, Vec } from "../../../core/utils";
 export const createText = (text: string) => {
   const anchor = createEmptySprite();
 
-  let offset = 0;
+  let offset = -(text.length * 0.38) / 2;
   for (let char of text) {
-    offset += 0.38;
     if (FONT_GLYPH_LIST.includes(char)) {
       const sprite = createSprite(assetLibrary._textures[`__font_${char}`], [offset, 0]);
       anchor._addChild(sprite);
     }
+    offset += 0.38;
   }
 
   anchor._updater = (s, g, d) => {
