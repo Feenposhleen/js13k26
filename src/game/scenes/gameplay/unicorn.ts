@@ -48,7 +48,7 @@ export const createUnicorn = (game: FullState): Sprite => {
     sprite._position = utils._vectorLerp(sprite._position, targetCoord, delta * 8);
     selected._texture = textureByColor(gameplayState._playerColor);
 
-    // Rotate towards movement direction with gentle bobbing
+    // Wiggle and bob
     const targetAngle = utils._sin(game._worker._ticks * 6) * 0.15;
     sprite._angle += (targetAngle - sprite._angle) * utils._clamp(delta * 5, 0, 1);
 

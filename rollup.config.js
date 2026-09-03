@@ -22,6 +22,7 @@ function inlineTemplate({
   outFile = "index.html",
   jsToken = "__js__",
   cssToken = "__css__",
+  isProduction = false,
 } = {}) {
   return {
     name: "inline-template",
@@ -29,9 +30,17 @@ function inlineTemplate({
       if (cssPath) this.addWatchFile(cssPath); // watch CSS in dev
       this.addWatchFile(templatePath);
     },
-    generateBundle(_opts, bundle) {
+    async generateBundle(_opts, bundle) {
       const entry = Object.values(bundle).find(f => f.type === "chunk" && f.isEntry);
-      const js = entry ? entry.code : "";
+      let js = entry ? entry.code : "";
+
+      if (isProduction && js) {
+        const { Packer } = await import("roadroller");
+        const packer = new Packer([{ data: js, type: "js", action: "eval" }], {});
+        await packer.optimize(2);
+        const { firstLine, secondLine } = packer.makeDecoder();
+        js = firstLine + "\n" + secondLine;
+      }
 
       const css = fs.readFileSync(path.resolve(cssPath), "utf8");
       const template = fs.readFileSync(templatePath, "utf8");
@@ -54,7 +63,6 @@ function runScript({ script = "editor/server.js" } = {}) {
       try {
         const cp = require("child_process");
         const scriptPath = path.resolve(script);
-        // Use the same Node binary that's running Rollup
         child = cp.spawn(process.execPath, [scriptPath], {
           stdio: "inherit",
           windowsHide: true
@@ -70,23 +78,18 @@ function runScript({ script = "editor/server.js" } = {}) {
           child = null;
         };
 
-        // Ensure child is killed when parent exits or is terminated
         process.on("exit", () => killChild());
         process.on("SIGINT", () => { killChild(); process.exit(0); });
         process.on("SIGTERM", () => { killChild(); process.exit(0); });
 
-        // Keep the plugin aware if the child exits unexpectedly
         child.on("exit", (code, sig) => {
           child = null;
-          // no-op: allow watcher to continue; user can restart rollup if needed
         });
       } catch (err) {
         this.warn(`run-editor-server: failed to start ${script}: ${err.message}`);
       }
     },
-    // when the build/watch ends, try to kill the child
     closeBundle() {
-      // In watch mode we want the server to survive incremental rebuilds.
       this.warn(`run-editor-server: watch mode — keeping ${script} running across rebuilds`);
       return;
     }
@@ -126,14 +129,29 @@ module.exports = (cli) => {
       // Start editor/server.js in dev watch mode
       dev && runScript({ script: "editor/server.js" }),
 
+      // Convert const/let to var before Terser
+      !dev && {
+        name: "const-to-var",
+        renderChunk(code) {
+          return {
+            code: code.replace(/\b(const|let)\b/g, "var")
+          };
+        }
+      },
+
       // Production-only minification (keep builds fast in dev)
       !dev &&
       terser({
         ecma: 2020,
         toplevel: true,
         compress: {
-          passes: 3,
+          passes: 5,
           unsafe: true,
+          unsafe_arrows: true,
+          unsafe_methods: true,
+          unsafe_math: true,
+          pure_getters: true,
+          drop_console: true,
           module: true,
           hoist_funs: true,
           hoist_vars: true,
@@ -142,27 +160,24 @@ module.exports = (cli) => {
         mangle: {
           toplevel: true,
           properties: {
-            // Only mangle your own "private" props (e.g., this._x)
             regex: /^_/
           }
         },
         format: { comments: false }
       }),
 
-      // Inject into scaffold.template → dist/index.html
-      inlineTemplate(),
+      // Inject into scaffold.template -> dist/index.html (with Roadroller in production)
+      inlineTemplate({ isProduction: !dev }),
 
       // Dev server + live reload only when watching
       dev &&
       serve({
-        // Serve project root (for index.html) and dist/ (for bundle)
         contentBase: [".", "dist"],
         port: 5173,
         headers: { "Cache-Control": "no-store" },
         open: false
       }),
 
-      // Live reload on changes to dist/ (e.g., bundle, index.html)
       dev && livereload({ watch: "dist", verbose: false })
     ].filter(Boolean),
     watch: {

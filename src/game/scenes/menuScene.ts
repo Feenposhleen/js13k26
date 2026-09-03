@@ -20,15 +20,15 @@ export const createMenuScene = () => {
 
     const menu = createMenu([
       {
-        text: "START GAME",
-        onSelected() {
+        _text: "START GAME",
+        _onSelected() {
           game._worker._setScene(createGameplayScene());
           console.log("One clicked");
         },
       },
       {
-        text: "LEVEL SELECT",
-        onSelected() {
+        _text: "LEVEL SELECT",
+        _onSelected() {
           console.log("Two clicked");
         },
       },

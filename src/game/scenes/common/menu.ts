@@ -3,8 +3,8 @@ import { utils } from "../../../core/utils";
 import { createText } from "./text";
 
 type MenuOption = {
-  text: string;
-  onSelected(): void;
+  _text: string;
+  _onSelected(): void;
 };
 
 // Expects the anchor to be in a clean viewport space (not a child to a transformed sprite)
@@ -16,7 +16,7 @@ export const createMenu = (options: Array<MenuOption>) => {
   let offset = 0;
 
   for (let option of options) {
-    const text = createText(option.text);
+    const text = createText(option._text);
     text._position = [0, offset];
     offset += 1.2;
     anchor._addChild(text);
@@ -47,7 +47,7 @@ export const createMenu = (options: Array<MenuOption>) => {
 
     if (g._input._pointer._down && hoverIndex > -1 && clickIndex != hoverIndex) {
       clickIndex = hoverIndex;
-      options[hoverIndex].onSelected();
+      options[hoverIndex]._onSelected();
     }
 
     hoverIndex = nearestOptionIndex;
