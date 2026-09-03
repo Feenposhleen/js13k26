@@ -2,9 +2,11 @@ import { RawAudioData, RawSong } from "./assets/audio.gen";
 
 const WAVE_TYPES: OscillatorType[] = ["sine", "triangle", "sawtooth", "square"];
 const FILTER_TYPES: BiquadFilterType[] = ["lowpass", "highpass", "bandpass"];
+const STEP_DUR = 15 / 134; // 134 BPM 16th-note steps
 
 const createMiniSequencer = (ctxArg?: AudioContext) => {
-  const _ctx: AudioContext = ctxArg || new (window.AudioContext || (window as any).webkitAudioContext)();
+  const _ctx: AudioContext =
+    ctxArg || new (window.AudioContext || (window as any).webkitAudioContext)();
 
   // Pre-generate 1-second white noise buffer for drums, snares, explosions
   const _sampleRate = _ctx.sampleRate || 44100;
@@ -18,8 +20,8 @@ const createMiniSequencer = (ctxArg?: AudioContext) => {
   let _step = 0;
   let _nextTime = 0;
   let _song: RawSong | null = null;
+  let _nextSong: RawSong | null = null;
   let _audioData: RawAudioData | null = null;
-  let _stepDur = 0.125;
 
   const _playVoice = (patch: string, t: number, noteOffset: number = 0) => {
     if (!patch || patch.length < 8) return;
@@ -83,6 +85,12 @@ const createMiniSequencer = (ctxArg?: AudioContext) => {
   const _schedule = () => {
     if (!_song || !_audioData) return;
     while (_nextTime < _ctx.currentTime + 0.12) {
+      if (_nextSong && _step % 16 === 0) {
+        _song = _nextSong;
+        _nextSong = null;
+        _step = 0;
+      }
+
       const t = _nextTime;
       const tracks = _song._tracks;
 
@@ -91,7 +99,7 @@ const createMiniSequencer = (ctxArg?: AudioContext) => {
         if (!notes || !notes.length) continue;
 
         const char = notes[_step % notes.length];
-        if (char && char !== '.') {
+        if (char && char !== ".") {
           const patch = (_audioData._sfx as Record<string, string>)[sfxKey];
           if (patch) {
             const noteOffset = char.charCodeAt(0) - 40;
@@ -100,20 +108,28 @@ const createMiniSequencer = (ctxArg?: AudioContext) => {
         }
       }
 
-      _nextTime += _stepDur;
+      _nextTime += STEP_DUR;
       _step++;
     }
   };
 
   const playSong = (song: RawSong, audioData: RawAudioData) => {
-    _song = song;
     _audioData = audioData;
-    _step = 0;
-    _nextTime = _ctx.currentTime;
-    _stepDur = (60 / (_song._bpm || 120)) / 4; // 16th-note steps
+    if (_song === song) {
+      _nextSong = null;
+      return;
+    }
 
-    if (!_timer) {
-      _timer = window.setInterval(_schedule, 25);
+    if (!_song) {
+      _song = song;
+      _nextSong = null;
+      _step = 0;
+      _nextTime = _ctx.currentTime;
+      if (!_timer) {
+        _timer = window.setInterval(_schedule, 25);
+      }
+    } else {
+      _nextSong = song;
     }
   };
 
@@ -127,6 +143,7 @@ const createMiniSequencer = (ctxArg?: AudioContext) => {
       _timer = null;
     }
     _song = null;
+    _nextSong = null;
   };
 
   return {
