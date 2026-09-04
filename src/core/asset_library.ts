@@ -12,23 +12,18 @@ const assetLibrary = {
   _songs: audioData._songs,
 
   async _preRenderTextures(): Promise<void> {
-    this._preRenderFont();
-
-    let i = 0;
-    for (const textureKey of Object.keys(assetLibrary._textures)) {
-      this._textureCache.set(
-        textureKey,
-        await this._preRenderTexture(
-          (drawables as RawDrawableData)._palette,
-          (drawables._textures as any)[textureKey],
-        ),
-      );
-
-      i++;
+    for (const textureKey of Object.keys(this._textures)) {
+      const texData = (drawables._textures as any)[textureKey];
+      if (texData && texData.length > 0) {
+        this._textureCache.set(
+          textureKey,
+          await this._preRenderTexture((drawables as RawDrawableData)._palette, texData),
+        );
+      }
     }
+
+    await this._preRenderFont();
   },
-
-
 
   async _preRenderFont(): Promise<void> {
     const scale = RENDERER_SPRITE_RESOLUTION / FONT_GLYPH_SIZE;

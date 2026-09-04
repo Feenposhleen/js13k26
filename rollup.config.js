@@ -16,6 +16,37 @@ function minifyCss(css) {
     .replace(/;}/g, "}"); // drop last semicolons
 }
 
+/** Collect property names that must NOT be mangled (dynamically accessed SFX, song, and font keys) */
+function getReservedProperties() {
+  const reserved = new Set();
+  try {
+    const audioContent = fs.readFileSync(path.resolve("src/core/assets/audio.gen.ts"), "utf8");
+    const sfxMatch = audioContent.match(/_sfx:\s*\{([^}]+)\}/);
+    if (sfxMatch) {
+      for (const match of sfxMatch[1].matchAll(/(_\w+)\s*:/g)) {
+        reserved.add(match[1]);
+      }
+    }
+    const songsMatch = audioContent.match(/_songs:\s*\{([\s\S]+?)\}\s*\}/);
+    if (songsMatch) {
+      for (const match of songsMatch[1].matchAll(/(_\w+)\s*:\s*\{/g)) {
+        reserved.add(match[1]);
+      }
+    }
+    const drawablesContent = fs.readFileSync(
+      path.resolve("src/core/assets/drawables.gen.ts"),
+      "utf8",
+    );
+    for (const match of drawablesContent.matchAll(/(__font_\S+?)\s*:/g)) {
+      reserved.add(match[1].replace(/['"]/g, ""));
+    }
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!".split("").forEach((c) => reserved.add(`__font_${c}`));
+  } catch (e) {
+    console.error("Failed reading reserved properties:", e);
+  }
+  return Array.from(reserved);
+}
+
 function inlineTemplate({
   templatePath = "scaffold.template",
   cssPath = "src/style.css",
@@ -129,12 +160,34 @@ module.exports = (cli) => {
       // Start editor/server.js in dev watch mode
       dev && runScript({ script: "editor/server.js" }),
 
-      // Convert const/let to var before Terser
+      // Convert const/let to var before Terser (AST-aware so GLSL string literals are untouched)
       !dev && {
         name: "const-to-var",
         renderChunk(code) {
+          const ast = this.parse(code);
+          const replacements = [];
+          function walk(node) {
+            if (!node || typeof node !== "object") return;
+            if (
+              node.type === "VariableDeclaration" &&
+              (node.kind === "const" || node.kind === "let")
+            ) {
+              replacements.push({ start: node.start, end: node.start + node.kind.length });
+            }
+            for (const key of Object.keys(node)) {
+              if (key === "comments") continue;
+              const val = node[key];
+              if (Array.isArray(val)) val.forEach(walk);
+              else if (val && typeof val === "object") walk(val);
+            }
+          }
+          walk(ast);
+          replacements.sort((a, b) => b.start - a.start);
+          for (const r of replacements) {
+            code = code.slice(0, r.start) + "var" + code.slice(r.end);
+          }
           return {
-            code: code.replace(/\b(const|let)\b/g, "var").replace("#define GLSLIFY 1", ""),
+            code: code.replace(/#define GLSLIFY 1\n?/g, ""),
           };
         },
       },
@@ -157,13 +210,14 @@ module.exports = (cli) => {
             hoist_vars: true,
             booleans_as_integers: true,
             global_defs: {
-              DEBUG: false
+              DEBUG: false,
             },
           },
           mangle: {
             toplevel: true,
             properties: {
               regex: /^_/,
+              reserved: getReservedProperties(),
             },
           },
           format: { comments: false },
