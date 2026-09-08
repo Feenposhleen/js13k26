@@ -20,34 +20,37 @@ export type Spawn = ReturnType<typeof createSpawn>;
 
 export const levelSpawns: Array<Array<Spawn>> = [
   [
-    createSpawn(3, 4, [0.5, 0.5]),
-    createSpawn(1, 4, [0.25, 0.25]),
-    createSpawn(1, 4, [0.5, 0.25]),
+    createSpawn(3, 4, [0, 1]),
 
-    createSpawn(4, 4, [1, 1]),
-    createSpawn(1, 4, [0.25, 1]),
-    createSpawn(1, 4, [0.5, 1]),
+    createSpawn(2, 4, [0, 0]),
+    createSpawn(0, 4, [0.5, 0]),
 
-    createSpawn(4, 4, [1, 0.5]),
-    createSpawn(1, 4, [1, 1]),
-    createSpawn(1, 4, [1, 0]),
+    createSpawn(3, 4, [0, 1]),
 
-    createSpawn(3, 4, [0, 0.75]),
-    createSpawn(0, 4, [0.5, 0.75]),
-    createSpawn(0, 4, [0.75, 0.75]),
-
-    createSpawn(2, 4, [0, 0.25]),
-    createSpawn(0, 4, [0.5, 0.25]),
-    createSpawn(0, 4, [0.75, 0.25]),
-
-    createSpawn(3, 4, [0, 0]),
-    createSpawn(0, 4, [1, 1]),
-
-    createSpawn(2, 4, [0, 1]),
+    createSpawn(2, 4, [0.5, 0]),
     createSpawn(0, 4, [1, 0]),
 
-    createSpawn(2, 4, [1, 0]),
-    createSpawn(0, 4, [0, 1]),
+    createSpawn(3, 4, [0, 1]),
+    createSpawn(1, 4, [0, 0.8]),
+    createSpawn(1, 4, [0, 0.6]),
+    createSpawn(1, 4, [0, 0.4]),
+    createSpawn(1, 4, [0, 0.2]),
+    createSpawn(1, 4, [0, 0]),
+
+    createSpawn(3, 4, [0.5, 0.8]),
+    createSpawn(0, 4, [0.25, 0.8]),
+    createSpawn(0, 4, [0, 0.8]),
+
+    createSpawn(3, 4, [0.5, 0.2]),
+    createSpawn(0, 4, [0.25, 0.2]),
+    createSpawn(0, 4, [0, 0.2]),
+
+    createSpawn(3, 4, [0.5, 1]),
+    createSpawn(0, 4, [0.75, 1]),
+    createSpawn(0, 4, [1, 1]),
+    createSpawn(0, 4, [0.5, 0.5]),
+    createSpawn(0, 4, [0.75, 0.5]),
+    createSpawn(0, 4, [1, 0.5]),
   ],
   [
     createSpawn(3, 4, [0.4, 0.5]),

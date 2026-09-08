@@ -206,7 +206,7 @@ export const utils = {
 
   // Engine things
 
-  _nearestEnemySprite: (
+  _nearestColorSprite: (
     position: Vec,
     enemySprites: ColorSprite[],
   ): [ColorSprite | null, number] => {

@@ -34,7 +34,7 @@ export const createTransitionScene = (previousLevel: number, completed: boolean)
     ]);
 
     menu._setUniformScale(0.05);
-    menu._position = [0.3, 0.4];
+    menu._position = [0.5, 0.4];
     scene._rootSprite._addChild(menu);
   });
 

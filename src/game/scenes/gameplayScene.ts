@@ -88,10 +88,14 @@ export const createGameplayScene = (level: number) => {
 
     // Check collisions
     game._state._gameplay._projectiles.forEach((projectile) => {
-      const [enemy, distance] = utils._nearestEnemySprite(
+      // Don't collide with things outside the screen
+      if (projectile._position[0] > 1) return;
+
+      const [enemy, distance] = utils._nearestColorSprite(
         projectile._position,
         gameplayState._enemies,
       );
+
       if (enemy && distance < 0.06) {
         const projectileSplash = createParticles(
           projectile._texture!,
@@ -108,7 +112,6 @@ export const createGameplayScene = (level: number) => {
 
         projectileSplash._position = [...enemy._position];
         game._state._gameplay._layerFxFront._addChild(projectileSplash);
-        projectile._dead = true;
 
         if (enemy._color < 0 || enemy._color === projectile._color) {
           enemy._dead = true;

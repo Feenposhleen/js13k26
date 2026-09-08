@@ -4,6 +4,7 @@ import { FullState } from "../../../core/game_worker";
 import { createSprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createText } from "../common/text";
+import { createTransitionScene } from "../transitionScene";
 import { createEnemy, ColorSprite } from "./enemy";
 import { createExplosion } from "./fxPacks";
 import { levelSpawns } from "./levelSpawns";
@@ -15,6 +16,9 @@ export const createLevel = (game: FullState, levelNr: number) => {
   const textContainer = createSprite(null, [0, 0]);
   const enemyContainer = createSprite(null, [0, 0]);
 
+  let completed = false;
+  let failed = false;
+  let transitionCountdown = 2;
   let enemyCount = levelSpawns[levelNr].length;
   let textScale = 0.05;
 
@@ -31,6 +35,27 @@ export const createLevel = (game: FullState, levelNr: number) => {
   };
 
   level._updater = (sprite, game, delta) => {
+    // ALways do this
+    const newEnemyCount = remainingSpawns.length + enemyContainer._children.length;
+    if (newEnemyCount !== game._state._gameplay._levelRemainingEnemies) {
+      game._state._gameplay._levelRemainingEnemies = newEnemyCount;
+      setText(newEnemyCount);
+    }
+
+    if (textScale > 0.05) {
+      textScale = utils._max(0.05, textScale - delta);
+      textContainer._setUniformScale(textScale);
+    }
+
+    if (completed || failed) {
+      transitionCountdown -= delta;
+      if (transitionCountdown < 0) {
+        const nextScene = createTransitionScene(levelNr, completed);
+        game._worker._setScene(nextScene);
+      }
+      return;
+    }
+
     if (remainingSpawns.length > 0 && (remainingSpawns[0]._delay -= delta) < 0) {
       const spawn = remainingSpawns.shift()!;
 
@@ -45,22 +70,14 @@ export const createLevel = (game: FullState, levelNr: number) => {
       );
 
       enemyContainer._addChild(enemy);
-
-      game._state._gameplay._levelTimeLeft = utils._max(
-        0,
-        game._state._gameplay._levelTimeLeft - delta,
-      );
     }
 
-    const newEnemyCount = remainingSpawns.length + enemyContainer._children.length;
-    if (newEnemyCount !== game._state._gameplay._levelRemainingEnemies) {
-      game._state._gameplay._levelRemainingEnemies = newEnemyCount;
-      setText(newEnemyCount);
-    }
+    game._state._gameplay._levelTimeLeft -= delta;
 
-    if (textScale > 0.05) {
-      textScale = utils._max(0.05, textScale - delta);
-      textContainer._setUniformScale(textScale);
+    if (game._state._gameplay._levelTimeLeft < 0) {
+      failed = true;
+    } else if (game._state._gameplay._levelRemainingEnemies < 1) {
+      completed = true;
     }
   };
 
