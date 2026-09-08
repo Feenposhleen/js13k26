@@ -1,7 +1,7 @@
 import { utils, Vec } from "../../../core/utils";
 
 export const safezoneTL: Vec = [0.3, 0.1];
-export const safezoneWH: Vec = [0.6, 0.55];
+export const safezoneWH: Vec = [0.5, 0.55];
 
 export const createSpawn = (delay: number, type: number, offsetPosition: Vec) => {
   const finalPosition = utils._vectorAdd(
@@ -20,26 +20,34 @@ export type Spawn = ReturnType<typeof createSpawn>;
 
 export const levelSpawns: Array<Array<Spawn>> = [
   [
-    createSpawn(3, 4, [0, 0]),
-    createSpawn(0, 4, [0, 0.25]),
-    createSpawn(0, 4, [0, 0.5]),
-    createSpawn(0, 4, [0, 0.75]),
-    createSpawn(0, 4, [0.25, 0]),
-    createSpawn(0, 4, [0.25, 0.25]),
-    createSpawn(0, 4, [0.25, 0.5]),
-    createSpawn(0, 4, [0.25, 0.75]),
-    createSpawn(0, 4, [0.5, 0]),
-    createSpawn(0, 4, [0.5, 0.25]),
-    createSpawn(0, 4, [0.5, 0.5]),
+    createSpawn(3, 4, [0.5, 0.5]),
+    createSpawn(1, 4, [0.25, 0.25]),
+    createSpawn(1, 4, [0.5, 0.25]),
+
+    createSpawn(4, 4, [1, 1]),
+    createSpawn(1, 4, [0.25, 1]),
+    createSpawn(1, 4, [0.5, 1]),
+
+    createSpawn(4, 4, [1, 0.5]),
+    createSpawn(1, 4, [1, 1]),
+    createSpawn(1, 4, [1, 0]),
+
+    createSpawn(3, 4, [0, 0.75]),
     createSpawn(0, 4, [0.5, 0.75]),
-    createSpawn(0, 4, [0.75, 0]),
-    createSpawn(0, 4, [0.75, 0.25]),
-    createSpawn(0, 4, [0.75, 0.5]),
     createSpawn(0, 4, [0.75, 0.75]),
+
+    createSpawn(2, 4, [0, 0.25]),
+    createSpawn(0, 4, [0.5, 0.25]),
+    createSpawn(0, 4, [0.75, 0.25]),
+
+    createSpawn(3, 4, [0, 0]),
+    createSpawn(0, 4, [1, 1]),
+
+    createSpawn(2, 4, [0, 1]),
     createSpawn(0, 4, [1, 0]),
-    createSpawn(0, 4, [1, 0.25]),
-    createSpawn(0, 4, [1, 0.5]),
-    createSpawn(0, 4, [1, 0.75]),
+
+    createSpawn(2, 4, [1, 0]),
+    createSpawn(0, 4, [0, 1]),
   ],
   [
     createSpawn(3, 4, [0.4, 0.5]),
