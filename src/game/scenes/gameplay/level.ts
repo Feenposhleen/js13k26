@@ -4,6 +4,7 @@ import { FullState } from "../../../core/game_worker";
 import { createSprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createText } from "../common/text";
+import { createTransitionOverlay } from "../common/transitionOverlay";
 import { createTransitionScene } from "../transitionScene";
 import { createEnemy, ColorSprite } from "./enemy";
 import { createExplosion } from "./fxPacks";
@@ -15,10 +16,9 @@ export const createLevel = (game: FullState, levelNr: number) => {
   const level = createSprite(null, [0, 0]);
   const textContainer = createSprite(null, [0, 0]);
   const enemyContainer = createSprite(null, [0, 0]);
+  const transition = createTransitionOverlay(game);
 
-  let completed = false;
-  let failed = false;
-  let transitionCountdown = 2;
+  let done = false;
   let enemyCount = levelSpawns[levelNr].length;
   let textScale = 0.05;
 
@@ -35,6 +35,8 @@ export const createLevel = (game: FullState, levelNr: number) => {
   };
 
   level._updater = (sprite, game, delta) => {
+    if (done) return;
+
     // ALways do this
     const newEnemyCount = remainingSpawns.length + enemyContainer._children.length;
     if (newEnemyCount !== game._state._gameplay._levelRemainingEnemies) {
@@ -45,15 +47,6 @@ export const createLevel = (game: FullState, levelNr: number) => {
     if (textScale > 0.05) {
       textScale = utils._max(0.05, textScale - delta);
       textContainer._setUniformScale(textScale);
-    }
-
-    if (completed || failed) {
-      transitionCountdown -= delta;
-      if (transitionCountdown < 0) {
-        const nextScene = createTransitionScene(levelNr, completed);
-        game._worker._setScene(nextScene);
-      }
-      return;
     }
 
     if (remainingSpawns.length > 0 && (remainingSpawns[0]._delay -= delta) < 0) {
@@ -75,9 +68,11 @@ export const createLevel = (game: FullState, levelNr: number) => {
     game._state._gameplay._levelTimeLeft -= delta;
 
     if (game._state._gameplay._levelTimeLeft < 0) {
-      failed = true;
+      transition._transitionTo(createTransitionScene(levelNr, false));
+      done = true;
     } else if (game._state._gameplay._levelRemainingEnemies < 1) {
-      completed = true;
+      transition._transitionTo(createTransitionScene(levelNr, true));
+      done = true;
     }
   };
 
@@ -91,6 +86,8 @@ export const createLevel = (game: FullState, levelNr: number) => {
   level._addChild(textContainer);
 
   setText(enemyCount);
+
+  gameplayState._layerUi._addChild(transition);
 
   return level;
 };

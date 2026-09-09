@@ -2,6 +2,7 @@ import createScene from "../../core/scene";
 import { createEmptySprite, Sprite } from "../../core/sprite";
 import { utils, Vec } from "../../core/utils";
 import { createParticles } from "./common/particles";
+import { createTransitionOverlay } from "./common/transitionOverlay";
 import { createBackground } from "./gameplay/background";
 import { ColorSprite } from "./gameplay/enemy";
 import { createExplosion } from "./gameplay/fxPacks";
@@ -71,10 +72,8 @@ export const createGameplayScene = (level: number) => {
 
     const bg = createBackground();
     gameplayState._layerBg._addChild(bg);
-
     gameplayState._layerEntities._addChild(createUnicorn(game));
     gameplayState._layerEntities._addChild(createLevel(game, level));
-
     game._worker._setMusic(1);
   });
 
