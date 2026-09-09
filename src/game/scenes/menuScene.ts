@@ -4,6 +4,7 @@ import { createEmptySprite, createSprite } from "../../core/sprite";
 import { utils } from "../../core/utils";
 import { createMenu } from "./common/menu";
 import { createParticles } from "./common/particles";
+import { createTransitionOverlay } from "./common/transitionOverlay";
 import { createGameplayScene } from "./gameplayScene";
 
 export const createMenuScene = () => {
@@ -12,11 +13,12 @@ export const createMenuScene = () => {
 
     const layerBg = createEmptySprite();
     const layerUi = createEmptySprite();
-
     scene._rootSprite._addChildren([layerBg, layerUi]);
 
+    const transition = createTransitionOverlay(game);
+
     // Full-screen background quad
-    const bg = createSprite(assetLibrary._textures._ui_square_bg, [1.5, 0.5], [10, 10]);
+    const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
     const starSpewer = createParticles(
@@ -30,23 +32,17 @@ export const createMenuScene = () => {
       [0.08, 0.1],
     );
     starSpewer._position = [0.5, 0.5];
-    layerBg._addChild(starSpewer);
 
-    let uni = createSprite(assetLibrary._textures._cloud_one, [0.5, 0.5]);
-    uni._updater = (s, g, d) => {
-      s._angle = s._angle + d;
-    };
+    const uni = createSprite(assetLibrary._textures._cloud_one, [0.5, 0.5]);
+    uni._updater = (s, g, d) => s._angle = s._angle + d;
 
-    scene._rootSprite._addChild(uni);
-
-    let menuBg = createSprite(assetLibrary._textures._square_bg, [0.5, 0.5]);
-    scene._rootSprite._addChild(menuBg);
+    const menuBg = createSprite(assetLibrary._textures._absolute_bg, [0.5, 0.5]);
 
     const menu = createMenu([
       {
         _text: "START GAME",
         _onSelected() {
-          game._worker._setScene(createGameplayScene(0));
+          transition._transitionTo(createGameplayScene(0));
         },
       },
       {
@@ -57,7 +53,9 @@ export const createMenuScene = () => {
 
     menu._setUniformScale(0.05);
     menu._position = [0.5, 0.45];
-    scene._rootSprite._addChild(menu);
+
+    layerBg._addChildren([starSpewer, uni]);
+    layerUi._addChildren([menuBg,menu, transition]);
   });
 
   return scene;

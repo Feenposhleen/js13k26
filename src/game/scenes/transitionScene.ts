@@ -3,6 +3,7 @@ import createScene from "../../core/scene";
 import { createEmptySprite, createSprite } from "../../core/sprite";
 import { createMenu } from "./common/menu";
 import { createParticles } from "./common/particles";
+import { createTransitionOverlay } from "./common/transitionOverlay";
 import { createGameplayScene } from "./gameplayScene";
 
 export const createTransitionScene = (previousLevel: number, completed: boolean) => {
@@ -11,6 +12,8 @@ export const createTransitionScene = (previousLevel: number, completed: boolean)
 
     const layerBg = createEmptySprite();
     const layerUi = createEmptySprite();
+
+    const transition = createTransitionOverlay(game);
 
     scene._rootSprite._addChildren([layerBg, layerUi]);
 
@@ -35,7 +38,9 @@ export const createTransitionScene = (previousLevel: number, completed: boolean)
 
     menu._setUniformScale(0.05);
     menu._position = [0.5, 0.4];
-    scene._rootSprite._addChild(menu);
+
+    layerUi._addChild(menu);
+    layerUi._addChild(transition);
   });
 
   return scene;
