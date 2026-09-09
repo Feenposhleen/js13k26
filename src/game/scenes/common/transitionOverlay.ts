@@ -3,6 +3,7 @@ import { FullState } from "../../../core/game_worker";
 import { Scene } from "../../../core/scene";
 import { createSprite, Sprite } from "../../../core/sprite";
 import { utils } from "../../../core/utils";
+import { createText } from "./text";
 
 type TransitionOverlaySprite = Sprite & {
   _transitionTo: (nextScene: Scene) => void;
