@@ -22,7 +22,7 @@ export const createTransitionOverlay = (game: FullState): TransitionOverlaySprit
 
   overlay._updater = (s, g, d) => {
     if (nextScene) {
-      transitionTimer = utils._min(1, transitionTimer + d);
+      transitionTimer = utils._min(1, transitionTimer + (d * .8));
       if (transitionTimer >= 1) {
         g._worker._setScene(nextScene);
       }

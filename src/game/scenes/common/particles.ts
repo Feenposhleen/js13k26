@@ -47,26 +47,31 @@ export const createParticles = (
       sprite._setUniformScale(
         particleScale - (sprite._lifetime / particleLifetime) * particleScale,
       );
-
-      if (sprite._lifetime > particleLifetime) {
-        sprite._dead = true;
-
-        if (repeat) {
-          addParticle();
-        }
-      }
     };
 
     emitter._addChild(particle);
   }
 
-  for (let i = 0; i < count; i++) {
-    addParticle();
+  if (!repeat) {
+    for (let i = 0; i < count; i++) {
+      addParticle();
+    }
   }
 
+  let emitTicks = 0;
+  let emitBudget = count;
   emitter._updater = (s, g, d) => {
-    if ((positioningTarget !== null && positioningTarget._dead) || s._children.length == 0) {
+    if ((positioningTarget !== null && positioningTarget._dead) || (!repeat && s._children.length == 0)) {
       s._dead = true;
+    }
+
+    if (repeat && emitBudget > 0) {
+      emitTicks += d;
+      if (emitTicks > (lifetimeRange[1] / count)) {
+        emitBudget--;
+        emitTicks = 0;
+        addParticle();
+      }
     }
   };
 
