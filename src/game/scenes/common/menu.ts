@@ -1,8 +1,8 @@
-import { createSprite, createEmptySprite } from "../../../core/sprite";
+import { createEmptySprite } from "../../../core/sprite";
 import { utils } from "../../../core/utils";
 import { createText } from "./text";
 
-type MenuOption = {
+export type MenuOption = {
   _text: string;
   _onSelected(): void;
 };
