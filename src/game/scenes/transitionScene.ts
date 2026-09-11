@@ -3,7 +3,10 @@ import createScene from "../../core/scene";
 import { createEmptySprite, createSprite } from "../../core/sprite";
 import { createMenuPrompt } from "./common/menuPrompt";
 import { createTransitionOverlay } from "./common/transitionOverlay";
+import { getCutsceneForLevel } from "./cutscene/cutsceneData";
+import { createCutsceneScene } from "./cutsceneScene";
 import { createGameplayScene } from "./gameplayScene";
+import { createMenuScene } from "./menuScene";
 
 export const createTransitionScene = (previousLevel: number, completed: boolean) => {
   const scene = createScene((scene, game) => {
@@ -24,14 +27,24 @@ export const createTransitionScene = (previousLevel: number, completed: boolean)
         {
           _text: completed ? "NEXT LEVEL" : "RETRY",
           _onSelected() {
-            game._worker._setScene(
-              createGameplayScene(completed ? previousLevel + 1 : previousLevel),
-            );
+            if (completed) {
+              const nextLevel = previousLevel + 1;
+              const cutscene = getCutsceneForLevel(nextLevel);
+              if (cutscene) {
+                game._worker._setScene(createCutsceneScene(nextLevel, cutscene));
+              } else {
+                game._worker._setScene(createGameplayScene(nextLevel));
+              }
+            } else {
+              game._worker._setScene(createGameplayScene(previousLevel));
+            }
           },
         },
         {
           _text: "BACK TO MENU",
-          _onSelected() {},
+          _onSelected() {
+            game._worker._setScene(createMenuScene());
+          },
         },
       ],
       [0.5, 0.4],

@@ -5,6 +5,8 @@ import { createSprite } from "../../../core/sprite";
 import { utils } from "../../../core/utils";
 import { createText } from "../common/text";
 import { createTransitionOverlay } from "../common/transitionOverlay";
+import { getCutsceneForLevel } from "../cutscene/cutsceneData";
+import { createCutsceneScene } from "../cutsceneScene";
 import { createTransitionScene } from "../transitionScene";
 import { createEnemy } from "./enemy";
 import { levelSpawns } from "./levelSpawns";
@@ -69,7 +71,13 @@ export const createLevel = (game: FullState, levelNr: number) => {
       transition._transitionTo(createTransitionScene(levelNr, false));
       done = true;
     } else if (game._state._gameplay._levelRemainingEnemies < 1) {
-      transition._transitionTo(createTransitionScene(levelNr, true));
+      const nextLevel = levelNr + 1;
+      const cutscene = getCutsceneForLevel(nextLevel);
+      if (cutscene) {
+        transition._transitionTo(createCutsceneScene(nextLevel, cutscene));
+      } else {
+        transition._transitionTo(createTransitionScene(levelNr, true));
+      }
       done = true;
     }
   };

@@ -6,7 +6,7 @@ import { createMenu } from "./common/menu";
 import { createParticles } from "./common/particles";
 import { createText } from "./common/text";
 import { createTransitionOverlay } from "./common/transitionOverlay";
-import { createGameplayScene } from "./gameplayScene";
+import { createCutsceneScene } from "./cutsceneScene";
 
 export const createMenuScene = () => {
   const scene = createScene((scene, game) => {
@@ -20,7 +20,7 @@ export const createMenuScene = () => {
 
     scene._rootSprite._addChildren([layerBg, layerUi]);
 
-    const transition = createTransitionOverlay(game);
+    const transition = createTransitionOverlay();
 
     // Full-screen background quad
     const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
@@ -50,7 +50,7 @@ export const createMenuScene = () => {
       {
         _text: "START GAME",
         _onSelected() {
-          transition._transitionTo(createGameplayScene(0));
+          transition._transitionTo(createCutsceneScene(0));
         },
       },
       {

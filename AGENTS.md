@@ -42,7 +42,7 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
   - Manages the Web Audio context and sound playback.
   - **Self-Bootstrapping Worker**: Reads the inline `<script id="j">` content from the DOM and creates a `Blob` URL (`URL.createObjectURL(new Blob([...]))`) to launch the worker without requiring external bundle files.
 - **Game Worker** (`src/core/game_worker.ts`):
-  - Maintains the active scene stack (`_pushScene`, `_popScene`, `_removeScene`) and entity scene graph.
+  - Maintains the active scene stack (`_pushScene`, `_popScene`, `_removeScene`).
   - Serializes sprite instance data (transformed clip-space 3x3 matrix, texture layer index, opacity) into a shared `Float32Array`.
   - Dispatches post-processing parameter updates (`_postProgramValues`) and queued audio playback requests to the main thread.
 - **Zero-Allocation Ping-Ponging**:
@@ -88,6 +88,10 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 
 - **Scene Management** (`src/core/scene.ts`):
   - Hierarchical scene stack. Scenes define one-time initializers (`(scene, state) => void`) and frame updaters (`(scene, state, delta) => void`).
+  - Standard scenes: `menuScene.ts`, `gameplayScene.ts`, `transitionScene.ts`, and dialogue cutscene system (`cutsceneScene.ts`, `cutscene/cutsceneData.ts`).
+- **Dialogue Cutscene System** (`src/game/scenes/cutsceneScene.ts`):
+  - Between-level dialogue sequences featuring the Unicop (`_unicorn_one`) and the Unicorn Captain (`_unicorn_captain`).
+  - Provides timed, back-and-forth dialogue lines with speaker focus/animations, optional manual skip/advance input, and smooth scene transitions into the next level.
 - **Sprite Node Tree** (`src/core/sprite.ts`):
   - Hierarchical transform tree (`_position`, `_velocity`, `_scale`, `_angle`, `_opacity`, `_children`, `_lifetime`, `_dead`, `_seed`).
   - Position updates automatically apply velocity per frame (`_position += _velocity * delta`).
@@ -118,7 +122,7 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 - **Bundler & Minifier Configuration** (`rollup.config.js`):
   - `@rollup/plugin-typescript`: Compiles TypeScript with strict type checking.
   - `rollup-plugin-glslify`: Inlines and compresses GLSL shader strings.
-  - `inlineTemplate()`: Custom plugin that inlines minified CSS (`src/style.css`) and JavaScript into `scaffold.template` to produce a standalone `dist/index.html`.
+  - `inlineTemplate()`: Custom plugin that inlines minified CSS (`src/style.css`) and JavaScript into `scaffold.template` to produce a standalone `dist/index.html``.
   - `@rollup/plugin-terser`: Production minifier configured with:
     - 3 compression passes (`passes: 3`, `unsafe: true`, `booleans_as_integers: true`).
     - **Property Mangling**: Aggressively mangles all properties matching `/^_/`.

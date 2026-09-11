@@ -1,0 +1,218 @@
+import assetLibrary from "../../core/asset_library";
+import createScene, { Scene } from "../../core/scene";
+import { createEmptySprite, createSprite } from "../../core/sprite";
+import { utils } from "../../core/utils";
+import { createParticles } from "./common/particles";
+import { createText } from "./common/text";
+import { createTransitionOverlay } from "./common/transitionOverlay";
+import { CutsceneData, getCutsceneForLevel } from "./cutscene/cutsceneData";
+import { createGameplayScene } from "./gameplayScene";
+import { levelSpawns } from "./gameplay/levelSpawns";
+import { createMenuScene } from "./menuScene";
+
+export const createCutsceneScene = (
+  nextLevel: number,
+  customCutscene?: CutsceneData,
+): Scene => {
+  const cutscene = customCutscene || getCutsceneForLevel(nextLevel);
+
+  // If no cutscene definition exists, immediately transition to next gameplay level or menu
+  if (!cutscene || cutscene._lines.length === 0) {
+    return nextLevel < levelSpawns.length
+      ? createGameplayScene(nextLevel)
+      : createMenuScene();
+  }
+
+  const scene = createScene((scene, game) => {
+    game._worker._setMusic(cutscene._music || 2);
+
+    const layerBg = createEmptySprite();
+    const layerActors = createEmptySprite();
+    const layerUi = createEmptySprite();
+
+    scene._rootSprite._addChildren([layerBg, layerActors, layerUi]);
+
+    const transition = createTransitionOverlay();
+
+    // Background quad
+    const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
+    layerBg._addChild(bg);
+
+    // Cosmic background particles
+    const stars = createParticles(
+      assetLibrary._textures._star,
+      20,
+      true,
+      null,
+      [-utils._pi, utils._pi],
+      [0.2, 0.4],
+      [0.4, 0.8],
+      [0.3, 0.6],
+    );
+    stars._position = [0.5, 0.5];
+    layerBg._addChild(stars);
+
+    // Characters: Unicop on the left, Captain on the right
+    const unicopSprite = createSprite(
+      assetLibrary._textures._unicorn_one,
+      [0.22, 0.65],
+      [0.55, 0.55],
+    );
+
+    const unicopLabelContainer = createEmptySprite();
+    unicopLabelContainer._position = [0.22, 0.84];
+    unicopLabelContainer._setUniformScale(0.035);
+    unicopLabelContainer._addChild(createText("UNICOP"));
+
+    const captainSprite = createSprite(
+      assetLibrary._textures._unicorn_captain,
+      [0.78, 0.65],
+      [-0.55, 0.55],
+    );
+
+    const captainLabelContainer = createEmptySprite();
+    captainLabelContainer._position = [0.78, 0.84];
+    captainLabelContainer._setUniformScale(0.035);
+    captainLabelContainer._addChild(createText("CAPTAIN"));
+
+    layerActors._addChildren([
+      unicopSprite,
+      unicopLabelContainer,
+      captainSprite,
+      captainLabelContainer,
+    ]);
+
+    // Dialogue Box UI
+    const boxBackdrop = createSprite(
+      assetLibrary._textures._absolute_bg,
+      [0.5, 0.25],
+      [2.3, 0.45],
+      [0, 0],
+      0.75,
+    );
+
+    const boxBorder = createSprite(
+      assetLibrary._textures._ui_square,
+      [0.5, 0.25],
+      [2.3, 0.45],
+      [0, 0],
+      0.9,
+    );
+
+    const speakerTagContainer = createEmptySprite();
+    speakerTagContainer._setUniformScale(0.04);
+
+    const dialogueContainer = createEmptySprite();
+    dialogueContainer._position = [0.5, 0.25];
+    dialogueContainer._setUniformScale(0.045);
+
+    const promptContainer = createEmptySprite();
+    promptContainer._position = [0.5, 0.93];
+    promptContainer._setUniformScale(0.03);
+    promptContainer._addChild(createText("[ CLICK OR WAIT TO ADVANCE ]"));
+
+    layerUi._addChildren([
+      boxBackdrop,
+      boxBorder,
+      speakerTagContainer,
+      dialogueContainer,
+      promptContainer,
+      transition,
+    ]);
+
+    let currentLineIdx = 0;
+    let lineTimer = 0;
+    let isTransitioning = false;
+    let lastPointerDown = false;
+
+    const showLine = (index: number) => {
+      if (index >= cutscene._lines.length) {
+        if (!isTransitioning) {
+          isTransitioning = true;
+          promptContainer._children = [createText("[ TRANSITIONING... ]")];
+          const target =
+            nextLevel < levelSpawns.length
+              ? createGameplayScene(nextLevel)
+              : createMenuScene();
+          transition._transitionTo(target);
+        }
+        return;
+      }
+
+      const line = cutscene._lines[index];
+      game._worker._playSfx(8);
+
+      const isUnicop = line._speaker === "unicop";
+      speakerTagContainer._children = [];
+      speakerTagContainer._position = isUnicop ? [0.32, 0.15] : [0.68, 0.15];
+      speakerTagContainer._addChild(createText(isUnicop ? "> UNICOP" : "> CAPTAIN"));
+
+      dialogueContainer._children = [];
+      const lineSpacing = 1.3;
+      line._text.forEach((textLine, i) => {
+        const textSprite = createText(textLine);
+        textSprite._position = [0, (i - (line._text.length - 1) / 2) * lineSpacing];
+        dialogueContainer._addChild(textSprite);
+      });
+
+      lineTimer = 0;
+    };
+
+    showLine(0);
+
+    scene._updater = (_s, game, delta) => {
+      const currentLine = cutscene._lines[currentLineIdx];
+      let lineDuration = 3.2;
+      if (currentLine) {
+        const totalChars = currentLine._text.join(" ").length;
+        lineDuration = currentLine._duration || utils._max(2.6, totalChars * 0.08);
+      }
+
+      const pointerJustDown = game._input._pointer._down && !lastPointerDown;
+      lastPointerDown = game._input._pointer._down;
+
+      if (!isTransitioning) {
+        lineTimer += delta;
+        if (pointerJustDown || lineTimer >= lineDuration) {
+          currentLineIdx++;
+          showLine(currentLineIdx);
+        }
+      }
+
+      // Animate speakers based on who is speaking
+      const isUnicop = currentLine && currentLine._speaker === "unicop";
+      const isCaptain = currentLine && currentLine._speaker === "captain";
+
+      if (isUnicop) {
+        unicopSprite._texture =
+          (game._state._ticks * 6) % 2 < 1
+            ? assetLibrary._textures._unicorn_two
+            : assetLibrary._textures._unicorn_one;
+        unicopSprite._opacity = 1;
+        unicopSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 8) * 0.01;
+        unicopLabelContainer._opacity = 1;
+      } else {
+        unicopSprite._texture = assetLibrary._textures._unicorn_one;
+        unicopSprite._opacity = 0.55;
+        unicopSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 2) * 0.005;
+        unicopLabelContainer._opacity = 0.55;
+      }
+
+      if (isCaptain) {
+        captainSprite._opacity = 1;
+        captainSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 8 + 1) * 0.01;
+        captainSprite._angle = utils._sin(game._state._ticks * 6) * 0.03;
+        captainLabelContainer._opacity = 1;
+      } else {
+        captainSprite._opacity = 0.55;
+        captainSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 2 + 1) * 0.005;
+        captainSprite._angle = 0;
+        captainLabelContainer._opacity = 0.55;
+      }
+
+      promptContainer._opacity = 0.5 + utils._sin(game._state._ticks * 5) * 0.35;
+    };
+  });
+
+  return scene;
+};
