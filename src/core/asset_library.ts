@@ -35,7 +35,7 @@ const assetLibrary = {
       RENDERER_SPRITE_RESOLUTION,
     ).getContext("2d")!;
 
-    for (var i = 0; i < FONT_GLYPH_LIST.length; i++) {
+    for (let i = 0; i < FONT_GLYPH_LIST.length; i++) {
       const glyph = FONT_GLYPH_LIST[i];
       const glyphKey: string = `__font_${glyph}`;
       ctx.fillStyle = "rgba(0, 0, 0, 0)";

@@ -1,13 +1,12 @@
 import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
 import { FullState } from "../../../core/game_worker";
-import { createSprite, Sprite } from "../../../core/sprite";
-import { utils, Vec } from "../../../core/utils";
+import { createSprite } from "../../../core/sprite";
+import { utils } from "../../../core/utils";
 import { createText } from "../common/text";
 import { createTransitionOverlay } from "../common/transitionOverlay";
 import { createTransitionScene } from "../transitionScene";
-import { createEnemy, ColorSprite } from "./enemy";
-import { createExplosion } from "./fxPacks";
+import { createEnemy } from "./enemy";
 import { levelSpawns } from "./levelSpawns";
 
 export const createLevel = (game: FullState, levelNr: number) => {
@@ -16,10 +15,10 @@ export const createLevel = (game: FullState, levelNr: number) => {
   const level = createSprite(null, [0, 0]);
   const textContainer = createSprite(null, [0, 0]);
   const enemyContainer = createSprite(null, [0, 0]);
-  const transition = createTransitionOverlay(game);
+  const transition = createTransitionOverlay();
 
   let done = false;
-  let enemyCount = levelSpawns[levelNr].length;
+  const enemyCount = levelSpawns[levelNr].length;
   let textScale = 0.05;
 
   gameplayState._levelTotalEnemies = enemyCount;

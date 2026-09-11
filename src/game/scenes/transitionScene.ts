@@ -11,13 +11,12 @@ export const createTransitionScene = (previousLevel: number, completed: boolean)
 
     const layerBg = createEmptySprite();
     const layerUi = createEmptySprite();
-
-    const transition = createTransitionOverlay(game);
+    const transition = createTransitionOverlay();
 
     scene._rootSprite._addChildren([layerBg, layerUi]);
 
     // Full-screen background quad
-    const bg = createSprite(assetLibrary._textures._ui_square_bg, [1.5, 0.5], [10, 10]);
+    const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
     const menu = createMenuPrompt(

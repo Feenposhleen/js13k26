@@ -1,6 +1,5 @@
-import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
-import { createSprite, createEmptySprite, Sprite, SpriteUpdater } from "../../../core/sprite";
+import { createSprite, createEmptySprite, SpriteUpdater } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 
 export const createParallax = (

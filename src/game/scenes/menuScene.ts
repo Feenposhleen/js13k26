@@ -14,7 +14,7 @@ export const createMenuScene = () => {
 
     const layerBg = createEmptySprite();
     const layerUi = createEmptySprite();
-    const title = createText('UNICOP');
+    const title = createText("UNICOP");
     title._position = [0.52, 0.2];
     title._scale = [0.1, 0.1];
 
@@ -39,7 +39,7 @@ export const createMenuScene = () => {
     starSpewer._position = [0.5, 0.5];
 
     const uni = createSprite(assetLibrary._textures._unicorn_one, [0.5, 0.5]);
-    uni._updater = (s, g, d) => s._angle = s._angle + d;
+    uni._updater = (s, g, d) => (s._angle = s._angle + d);
     uni._setUniformScale(1);
 
     const menuBg = createSprite(assetLibrary._textures._absolute_bg, [0.5, 0.7]);
@@ -65,7 +65,7 @@ export const createMenuScene = () => {
     layerBg._addChildren([starSpewer, uni]);
     layerUi._addChildren([menuBg, menu, title, transition]);
 
-    scene._updater = (s, g, d) => {
+    scene._updater = (_s, g, _d) => {
       title._position = utils._vectorAdd(
         [0.53, 0.2],
         utils._vectorRotate([0, 0.01], g._worker._ticks),

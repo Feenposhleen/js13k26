@@ -69,7 +69,7 @@ export const utils = {
   },
 
   _wrap: (num: number, min: number, max: number): number => {
-    var range = max - min;
+    const range = max - min;
     return ((((num - min) % range) + range) % range) + min;
   },
 
@@ -212,8 +212,8 @@ export const utils = {
   ): [ColorSprite | null, number] => {
     let nearestDistance = 999;
     let nearestSprite: ColorSprite | null = null;
-    for (let sprite of enemySprites) {
-      let distance = utils._vectorDistance(position, sprite._position);
+    for (const sprite of enemySprites) {
+      const distance = utils._vectorDistance(position, sprite._position);
       if (distance < nearestDistance) {
         nearestDistance = distance;
         nearestSprite = sprite;

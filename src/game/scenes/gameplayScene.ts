@@ -2,7 +2,6 @@ import createScene from "../../core/scene";
 import { createEmptySprite, Sprite } from "../../core/sprite";
 import { utils, Vec } from "../../core/utils";
 import { createParticles } from "./common/particles";
-import { createTransitionOverlay } from "./common/transitionOverlay";
 import { createBackground } from "./gameplay/background";
 import { ColorSprite } from "./gameplay/enemy";
 import { createExplosion } from "./gameplay/fxPacks";
@@ -78,7 +77,7 @@ export const createGameplayScene = (level: number) => {
   });
 
   scene._updater = (scene, game, delta) => {
-    let bloomValue = game._worker._getPostProgramValue(0);
+    const bloomValue = game._worker._getPostProgramValue(0);
     if (bloomValue > 0) {
       game._worker._setPostProgramValue(0, utils._max(0, bloomValue - delta * 2));
     }

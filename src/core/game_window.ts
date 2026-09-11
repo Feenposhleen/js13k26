@@ -32,8 +32,8 @@ const createGameWindow = () => {
   const playButton = utils.$('#p') as HTMLDivElement;
 
   // Input
-  let _pointer: Pointer = { _coord: [0, 0], _down: false };
-  let _keysDown: Record<string, boolean> = {};
+  const _pointer: Pointer = { _coord: [0, 0], _down: false };
+  const _keysDown: Record<string, boolean> = {};
   let _keyTaps: Record<string, boolean> = {};
 
   // Rendering

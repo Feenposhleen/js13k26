@@ -29,15 +29,15 @@ export type FullState = {
 
 const createGameWorker = () => {
   const _sceneRemoveList = new Set<Scene>();
-  var _sceneTree: Scene[] = [];
-  var _keys: Record<string, boolean> = {};
-  var _pointer = { _coord: <Vec>[0, 0], _down: false };
-  var _lastTs: number = 0;
-  var _state: FullState | undefined = undefined;
-  var _input: InputState = { _keys: _keys, _pointer: _pointer };
-  var _pendingMusic: number | string | null = null;
-  var _pendingSfx: (number | string)[] = [];
-  var _postProgramValues: number[] = [];
+  let _sceneTree: Scene[] = [];
+  const _keys: Record<string, boolean> = {};
+  const _pointer = { _coord: <Vec>[0, 0], _down: false };
+  let _lastTs: number = 0;
+  let _state: FullState | undefined = undefined;
+  const _input: InputState = { _keys: _keys, _pointer: _pointer };
+  let _pendingMusic: number | string | null = null;
+  let _pendingSfx: (number | string)[] = [];
+  const _postProgramValues: number[] = [];
 
   self.onmessage = ({ data }: { data: TransferDataFromWindow }) => {
     if (!_state) return;

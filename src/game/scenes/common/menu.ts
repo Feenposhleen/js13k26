@@ -15,7 +15,7 @@ export const createMenu = (options: Array<MenuOption>) => {
   let hoverIndex = -1;
   let offset = 0;
 
-  for (let option of options) {
+  for (const option of options) {
     const text = createText(option._text);
     text._position = [0, offset];
     offset += 1.2;
@@ -30,9 +30,9 @@ export const createMenu = (options: Array<MenuOption>) => {
 
     let nearestDist = 999;
     let nearestOptionIndex = -1;
-    for (let optionSprite of anchor._children) {
-      let idx = anchor._children.indexOf(optionSprite);
-      let dist = utils._vectorManhattanDistance(optionSprite._position, transformedCursorPos);
+    for (const optionSprite of anchor._children) {
+      const idx = anchor._children.indexOf(optionSprite);
+      const dist = utils._vectorManhattanDistance(optionSprite._position, transformedCursorPos);
       if (dist < nearestDist && dist < 3) {
         nearestDist = dist;
         nearestOptionIndex = anchor._children.indexOf(optionSprite);

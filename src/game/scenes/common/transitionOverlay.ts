@@ -1,16 +1,14 @@
 import assetLibrary from "../../../core/asset_library";
-import { FullState } from "../../../core/game_worker";
 import { Scene } from "../../../core/scene";
 import { createSprite, Sprite } from "../../../core/sprite";
 import { utils } from "../../../core/utils";
-import { createText } from "./text";
 
 type TransitionOverlaySprite = Sprite & {
   _transitionTo: (nextScene: Scene) => void;
 };
 
 // Expects the anchor to be in a clean viewport space (not a child to a transformed sprite)
-export const createTransitionOverlay = (game: FullState): TransitionOverlaySprite => {
+export const createTransitionOverlay = (): TransitionOverlaySprite => {
   let nextScene: Scene;
   let transitionTimer = 1;
 
@@ -22,7 +20,7 @@ export const createTransitionOverlay = (game: FullState): TransitionOverlaySprit
 
   overlay._updater = (s, g, d) => {
     if (nextScene) {
-      transitionTimer = utils._min(1, transitionTimer + (d * .8));
+      transitionTimer = utils._min(1, transitionTimer + d * 0.8);
       if (transitionTimer >= 1) {
         g._worker._setScene(nextScene);
       }

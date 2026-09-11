@@ -22,11 +22,6 @@ export type RenderTarget = {
   _height: number;
 };
 
-type WrappedProgram = {
-  _updater(v: number): number;
-  _program: WebGLProgram;
-};
-
 type RenderDataItem = { _mat: Float32Array; _layer: number; _opacity: number };
 
 const _walkBuffer: Array<RenderDataItem> = [];
@@ -48,7 +43,7 @@ const _fillWalkView = (sprite: Sprite, parentMat: Float32Array | null, parentOpa
     sprite.___r = [new Float32Array(9), new Float32Array(9), new Float32Array(9)];
   }
 
-  let local = utils._mat3FromTRS(
+  const local = utils._mat3FromTRS(
     x * RENDERER_WIDTH,
     y * RENDERER_HEIGHT,
     angle,
@@ -208,8 +203,8 @@ export const createRenderer = (canvas: HTMLCanvasElement) => {
     _createProgram(fsQuadVs, boxBlurFs),
   ];
 
-  let targetA: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
-  let targetB: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
+  const targetA: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
+  const targetB: RenderTarget | null = _createRenderTarget(canvas.width, canvas.height);
 
   gl.enable(gl.BLEND);
   // use standard alpha blending for straight (non-premultiplied) alpha

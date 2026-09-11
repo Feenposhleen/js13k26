@@ -101,7 +101,7 @@ function runScript({ script = "editor/server.js" } = {}) {
           if (!child) return;
           try {
             child.kill(signal || "SIGTERM");
-          } catch (e) {
+          } catch (_e) {
             try {
               child.kill();
             } catch (_) {}
