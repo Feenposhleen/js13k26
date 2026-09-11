@@ -10,17 +10,12 @@ import { createGameplayScene } from "./gameplayScene";
 import { levelSpawns } from "./gameplay/levelSpawns";
 import { createMenuScene } from "./menuScene";
 
-export const createCutsceneScene = (
-  nextLevel: number,
-  customCutscene?: CutsceneData,
-): Scene => {
+export const createCutsceneScene = (nextLevel: number, customCutscene?: CutsceneData): Scene => {
   const cutscene = customCutscene || getCutsceneForLevel(nextLevel);
 
   // If no cutscene definition exists, immediately transition to next gameplay level or menu
   if (!cutscene || cutscene._lines.length === 0) {
-    return nextLevel < levelSpawns.length
-      ? createGameplayScene(nextLevel)
-      : createMenuScene();
+    return nextLevel < levelSpawns.length ? createGameplayScene(nextLevel) : createMenuScene();
   }
 
   const scene = createScene((scene, game) => {
@@ -38,20 +33,6 @@ export const createCutsceneScene = (
     const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
-    // Cosmic background particles
-    const stars = createParticles(
-      assetLibrary._textures._star,
-      20,
-      true,
-      null,
-      [-utils._pi, utils._pi],
-      [0.2, 0.4],
-      [0.4, 0.8],
-      [0.3, 0.6],
-    );
-    stars._position = [0.5, 0.5];
-    layerBg._addChild(stars);
-
     // Characters: Unicop on the left, Captain on the right
     const unicopSprite = createSprite(
       assetLibrary._textures._unicorn_one,
@@ -59,28 +40,13 @@ export const createCutsceneScene = (
       [0.55, 0.55],
     );
 
-    const unicopLabelContainer = createEmptySprite();
-    unicopLabelContainer._position = [0.22, 0.84];
-    unicopLabelContainer._setUniformScale(0.035);
-    unicopLabelContainer._addChild(createText("UNICOP"));
-
     const captainSprite = createSprite(
       assetLibrary._textures._unicorn_captain,
       [0.78, 0.65],
       [-0.55, 0.55],
     );
 
-    const captainLabelContainer = createEmptySprite();
-    captainLabelContainer._position = [0.78, 0.84];
-    captainLabelContainer._setUniformScale(0.035);
-    captainLabelContainer._addChild(createText("CAPTAIN"));
-
-    layerActors._addChildren([
-      unicopSprite,
-      unicopLabelContainer,
-      captainSprite,
-      captainLabelContainer,
-    ]);
+    layerActors._addChildren([unicopSprite, captainSprite]);
 
     // Dialogue Box UI
     const boxBackdrop = createSprite(
@@ -91,34 +57,14 @@ export const createCutsceneScene = (
       0.75,
     );
 
-    const boxBorder = createSprite(
-      assetLibrary._textures._ui_square,
-      [0.5, 0.25],
-      [2.3, 0.45],
-      [0, 0],
-      0.9,
-    );
-
     const speakerTagContainer = createEmptySprite();
     speakerTagContainer._setUniformScale(0.04);
 
     const dialogueContainer = createEmptySprite();
-    dialogueContainer._position = [0.5, 0.25];
+    dialogueContainer._position = [0.5, 0.75];
     dialogueContainer._setUniformScale(0.045);
 
-    const promptContainer = createEmptySprite();
-    promptContainer._position = [0.5, 0.93];
-    promptContainer._setUniformScale(0.03);
-    promptContainer._addChild(createText("[ CLICK OR WAIT TO ADVANCE ]"));
-
-    layerUi._addChildren([
-      boxBackdrop,
-      boxBorder,
-      speakerTagContainer,
-      dialogueContainer,
-      promptContainer,
-      transition,
-    ]);
+    layerUi._addChildren([boxBackdrop, speakerTagContainer, dialogueContainer, transition]);
 
     let currentLineIdx = 0;
     let lineTimer = 0;
@@ -129,11 +75,8 @@ export const createCutsceneScene = (
       if (index >= cutscene._lines.length) {
         if (!isTransitioning) {
           isTransitioning = true;
-          promptContainer._children = [createText("[ TRANSITIONING... ]")];
           const target =
-            nextLevel < levelSpawns.length
-              ? createGameplayScene(nextLevel)
-              : createMenuScene();
+            nextLevel < levelSpawns.length ? createGameplayScene(nextLevel) : createMenuScene();
           transition._transitionTo(target);
         }
         return;
@@ -190,27 +133,21 @@ export const createCutsceneScene = (
             : assetLibrary._textures._unicorn_one;
         unicopSprite._opacity = 1;
         unicopSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 8) * 0.01;
-        unicopLabelContainer._opacity = 1;
       } else {
         unicopSprite._texture = assetLibrary._textures._unicorn_one;
         unicopSprite._opacity = 0.55;
         unicopSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 2) * 0.005;
-        unicopLabelContainer._opacity = 0.55;
       }
 
       if (isCaptain) {
         captainSprite._opacity = 1;
         captainSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 8 + 1) * 0.01;
         captainSprite._angle = utils._sin(game._state._ticks * 6) * 0.03;
-        captainLabelContainer._opacity = 1;
       } else {
         captainSprite._opacity = 0.55;
         captainSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 2 + 1) * 0.005;
         captainSprite._angle = 0;
-        captainLabelContainer._opacity = 0.55;
       }
-
-      promptContainer._opacity = 0.5 + utils._sin(game._state._ticks * 5) * 0.35;
     };
   });
 

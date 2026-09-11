@@ -4,8 +4,7 @@ import { FullState } from "../../../core/game_worker";
 import { createSprite, Sprite } from "../../../core/sprite";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
-import { createExplosion } from "./fxPacks";
-import { colorByTexture, textureByColor } from "./projectile";
+import { textureByColor } from "./projectile";
 
 export type ColorSprite = Sprite & { _color: number };
 
