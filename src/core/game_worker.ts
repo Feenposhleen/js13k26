@@ -64,7 +64,7 @@ const createGameWorker = () => {
     if (!_state) return;
 
     const now = performance.now();
-    const delta = (now - _lastTs) / 1000;
+    const delta = utils._min(0.1,(now - _lastTs) / 1000);
     _lastTs = now;
 
     gameWorker._ticks += delta;

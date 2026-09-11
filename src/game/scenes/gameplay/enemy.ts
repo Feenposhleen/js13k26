@@ -42,7 +42,7 @@ export const createEnemy = (
     );
 
     s._position = utils._vectorAdd(s._position, [
-      utils._cos(g._worker._ticks * 2 + rand) * 0.02,
+      utils._cos(g._worker._ticks * 2 + rand) * 0.01,
       utils._sin(g._worker._ticks + rand) * 0.01,
     ]);
 

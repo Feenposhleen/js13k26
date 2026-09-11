@@ -35,19 +35,18 @@ export const createLevel = (game: FullState, levelNr: number) => {
   };
 
   level._updater = (sprite, game, delta) => {
-    if (done) return;
+    if (textScale > 0.05) {
+      textScale = utils._max(0.05, textScale - delta);
+      textContainer._setUniformScale(textScale);
+    }
 
-    // ALways do this
     const newEnemyCount = remainingSpawns.length + enemyContainer._children.length;
     if (newEnemyCount !== game._state._gameplay._levelRemainingEnemies) {
       game._state._gameplay._levelRemainingEnemies = newEnemyCount;
       setText(newEnemyCount);
     }
 
-    if (textScale > 0.05) {
-      textScale = utils._max(0.05, textScale - delta);
-      textContainer._setUniformScale(textScale);
-    }
+    if (done) return;
 
     if (remainingSpawns.length > 0 && (remainingSpawns[0]._delay -= delta) < 0) {
       const spawn = remainingSpawns.shift()!;
