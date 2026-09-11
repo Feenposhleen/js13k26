@@ -15,7 +15,7 @@ export const utils = {
     return utils._keys(obj).find((key) => obj[key] === val) || "";
   },
 
-  _deepCopy: (obj: Object) => JSON.parse(JSON.stringify(obj)),
+  _deepCopy: (obj: object) => JSON.parse(JSON.stringify(obj)),
 
   _removeFromArray: <T>(arr: Array<T>, item: T): void => {
     const index = arr.indexOf(item);

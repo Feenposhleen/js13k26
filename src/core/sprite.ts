@@ -5,7 +5,7 @@ import { utils, Vec } from "./utils";
 export type SpriteUpdater = (sprite: Sprite, state: FullState, delta: number) => void;
 
 export type Sprite = {
-  _dead: Boolean;
+  _dead: boolean;
   _seed: number;
   _lifetime: number;
   _velocity: Vec;

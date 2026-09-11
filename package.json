@@ -11,7 +11,9 @@
     "pack": "bestzip dist/game.zip dist/index.html",
     "shrinkzip": "advzip --recompress --shrink-extra -4 -i 200 dist/game.zip || echo advzip-skip",
     "size": "node -e \"const s=require('fs').statSync('dist/game.zip').size;console.log((s/1024).toFixed(1)+' KB')\"",
-    "release": "npm run clean && npm run build && npm run pack && npm run shrinkzip && npm run size"
+    "release": "npm run clean && npm run build && npm run pack && npm run shrinkzip && npm run size",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [
     "game",
@@ -21,11 +23,15 @@
   "author": "Charlie Norin",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.4",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "advzip-bin": "^1.0.0",
     "bestzip": "^2.2.1",
     "concurrently": "^8.2.1",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
     "rimraf": "^6.0.1",
     "roadroller": "^2.1.0",
     "rollup": "^4.46.2",
@@ -35,6 +41,7 @@
     "serve": "^10.0.2",
     "tslib": "^2.8.1",
     "typescript": "^5.9.2",
+    "typescript-eslint": "^8.70.0",
     "watch": "^0.13.0"
   }
 }

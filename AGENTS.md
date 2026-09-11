@@ -122,11 +122,18 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
   - `@rollup/plugin-terser`: Production minifier configured with:
     - 3 compression passes (`passes: 3`, `unsafe: true`, `booleans_as_integers: true`).
     - **Property Mangling**: Aggressively mangles all properties matching `/^_/`.
+- **Code Quality & Formatting Pipeline** (`eslint.config.mjs`):
+  - ESLint 10 + `typescript-eslint` + `@stylistic/eslint-plugin`.
+  - Enforces trailing commas on multiline structures and 2-space indentation.
+  - Enforces line length of 100 characters max (`@stylistic/max-len`).
+  - Enforces required newlines (`@stylistic/eol-last`, multiline object/array/function breaks, etc.).
 - **Build Commands** (`package.json`):
   - `npm run dev`: Starts Rollup watch mode, live reload, dev server on port 5173, and the asset editor on port 7362.
   - `npm run build`: Generates the production bundle in `dist/index.html`.
   - `npm run preview`: Previews the production build via local HTTP server.
   - `npm run release`: Performs full clean, build, zip (`bestzip`), and extreme Deflate recompression (`advzip` with 200 iterations), then prints the final `.zip` file size in KB.
+  - `npm run lint`: Runs ESLint checks across TypeScript and JavaScript source files.
+  - `npm run lint:fix`: Automatically fixes fixable ESLint stylistic and formatting issues.
 
 ---
 

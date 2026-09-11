@@ -61,7 +61,10 @@ export const createParticles = (
   let emitTicks = 0;
   let emitBudget = count;
   emitter._updater = (s, g, d) => {
-    if ((positioningTarget !== null && positioningTarget._dead) || (!repeat && s._children.length == 0)) {
+    if (
+      (positioningTarget !== null && positioningTarget._dead) ||
+      (!repeat && s._children.length == 0)
+    ) {
       s._dead = true;
     }
 

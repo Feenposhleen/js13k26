@@ -38,7 +38,9 @@ const createGameWindow = () => {
 
   // Rendering
   let _renderer: Renderer | null = null;
-  let _freeRenderBuffer: Float32Array | null = new Float32Array(MAX_SPRITE_COUNT * FLOATS_PER_INSTANCE);
+  let _freeRenderBuffer: Float32Array | null = new Float32Array(
+    MAX_SPRITE_COUNT * FLOATS_PER_INSTANCE,
+  );
 
   // Audio
   let _sound: MiniSequencer | null = null;

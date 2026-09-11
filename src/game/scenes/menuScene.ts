@@ -66,7 +66,10 @@ export const createMenuScene = () => {
     layerUi._addChildren([menuBg, menu, title, transition]);
 
     scene._updater = (s, g, d) => {
-      title._position = utils._vectorAdd([0.53, 0.2], utils._vectorRotate([0,0.01], g._worker._ticks));
+      title._position = utils._vectorAdd(
+        [0.53, 0.2],
+        utils._vectorRotate([0, 0.01], g._worker._ticks),
+      );
     };
   });
 
