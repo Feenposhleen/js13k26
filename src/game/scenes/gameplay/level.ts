@@ -66,11 +66,7 @@ export const createLevel = (
 
     if (done) return;
 
-    if (
-      remainingSpawns.length > 0 &&
-      enemyContainer._children.length < 6 &&
-      (remainingSpawns[0]._delay -= delta) < 0
-    ) {
+    if (remainingSpawns.length > 0 && (remainingSpawns[0]._delay -= delta) < 0) {
       const spawn = remainingSpawns.shift()!;
 
       const texture: RawTexture =
@@ -106,10 +102,10 @@ export const createLevel = (
   textContainer._setUniformScale(0.05);
   level._addChild(textContainer);
 
-  const timeBg = createNode(assetLibrary._textures._ui_square, [0.2, 0.1], [1, 0.3], [0, 0], 0.8);
+  const timeBg = createNode(assetLibrary._textures._ui_square, [0.8, 0.9], [1, 0.3], [0, 0], 0.8);
   level._addChild(timeBg);
 
-  timeContainer._position = [0.21, 0.1];
+  timeContainer._position = [0.8, 0.9];
   timeContainer._setUniformScale(0.05);
   level._addChild(timeContainer);
 

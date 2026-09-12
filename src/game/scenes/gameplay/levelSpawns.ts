@@ -41,6 +41,18 @@ const verticalLine = (x: number, delay: number = 3, trickle: number = 0) => [
   createSpawn(trickle, 4, [x, 1]),
 ];
 
+const blockedDuo = (
+  x: number,
+  y: number,
+  color: number,
+  delay: number = 3,
+  trickle: number = 0,
+) => [
+  createSpawn(delay, color, [x, y]),
+  createSpawn(trickle, 4, [x + 0.1, y]),
+  createSpawn(trickle, 4, [x + 0.2, y]),
+];
+
 const blockedHalfLine = (
   x: number,
   y: number,
@@ -68,9 +80,6 @@ export const levelSpawns: Array<Array<Spawn>> = [
     ...verticalLine(0, 3, 1),
     ...verticalLine(0.5, 3, 1),
     ...verticalLine(1, 3, 1),
-    ...horizontalLine(0, 2, 1),
-    ...horizontalLine(0.5, 2, 1),
-    ...horizontalLine(1, 2, 1),
   ],
   [
     ...boxFormation(),
@@ -100,9 +109,42 @@ export const levelSpawns: Array<Array<Spawn>> = [
     ...verticalLine(0),
     ...verticalLine(1),
   ],
-  [...boxFormation()],
-  [...boxFormation()],
-  [...boxFormation()],
+  [
+    ...blockedDuo(0.1, 0, 0, 0),
+    ...blockedDuo(0.1, 1, 3, 0),
+    ...blockedDuo(0.1, 0.25, 2, 0),
+    ...blockedDuo(0.1, 0.75, 2, 0),
+    ...verticalLine(1),
+    ...verticalLine(0),
+    ...verticalLine(0.5),
+    ...blockedDuo(0.5, 0, 2),
+    ...blockedDuo(0.5, 1, 3, 0),
+    ...blockedDuo(0, 0, 2),
+    ...blockedDuo(0, 1, 3, 0),
+    ...blockedDuo(0.5, 0.25, 3),
+    ...blockedDuo(0.5, 0.75, 2, 0),
+  ],
+  [
+    ...blockedDuo(0.1, 0, 0, 3),
+    ...blockedDuo(0.1, 0.25, 2, 0),
+    ...blockedDuo(0.1, 0.75, 1, 0),
+    ...blockedDuo(0.1, 1, 3, 0),
+    ...verticalLine(0, 2, 5),
+    ...verticalLine(0.25, 1, 1),
+    ...verticalLine(0.5, 1, 1),
+    ...verticalLine(0.75, 1, 1),
+    ...verticalLine(0, 1, 4),
+    ...verticalLine(1, 1, 4),
+    ...zipSpawns(
+      zipSpawns(blockedDuo(0.2, 0, 3), blockedDuo(0.2, 1, 0)),
+      zipSpawns(blockedDuo(0.4, 0.4, 1), blockedDuo(0.4, 0.6, 2)),
+    ),
+    ...zipSpawns(
+      zipSpawns(blockedDuo(0.2, 0, 3), blockedDuo(0.2, 1, 0)),
+      zipSpawns(blockedDuo(0.4, 0.4, 1), blockedDuo(0.4, 0.6, 2)),
+    ),
+    ...verticalLine(1, 1, 4),
+  ],
 ];
 
 export const levelSpawnDuration = (levelSpawns: Array<Spawn>): number => {
