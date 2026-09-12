@@ -52,7 +52,11 @@ export const createLevel = (
 
     if (done) return;
 
-    if (remainingSpawns.length > 0 && (remainingSpawns[0]._delay -= delta) < 0) {
+    if (
+      remainingSpawns.length > 0 &&
+      enemyContainer._children.length < 6 &&
+      (remainingSpawns[0]._delay -= delta) < 0
+    ) {
       const spawn = remainingSpawns.shift()!;
 
       const texture: RawTexture =
