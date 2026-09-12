@@ -1,14 +1,13 @@
 import assetLibrary from "../../core/asset_library";
-import createScene from "../../core/scene";
+import createScene, { Scene } from "../../core/scene";
 import { createEmptyNode, createNode } from "../../core/node";
 import { utils } from "../../core/utils";
 import { createMenu } from "./common/menu";
 import { createParticles } from "./common/particles";
 import { createText } from "./common/text";
 import { createTransitionOverlay } from "./common/transitionOverlay";
-import { createCutsceneScene } from "./cutsceneScene";
 
-export const createMenuScene = () => {
+export const createMenuScene = (onStartGame: () => Scene) => {
   const scene = createScene((scene, game) => {
     game._worker._setMusic(2);
 
@@ -50,7 +49,7 @@ export const createMenuScene = () => {
       {
         _text: "START GAME",
         _onSelected() {
-          transition._transitionTo(createCutsceneScene(0));
+          transition._transitionTo(onStartGame());
         },
       },
       {

@@ -4,17 +4,12 @@ import { createEmptyNode, createNode } from "../../core/node";
 import { utils } from "../../core/utils";
 import { createText } from "./common/text";
 import { createTransitionOverlay } from "./common/transitionOverlay";
-import { CutsceneData, getCutsceneForLevel } from "./cutscene/cutsceneData";
-import { createGameplayScene } from "./gameplayScene";
-import { levelSpawns } from "./gameplay/levelSpawns";
-import { createMenuScene } from "./menuScene";
+import { CutsceneData } from "./cutscene/cutsceneData";
 
-export const createCutsceneScene = (nextLevel: number, customCutscene?: CutsceneData): Scene => {
-  const cutscene = customCutscene || getCutsceneForLevel(nextLevel);
-
-  // If no cutscene definition exists, immediately transition to next gameplay level or menu
+export const createCutsceneScene = (cutscene: CutsceneData, onFinish: () => Scene): Scene => {
+  // If no cutscene definition exists, immediately transition to target
   if (!cutscene || cutscene._lines.length === 0) {
-    return nextLevel < levelSpawns.length ? createGameplayScene(nextLevel) : createMenuScene();
+    return onFinish();
   }
 
   const scene = createScene((scene, game) => {
@@ -70,9 +65,7 @@ export const createCutsceneScene = (nextLevel: number, customCutscene?: Cutscene
       if (index >= cutscene._lines.length) {
         if (!isTransitioning) {
           isTransitioning = true;
-          const target =
-            nextLevel < levelSpawns.length ? createGameplayScene(nextLevel) : createMenuScene();
-          transition._transitionTo(target);
+          transition._transitionTo(onFinish());
         }
         return;
       }

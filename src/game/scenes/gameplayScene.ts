@@ -1,4 +1,4 @@
-import createScene from "../../core/scene";
+import createScene, { Scene } from "../../core/scene";
 import { createEmptyNode, Node } from "../../core/node";
 import { utils, Vec } from "../../core/utils";
 import { createParticles } from "./common/particles";
@@ -55,7 +55,11 @@ export const createGameplayState = (): GameplayState => ({
   _projectiles: [],
 });
 
-export const createGameplayScene = (level: number) => {
+export const createGameplayScene = (
+  level: number,
+  onComplete: () => Scene,
+  onFail: () => Scene,
+) => {
   const gameplayState = createGameplayState();
 
   const scene = createScene((scene, game) => {
@@ -72,7 +76,7 @@ export const createGameplayScene = (level: number) => {
     const bg = createBackground();
     gameplayState._layerBg._addChild(bg);
     gameplayState._layerEntities._addChild(createUnicorn(game));
-    gameplayState._layerEntities._addChild(createLevel(game, level));
+    gameplayState._layerEntities._addChild(createLevel(game, level, onComplete, onFail));
     game._worker._setMusic(1);
   });
 

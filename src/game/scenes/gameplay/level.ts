@@ -2,16 +2,19 @@ import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
 import { FullState } from "../../../core/game_worker";
 import { createNode, createEmptyNode } from "../../../core/node";
+import { Scene } from "../../../core/scene";
 import { utils } from "../../../core/utils";
 import { createText } from "../common/text";
 import { createTransitionOverlay } from "../common/transitionOverlay";
-import { getCutsceneForLevel } from "../cutscene/cutsceneData";
-import { createCutsceneScene } from "../cutsceneScene";
-import { createTransitionScene } from "../transitionScene";
 import { createEnemy } from "./enemy";
 import { levelSpawns } from "./levelSpawns";
 
-export const createLevel = (game: FullState, levelNr: number) => {
+export const createLevel = (
+  game: FullState,
+  levelNr: number,
+  onComplete: () => Scene,
+  onFail: () => Scene,
+) => {
   const gameplayState = game._state._gameplay;
   const remainingSpawns = utils._deepCopy(levelSpawns[levelNr]);
   const level = createEmptyNode();
@@ -68,16 +71,10 @@ export const createLevel = (game: FullState, levelNr: number) => {
     game._state._gameplay._levelTimeLeft -= delta;
 
     if (game._state._gameplay._levelTimeLeft < 0) {
-      transition._transitionTo(createTransitionScene(levelNr, false));
+      transition._transitionTo(onFail());
       done = true;
     } else if (game._state._gameplay._levelRemainingEnemies < 1) {
-      const nextLevel = levelNr + 1;
-      const cutscene = getCutsceneForLevel(nextLevel);
-      if (cutscene) {
-        transition._transitionTo(createCutsceneScene(nextLevel, cutscene));
-      } else {
-        transition._transitionTo(createTransitionScene(levelNr, true));
-      }
+      transition._transitionTo(onComplete());
       done = true;
     }
   };
