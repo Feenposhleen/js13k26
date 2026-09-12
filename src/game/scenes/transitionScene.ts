@@ -1,6 +1,6 @@
 import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
-import { createEmptySprite, createSprite } from "../../core/sprite";
+import { createEmptyNode, createNode } from "../../core/node";
 import { createMenuPrompt } from "./common/menuPrompt";
 import { createTransitionOverlay } from "./common/transitionOverlay";
 import { getCutsceneForLevel } from "./cutscene/cutsceneData";
@@ -12,14 +12,14 @@ export const createTransitionScene = (previousLevel: number, completed: boolean)
   const scene = createScene((scene, game) => {
     game._worker._setMusic(2);
 
-    const layerBg = createEmptySprite();
-    const layerUi = createEmptySprite();
+    const layerBg = createEmptyNode();
+    const layerUi = createEmptyNode();
     const transition = createTransitionOverlay();
 
-    scene._rootSprite._addChildren([layerBg, layerUi]);
+    scene._rootNode._addChildren([layerBg, layerUi]);
 
     // Full-screen background quad
-    const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
+    const bg = createNode(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
     const menu = createMenuPrompt(

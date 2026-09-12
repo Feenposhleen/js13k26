@@ -1,18 +1,18 @@
 import assetLibrary from "../../../core/asset_library";
 import { Scene } from "../../../core/scene";
-import { createSprite, Sprite } from "../../../core/sprite";
+import { createNode, Node } from "../../../core/node";
 import { utils } from "../../../core/utils";
 
-type TransitionOverlaySprite = Sprite & {
+type TransitionOverlayNode = Node & {
   _transitionTo: (nextScene: Scene) => void;
 };
 
-// Expects the anchor to be in a clean viewport space (not a child to a transformed sprite)
-export const createTransitionOverlay = (): TransitionOverlaySprite => {
+// Expects the anchor to be in a clean viewport space (not a child to a transformed node)
+export const createTransitionOverlay = (): TransitionOverlayNode => {
   let nextScene: Scene;
   let transitionTimer = 1;
 
-  const overlay = Object.assign(createSprite(assetLibrary._textures._absolute_bg, [0.5, 0.5]), {
+  const overlay = Object.assign(createNode(assetLibrary._textures._absolute_bg, [0.5, 0.5]), {
     _transitionTo: (scene: Scene) => (nextScene = scene),
   });
 

@@ -1,12 +1,12 @@
 import { RawTexture } from "../../../core/assets/drawables.gen";
-import { createSprite, createEmptySprite, Sprite } from "../../../core/sprite";
+import { createNode, createEmptyNode, Node } from "../../../core/node";
 import { utils, Vec } from "../../../core/utils";
 
 export const createParticles = (
   texture: RawTexture,
   count: number,
   repeat: boolean = false,
-  positioningTarget: Sprite | null = null,
+  positioningTarget: Node | null = null,
   directionRange: Vec = [-utils._pi, utils._pi],
   lifetimeRange: Vec = [0.2, 0.4],
   speedRange: Vec = [0.3, 0.4],
@@ -14,7 +14,7 @@ export const createParticles = (
   angleRange: Vec = [-utils._pi, utils._pi],
   angularVelocityRange: Vec = [-3, 3],
 ) => {
-  const emitter = createEmptySprite();
+  const emitter = createEmptyNode();
 
   function addParticle() {
     const particleScale = utils._rndFromRange(scaleRange);
@@ -24,18 +24,18 @@ export const createParticles = (
     const particleDirection = utils._rndFromRange(directionRange);
     const particleAngularVelocity = utils._rndFromRange(angularVelocityRange);
 
-    const particle = createSprite(
+    const particle = createNode(
       texture,
       positioningTarget ? [...positioningTarget._position] : [0, 0],
       [particleScale, particleScale],
       utils._vectorRotate([particleSpeed, 0], particleDirection),
     );
 
-    particle._angle = particleAngle;
+    particle._rotation = particleAngle;
 
-    particle._updater = (sprite, _game, delta) => {
-      if (sprite._lifetime > particleLifetime && !sprite._dead) {
-        sprite._dead = true;
+    particle._updater = (node, _game, delta) => {
+      if (node._lifetime > particleLifetime && !node._dead) {
+        node._dead = true;
 
         if (repeat) {
           addParticle();
@@ -43,10 +43,8 @@ export const createParticles = (
         return;
       }
 
-      sprite._angle += particleAngularVelocity * delta;
-      sprite._setUniformScale(
-        particleScale - (sprite._lifetime / particleLifetime) * particleScale,
-      );
+      node._rotation += particleAngularVelocity * delta;
+      node._setUniformScale(particleScale - (node._lifetime / particleLifetime) * particleScale);
     };
 
     emitter._addChild(particle);
@@ -70,7 +68,7 @@ export const createParticles = (
 
     if (repeat && emitBudget > 0) {
       emitTicks += d;
-      if (emitTicks > (lifetimeRange[1] / count)) {
+      if (emitTicks > lifetimeRange[1] / count) {
         emitBudget--;
         emitTicks = 0;
         addParticle();

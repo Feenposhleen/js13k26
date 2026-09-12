@@ -1,4 +1,4 @@
-import { ColorSprite } from "../game/scenes/gameplay/enemy";
+import { ColorNode } from "../game/scenes/gameplay/enemy";
 
 export type Vec = [number, number];
 
@@ -206,21 +206,21 @@ export const utils = {
 
   // Engine things
 
-  _nearestColorSprite: (
+  _nearestColorNode: (
     position: Vec,
-    enemySprites: ColorSprite[],
-  ): [ColorSprite | null, number] => {
+    enemyNodes: ColorNode[],
+  ): [ColorNode | null, number] => {
     let nearestDistance = 999;
-    let nearestSprite: ColorSprite | null = null;
-    for (const sprite of enemySprites) {
-      const distance = utils._vectorDistance(position, sprite._position);
+    let nearestNode: ColorNode | null = null;
+    for (const node of enemyNodes) {
+      const distance = utils._vectorDistance(position, node._position);
       if (distance < nearestDistance) {
         nearestDistance = distance;
-        nearestSprite = sprite;
+        nearestNode = node;
       }
     }
 
-    return [nearestSprite, nearestDistance];
+    return [nearestNode, nearestDistance];
   },
 
   _wait: (duration: number): Promise<void> => {

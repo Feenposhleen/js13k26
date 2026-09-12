@@ -81,7 +81,7 @@ const createGameWorker = () => {
     }
 
     const spriteCount = _buildRenderData(
-      _sceneTree.map((scene) => scene._rootSprite),
+      _sceneTree.map((scene) => scene._rootNode),
       renderBuffer,
     );
     _updateWindow(renderBuffer, spriteCount);

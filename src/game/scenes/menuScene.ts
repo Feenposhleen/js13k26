@@ -1,6 +1,6 @@
 import assetLibrary from "../../core/asset_library";
 import createScene from "../../core/scene";
-import { createEmptySprite, createSprite } from "../../core/sprite";
+import { createEmptyNode, createNode } from "../../core/node";
 import { utils } from "../../core/utils";
 import { createMenu } from "./common/menu";
 import { createParticles } from "./common/particles";
@@ -12,18 +12,18 @@ export const createMenuScene = () => {
   const scene = createScene((scene, game) => {
     game._worker._setMusic(2);
 
-    const layerBg = createEmptySprite();
-    const layerUi = createEmptySprite();
+    const layerBg = createEmptyNode();
+    const layerUi = createEmptyNode();
     const title = createText("UNICOP");
     title._position = [0.52, 0.2];
     title._scale = [0.1, 0.1];
 
-    scene._rootSprite._addChildren([layerBg, layerUi]);
+    scene._rootNode._addChildren([layerBg, layerUi]);
 
     const transition = createTransitionOverlay();
 
     // Full-screen background quad
-    const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
+    const bg = createNode(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
     const starSpewer = createParticles(
@@ -38,11 +38,11 @@ export const createMenuScene = () => {
     );
     starSpewer._position = [0.5, 0.5];
 
-    const uni = createSprite(assetLibrary._textures._unicorn_one, [0.5, 0.5]);
-    uni._updater = (s, g, d) => (s._angle = s._angle + d);
+    const uni = createNode(assetLibrary._textures._unicorn_one, [0.5, 0.5]);
+    uni._updater = (s, g, d) => (s._rotation = s._rotation + d);
     uni._setUniformScale(1);
 
-    const menuBg = createSprite(assetLibrary._textures._absolute_bg, [0.5, 0.7]);
+    const menuBg = createNode(assetLibrary._textures._absolute_bg, [0.5, 0.7]);
     menuBg._scale = [4, 0.4];
     menuBg._opacity = 0.8;
 

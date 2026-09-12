@@ -1,12 +1,12 @@
 import assetLibrary from "../../../core/asset_library";
-import { createSprite, createEmptySprite, Sprite } from "../../../core/sprite";
+import { createNode, createEmptyNode } from "../../../core/node";
 import { utils } from "../../../core/utils";
 import { createParallax } from "../common/parallax";
 
 export const createBackground = () => {
-  const bg = createEmptySprite();
+  const bg = createEmptyNode();
 
-  const fill = createSprite(assetLibrary._textures._ui_square_bg, [0.5, 0.5], [10, 10]);
+  const fill = createNode(assetLibrary._textures._ui_square_bg, [0.5, 0.5], [10, 10]);
   bg._addChild(fill);
 
   const mountains = createParallax(
@@ -25,7 +25,7 @@ export const createBackground = () => {
     [-0.1, 0.4],
     [0.1, 0.05],
     (s, g, d) => {
-      s._angle += d * (s._scale[0] - 0.3) * 4;
+      s._rotation += d * (s._scale[0] - 0.3) * 4;
     },
   );
   bg._addChild(stars);

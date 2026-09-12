@@ -1,12 +1,12 @@
 import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
 import { FullState } from "../../../core/game_worker";
-import { createSprite, Sprite } from "../../../core/sprite";
+import { createNode, Node } from "../../../core/node";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
 import { textureByColor } from "./projectile";
 
-export type ColorSprite = Sprite & { _color: number };
+export type ColorNode = Node & { _color: number };
 
 const enemyOriginAddend: Vec = [1, -0.5];
 
@@ -15,19 +15,19 @@ export const createEnemy = (
   texture: RawTexture,
   color: number | null,
   targetPosition: Vec,
-): ColorSprite => {
+): ColorNode => {
   const enemyOrigin = utils._vectorAdd(targetPosition, enemyOriginAddend);
-  const enemy = createSprite(
+  const enemy = createNode(
     texture,
     utils._vectorAdd(targetPosition, enemyOriginAddend),
     [0.2, 0.2],
-  ) as ColorSprite;
+  ) as ColorNode;
   enemy._color = color !== null ? color : -1;
   enemy._setTrackedMemberOf(game._state._gameplay._enemies);
 
   if (color !== null) {
-    const colorTexture = createSprite(textureByColor(color), [-0.09, -0.06], [0.5, 0.5]);
-    colorTexture._angle = -utils._pi / 2;
+    const colorTexture = createNode(textureByColor(color), [-0.09, -0.06], [0.5, 0.5]);
+    colorTexture._rotation = -utils._pi / 2;
     enemy._addChild(colorTexture);
   }
 
@@ -46,7 +46,7 @@ export const createEnemy = (
     ]);
 
     const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
-    s._angle += (targetAngle - s._angle) * utils._clamp(d * 5, 0, 1);
+    s._rotation += (targetAngle - s._rotation) * utils._clamp(d * 5, 0, 1);
   };
 
   const trail = createParticles(

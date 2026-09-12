@@ -1,5 +1,5 @@
 import assetLibrary from "../../../core/asset_library";
-import { createEmptySprite, createSprite, Sprite } from "../../../core/sprite";
+import { createEmptyNode, createNode, Node } from "../../../core/node";
 import { utils, Vec } from "../../../core/utils";
 import { createMenu, MenuOption } from "./menu";
 import { createParticles } from "./particles";
@@ -9,8 +9,8 @@ export const createMenuPrompt = (
   position: Vec = [0.5, 0.4],
   emitterPosition: Vec = [0.5, 0.5],
   menuScale: number = 0.05,
-): Sprite => {
-  const container = createEmptySprite();
+): Node => {
+  const container = createEmptyNode();
 
   const starSpewer = createParticles(
     assetLibrary._textures._star,
@@ -25,7 +25,7 @@ export const createMenuPrompt = (
   starSpewer._position = [...emitterPosition];
 
   const menuYCenter = position[1] + ((options.length - 1) * 1.2 * menuScale) / 2;
-  const menuBg = createSprite(
+  const menuBg = createNode(
     assetLibrary._textures._absolute_bg,
     [position[0], menuYCenter],
     [4, 0.4],
@@ -40,7 +40,7 @@ export const createMenuPrompt = (
   container._addChildren([starSpewer, menuBg, menu]);
 
   let lastPos: Vec = [...position];
-  container._updater = (_s, _g, _d) => {
+  container._updater = (_n, _g, _d) => {
     if (container._position[0] !== 0 || container._position[1] !== 0) {
       lastPos = [...container._position];
       menu._position = [...lastPos];

@@ -1,7 +1,7 @@
 import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
 import { FullState } from "../../../core/game_worker";
-import { createSprite } from "../../../core/sprite";
+import { createNode, createEmptyNode } from "../../../core/node";
 import { utils } from "../../../core/utils";
 import { createText } from "../common/text";
 import { createTransitionOverlay } from "../common/transitionOverlay";
@@ -14,9 +14,9 @@ import { levelSpawns } from "./levelSpawns";
 export const createLevel = (game: FullState, levelNr: number) => {
   const gameplayState = game._state._gameplay;
   const remainingSpawns = utils._deepCopy(levelSpawns[levelNr]);
-  const level = createSprite(null, [0, 0]);
-  const textContainer = createSprite(null, [0, 0]);
-  const enemyContainer = createSprite(null, [0, 0]);
+  const level = createEmptyNode();
+  const textContainer = createEmptyNode();
+  const enemyContainer = createEmptyNode();
   const transition = createTransitionOverlay();
 
   let done = false;
@@ -35,7 +35,7 @@ export const createLevel = (game: FullState, levelNr: number) => {
     textScale = 0.4;
   };
 
-  level._updater = (sprite, game, delta) => {
+  level._updater = (node, game, delta) => {
     if (textScale > 0.05) {
       textScale = utils._max(0.05, textScale - delta);
       textContainer._setUniformScale(textScale);
@@ -84,7 +84,7 @@ export const createLevel = (game: FullState, levelNr: number) => {
 
   level._addChild(enemyContainer);
 
-  const textBg = createSprite(assetLibrary._textures._ui_square, [0.2, 0.9], [1, 0.3], [0, 0], 0.8);
+  const textBg = createNode(assetLibrary._textures._ui_square, [0.2, 0.9], [1, 0.3], [0, 0], 0.8);
   level._addChild(textBg);
 
   textContainer._position = [0.21, 0.9];

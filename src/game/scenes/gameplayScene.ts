@@ -1,9 +1,9 @@
 import createScene from "../../core/scene";
-import { createEmptySprite, Sprite } from "../../core/sprite";
+import { createEmptyNode, Node } from "../../core/node";
 import { utils, Vec } from "../../core/utils";
 import { createParticles } from "./common/particles";
 import { createBackground } from "./gameplay/background";
-import { ColorSprite } from "./gameplay/enemy";
+import { ColorNode } from "./gameplay/enemy";
 import { createExplosion } from "./gameplay/fxPacks";
 import { createLevel } from "./gameplay/level";
 import { createProjectile } from "./gameplay/projectile";
@@ -11,11 +11,11 @@ import { createUnicorn } from "./gameplay/unicorn";
 
 export type GameplayState = {
   // Layers
-  _layerBg: Sprite;
-  _layerFxBack: Sprite;
-  _layerUi: Sprite;
-  _layerFxFront: Sprite;
-  _layerEntities: Sprite;
+  _layerBg: Node;
+  _layerFxBack: Node;
+  _layerUi: Node;
+  _layerFxFront: Node;
+  _layerEntities: Node;
 
   // Player
   _playerColor: number;
@@ -30,16 +30,16 @@ export type GameplayState = {
   _levelTimeLeft: number;
 
   // Entities
-  _enemies: Array<ColorSprite>;
-  _projectiles: Array<ColorSprite>;
+  _enemies: Array<ColorNode>;
+  _projectiles: Array<ColorNode>;
 };
 
 export const createGameplayState = (): GameplayState => ({
-  _layerBg: createEmptySprite(),
-  _layerFxBack: createEmptySprite(),
-  _layerUi: createEmptySprite(),
-  _layerFxFront: createEmptySprite(),
-  _layerEntities: createEmptySprite(),
+  _layerBg: createEmptyNode(),
+  _layerFxBack: createEmptyNode(),
+  _layerUi: createEmptyNode(),
+  _layerFxFront: createEmptyNode(),
+  _layerEntities: createEmptyNode(),
 
   _playerColor: 0,
   _playerPosition: [0, 0],
@@ -61,7 +61,7 @@ export const createGameplayScene = (level: number) => {
   const scene = createScene((scene, game) => {
     game._state._gameplay = gameplayState;
 
-    scene._rootSprite._addChildren([
+    scene._rootNode._addChildren([
       gameplayState._layerBg,
       gameplayState._layerFxBack,
       gameplayState._layerEntities,
@@ -89,7 +89,7 @@ export const createGameplayScene = (level: number) => {
       // Don't collide with things outside the screen
       if (projectile._position[0] > 1) return;
 
-      const [enemy, distance] = utils._nearestColorSprite(
+      const [enemy, distance] = utils._nearestColorNode(
         projectile._position,
         gameplayState._enemies,
       );

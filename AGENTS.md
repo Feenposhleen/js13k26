@@ -92,10 +92,10 @@ The engine decouples game simulation from DOM and WebGL rendering using a dual-t
 - **Dialogue Cutscene System** (`src/game/scenes/cutsceneScene.ts`):
   - Between-level dialogue sequences featuring the Unicop (`_unicorn_one`) and the Unicorn Captain (`_unicorn_captain`).
   - Provides timed, back-and-forth dialogue lines with speaker focus/animations, optional manual skip/advance input, and smooth scene transitions into the next level.
-- **Sprite Node Tree** (`src/core/sprite.ts`):
+- **Node Tree** (`src/core/node.ts`):
   - Hierarchical transform tree (`_position`, `_velocity`, `_scale`, `_angle`, `_opacity`, `_children`, `_lifetime`, `_dead`, `_seed`).
   - Position updates automatically apply velocity per frame (`_position += _velocity * delta`).
-  - Supports per-sprite `_updater` callbacks and tree operations (`_addChild`, `_removeChild`, `_copy`, `_setUniformScale`).
+  - Supports per-node `_updater` callbacks and tree operations (`_addChild`, `_removeChild`, `_copy`, `_setUniformScale`).
 - **Utilities** (`src/core/utils.ts`):
   - Vector math (`_vectorAdd`, `_vectorLerp`, `_vectorAngle`, `_vectorDistance`, `_vectorManhattanDistance`, `_vectorDampenedApproach`, `_vectorIntersects`, `_vectorLength`, `_vectorRotate`).
   - Matrix transforms (`_mat3Multiply`, `_mat3FromTRS`).

@@ -1,8 +1,7 @@
 import assetLibrary from "../../core/asset_library";
 import createScene, { Scene } from "../../core/scene";
-import { createEmptySprite, createSprite } from "../../core/sprite";
+import { createEmptyNode, createNode } from "../../core/node";
 import { utils } from "../../core/utils";
-import { createParticles } from "./common/particles";
 import { createText } from "./common/text";
 import { createTransitionOverlay } from "./common/transitionOverlay";
 import { CutsceneData, getCutsceneForLevel } from "./cutscene/cutsceneData";
@@ -21,35 +20,31 @@ export const createCutsceneScene = (nextLevel: number, customCutscene?: Cutscene
   const scene = createScene((scene, game) => {
     game._worker._setMusic(cutscene._music || 2);
 
-    const layerBg = createEmptySprite();
-    const layerActors = createEmptySprite();
-    const layerUi = createEmptySprite();
+    const layerBg = createEmptyNode();
+    const layerActors = createEmptyNode();
+    const layerUi = createEmptyNode();
 
-    scene._rootSprite._addChildren([layerBg, layerActors, layerUi]);
+    scene._rootNode._addChildren([layerBg, layerActors, layerUi]);
 
     const transition = createTransitionOverlay();
 
     // Background quad
-    const bg = createSprite(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
+    const bg = createNode(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
     // Characters: Unicop on the left, Captain on the right
-    const unicopSprite = createSprite(
-      assetLibrary._textures._unicorn_one,
-      [0.22, 0.65],
-      [0.55, 0.55],
-    );
+    const unicopNode = createNode(assetLibrary._textures._unicorn_one, [0.22, 0.65], [0.55, 0.55]);
 
-    const captainSprite = createSprite(
+    const captainNode = createNode(
       assetLibrary._textures._unicorn_captain,
       [0.78, 0.65],
       [-0.55, 0.55],
     );
 
-    layerActors._addChildren([unicopSprite, captainSprite]);
+    layerActors._addChildren([unicopNode, captainNode]);
 
     // Dialogue Box UI
-    const boxBackdrop = createSprite(
+    const boxBackdrop = createNode(
       assetLibrary._textures._absolute_bg,
       [0.5, 0.25],
       [2.3, 0.45],
@@ -57,10 +52,10 @@ export const createCutsceneScene = (nextLevel: number, customCutscene?: Cutscene
       0.75,
     );
 
-    const speakerTagContainer = createEmptySprite();
+    const speakerTagContainer = createEmptyNode();
     speakerTagContainer._setUniformScale(0.04);
 
-    const dialogueContainer = createEmptySprite();
+    const dialogueContainer = createEmptyNode();
     dialogueContainer._position = [0.5, 0.75];
     dialogueContainer._setUniformScale(0.045);
 
@@ -93,9 +88,9 @@ export const createCutsceneScene = (nextLevel: number, customCutscene?: Cutscene
       dialogueContainer._children = [];
       const lineSpacing = 1.3;
       line._text.forEach((textLine, i) => {
-        const textSprite = createText(textLine);
-        textSprite._position = [0, (i - (line._text.length - 1) / 2) * lineSpacing];
-        dialogueContainer._addChild(textSprite);
+        const textNode = createText(textLine);
+        textNode._position = [0, (i - (line._text.length - 1) / 2) * lineSpacing];
+        dialogueContainer._addChild(textNode);
       });
 
       lineTimer = 0;
@@ -127,26 +122,26 @@ export const createCutsceneScene = (nextLevel: number, customCutscene?: Cutscene
       const isCaptain = currentLine && currentLine._speaker === "captain";
 
       if (isUnicop) {
-        unicopSprite._texture =
+        unicopNode._texture =
           (game._state._ticks * 6) % 2 < 1
             ? assetLibrary._textures._unicorn_two
             : assetLibrary._textures._unicorn_one;
-        unicopSprite._opacity = 1;
-        unicopSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 8) * 0.01;
+        unicopNode._opacity = 1;
+        unicopNode._position[1] = 0.65 + utils._sin(game._state._ticks * 8) * 0.01;
       } else {
-        unicopSprite._texture = assetLibrary._textures._unicorn_one;
-        unicopSprite._opacity = 0.55;
-        unicopSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 2) * 0.005;
+        unicopNode._texture = assetLibrary._textures._unicorn_one;
+        unicopNode._opacity = 0.55;
+        unicopNode._position[1] = 0.65 + utils._sin(game._state._ticks * 2) * 0.005;
       }
 
       if (isCaptain) {
-        captainSprite._opacity = 1;
-        captainSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 8 + 1) * 0.01;
-        captainSprite._angle = utils._sin(game._state._ticks * 6) * 0.03;
+        captainNode._opacity = 1;
+        captainNode._position[1] = 0.65 + utils._sin(game._state._ticks * 8 + 1) * 0.01;
+        captainNode._rotation = utils._sin(game._state._ticks * 6) * 0.03;
       } else {
-        captainSprite._opacity = 0.55;
-        captainSprite._position[1] = 0.65 + utils._sin(game._state._ticks * 2 + 1) * 0.005;
-        captainSprite._angle = 0;
+        captainNode._opacity = 0.55;
+        captainNode._position[1] = 0.65 + utils._sin(game._state._ticks * 2 + 1) * 0.005;
+        captainNode._rotation = 0;
       }
     };
   });

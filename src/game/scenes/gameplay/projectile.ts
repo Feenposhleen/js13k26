@@ -1,10 +1,10 @@
 import assetLibrary from "../../../core/asset_library";
 import { RawTexture } from "../../../core/assets/drawables.gen";
 import { FullState } from "../../../core/game_worker";
-import { createSprite, Sprite } from "../../../core/sprite";
+import { createNode } from "../../../core/node";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
-import { ColorSprite } from "./enemy";
+import { ColorNode } from "./enemy";
 import { createExplosion } from "./fxPacks";
 
 const projectileTextures = [
@@ -18,13 +18,13 @@ export const textureByColor = (color: number) => projectileTextures[color];
 
 export const colorByTexture = (texture: RawTexture) => projectileTextures.indexOf(texture);
 
-export const createProjectile = (game: FullState, position: Vec, color: number): ColorSprite => {
+export const createProjectile = (game: FullState, position: Vec, color: number): ColorNode => {
   const texture = textureByColor(color);
-  const projectile = createSprite(
+  const projectile = createNode(
     texture,
     [position[0], position[1] - 0.04],
     [0.1, 0.1],
-  ) as ColorSprite;
+  ) as ColorNode;
   projectile._color = color;
   projectile._setTrackedMemberOf(game._state._gameplay._projectiles);
   projectile._velocity = [1, 0];

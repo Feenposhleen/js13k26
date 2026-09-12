@@ -1,9 +1,9 @@
 import assetLibrary from "../../../core/asset_library";
-import { createSprite, Sprite } from "../../../core/sprite";
+import { Node } from "../../../core/node";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
 
-export const createExplosion = (layer: Sprite, position: Vec, size: number) => {
+export const createExplosion = (layer: Node, position: Vec, size: number) => {
   const fireball = createParticles(
     assetLibrary._textures._explosion,
     6,

@@ -1,4 +1,4 @@
-import { createEmptySprite } from "../../../core/sprite";
+import { createEmptyNode } from "../../../core/node";
 import { utils } from "../../../core/utils";
 import { createText } from "./text";
 
@@ -7,9 +7,9 @@ export type MenuOption = {
   _onSelected(): void;
 };
 
-// Expects the anchor to be in a clean viewport space (not a child to a transformed sprite)
+// Expects the anchor to be in a clean viewport space (not a child to a transformed node)
 export const createMenu = (options: Array<MenuOption>) => {
-  const anchor = createEmptySprite();
+  const anchor = createEmptyNode();
 
   let clickIndex = -1;
   let hoverIndex = -1;
@@ -30,16 +30,16 @@ export const createMenu = (options: Array<MenuOption>) => {
 
     let nearestDist = 999;
     let nearestOptionIndex = -1;
-    for (const optionSprite of anchor._children) {
-      const idx = anchor._children.indexOf(optionSprite);
-      const dist = utils._vectorManhattanDistance(optionSprite._position, transformedCursorPos);
+    for (const optionNode of anchor._children) {
+      const idx = anchor._children.indexOf(optionNode);
+      const dist = utils._vectorManhattanDistance(optionNode._position, transformedCursorPos);
       if (dist < nearestDist && dist < 3) {
         nearestDist = dist;
-        nearestOptionIndex = anchor._children.indexOf(optionSprite);
+        nearestOptionIndex = anchor._children.indexOf(optionNode);
       }
 
-      optionSprite._scale = utils._vectorLerp(
-        optionSprite._scale,
+      optionNode._scale = utils._vectorLerp(
+        optionNode._scale,
         idx === hoverIndex ? [1.2, 1.2] : [1, 1],
         d * 10,
       );

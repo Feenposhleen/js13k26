@@ -5,7 +5,7 @@ import boxBlurFs from "./glsl/box_blur.fs";
 import boxBloomFs from "./glsl/box_bloom.fs";
 
 import { utils } from "./utils";
-import { Sprite } from "./sprite";
+import { Node } from "./node";
 import assetLibrary from "./asset_library";
 import {
   BYTES_PER_INSTANCE,
@@ -30,17 +30,17 @@ const texHalf = 400 / 2;
 const texScale = new Float32Array([texHalf, 0, 0, 0, texHalf, 0, 0, 0, 1]);
 const pxToClip = new Float32Array([2 / RENDERER_WIDTH, 0, 0, 0, -2 / RENDERER_HEIGHT, 0, -1, 1, 1]);
 
-const _fillWalkView = (sprite: Sprite, parentMat: Float32Array | null, parentOpacity = 1): void => {
-  const x = sprite._position[0]!;
-  const y = sprite._position[1]!;
-  const angle = sprite._angle || 0;
+const _fillWalkView = (node: Node, parentMat: Float32Array | null, parentOpacity = 1): void => {
+  const x = node._position[0]!;
+  const y = node._position[1]!;
+  const angle = node._rotation || 0;
 
-  const sx = sprite._scale[0];
-  const sy = sprite._scale[1];
+  const sx = node._scale[0];
+  const sy = node._scale[1];
 
   // Reusable matrices
-  if (!sprite.___r) {
-    sprite.___r = [new Float32Array(9), new Float32Array(9), new Float32Array(9)];
+  if (!node.___r) {
+    node.___r = [new Float32Array(9), new Float32Array(9), new Float32Array(9)];
   }
 
   const local = utils._mat3FromTRS(
@@ -49,32 +49,32 @@ const _fillWalkView = (sprite: Sprite, parentMat: Float32Array | null, parentOpa
     angle,
     sx,
     sy,
-    sprite.___r[0],
+    node.___r[0],
   );
-  const world = parentMat ? utils._mat3Multiply(sprite.___r[1], parentMat, local) : local;
-  const worldWithTex = utils._mat3Multiply(sprite.___r[2], sprite.___r[1], texScale);
+  const world = parentMat ? utils._mat3Multiply(node.___r[1], parentMat, local) : local;
+  const worldWithTex = utils._mat3Multiply(node.___r[2], node.___r[1], texScale);
 
-  const combinedOpacity = parentOpacity * sprite._opacity;
+  const combinedOpacity = parentOpacity * node._opacity;
 
-  if (sprite._texture !== null) {
+  if (node._texture !== null) {
     const obj = _walkBuffer[_walkView.length] || {};
     _walkBuffer[_walkView.length] = obj;
 
     obj._mat = utils._mat3Multiply(obj._mat || new Float32Array(9), pxToClip, worldWithTex);
-    obj._layer = assetLibrary._textureIndex(sprite._texture);
+    obj._layer = assetLibrary._textureIndex(node._texture);
     obj._opacity = combinedOpacity;
     _walkView.push(obj);
   }
 
-  if (sprite._children)
-    for (const c of sprite._children) {
+  if (node._children)
+    for (const c of node._children) {
       _fillWalkView(c, world, combinedOpacity);
     }
 };
 
-export const _buildRenderData = (sprites: Sprite[], outRenderBuffer: Float32Array): number => {
+export const _buildRenderData = (nodes: Node[], outRenderBuffer: Float32Array): number => {
   _walkView.length = 0;
-  for (const s of sprites) _fillWalkView(s, null);
+  for (const n of nodes) _fillWalkView(n, null);
 
   let i = 0;
   for (const s of _walkView) {
