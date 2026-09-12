@@ -30,7 +30,7 @@ export const createLevel = (
 
   gameplayState._levelTotalEnemies = enemyCount;
   gameplayState._levelRemainingEnemies = enemyCount;
-  gameplayState._levelTimeLeft = levelSpawnDuration(remainingSpawns) + 6;
+  gameplayState._levelTimeLeft = levelSpawnDuration(remainingSpawns) + 20;
   gameplayState._levelNumber = levelNr;
 
   const setText = (remainingEnemies: number) => {
