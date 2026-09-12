@@ -1,6 +1,5 @@
 import assetLibrary from "../../../core/asset_library";
 import { createNode, createEmptyNode } from "../../../core/node";
-import { utils } from "../../../core/utils";
 import { createParallax } from "../common/parallax";
 
 export const createBackground = () => {

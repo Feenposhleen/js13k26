@@ -1,4 +1,4 @@
-export type DialogueSpeaker = "unicop" | "captain";
+export type DialogueSpeaker = 0 | 1;
 
 export type DialogueLine = {
   _speaker: DialogueSpeaker;
@@ -16,20 +16,20 @@ export const cutscenes: Record<number, CutsceneData> = {
   0: {
     _lines: [
       {
-        _speaker: "captain",
-        _text: ["UNICOP! EMERGENCY.", "LEPRECHAUNS CANNOT STOP HOARDING."],
+        _speaker: 1,
+        _text: ["UNICOP! EMERGENCY!", "LEPRECHAUNS ARE AT IT AGAIN."],
       },
       {
-        _speaker: "unicop",
-        _text: ["HOW BAD IS IT SIR."],
+        _speaker: 0,
+        _text: ["HOW BAD IS IT"],
       },
       {
-        _speaker: "captain",
-        _text: ["WAY TOO MUCH GOLD AT RAINBOWS END.", "THE RAINBOW WORLD WILL COLLAPSE!"],
+        _speaker: 1,
+        _text: ["GOLD OVERFLOWING AT RAINBOWS END.", "THE RAINBOW WORLD WILL COLLAPSE!"],
       },
       {
-        _speaker: "unicop",
-        _text: ["I WILL SHOOT THEM DOWN.", "TIME TO SAVE THE RAINBOW!"],
+        _speaker: 0,
+        _text: ["TIME TO SAVE THE RAINBOW!"],
       },
     ],
   },
@@ -37,23 +37,23 @@ export const cutscenes: Record<number, CutsceneData> = {
   1: {
     _lines: [
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["EXCELLENT WORK UNICOP.", "SECTOR 1 IS FULLY SECURED."],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["JUST DOING MY DUTY SIR.", "ANY SIGN OF THE CRIMINALS."],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["RADAR DETECTS THEM IN SECTOR 2.", "THEY ARE HEAVILY ARMED."],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["MY RAINBOW ZOOKA IS READY.", "JUSTICE WILL PREVAIL!"],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["MOVE OUT UNICOP.", "SHOW THEM NO MERCY!"],
       },
     ],
@@ -62,19 +62,19 @@ export const cutscenes: Record<number, CutsceneData> = {
   2: {
     _lines: [
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["SECTOR 2 HAS BEEN PURGED SIR."],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["DONT CELEBRATE JUST YET.", "A HEAVY FLIGHT IS INCOMING."],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["THEY CANNOT OUTRUN", "THE LAW OF THE HORN."],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["WATCH YOUR FLANKS UNICOP.", "ENGAGE AT WILL!"],
       },
     ],
@@ -83,19 +83,19 @@ export const cutscenes: Record<number, CutsceneData> = {
   3: {
     _lines: [
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["UNICOP. SENSORS ARE BLINKING.", "THEY ARE SCRAMBLING ALL UNITS."],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["THEN IT IS A FAIR FIGHT.", "MY LASERS ARE FULLY CHARGED."],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["KEEP ROLLING AND", "USE RAPID FIRE!"],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["FOR GLORY AND RAINBOWS SIR!"],
       },
     ],
@@ -104,23 +104,23 @@ export const cutscenes: Record<number, CutsceneData> = {
   4: {
     _lines: [
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["THIS IS THEIR FINAL STAND.", "THE HEADQUARTERS IS AHEAD."],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["TIME TO FINISH THIS ONCE", "AND FOR ALL."],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["THE WHOLE GALAXY IS", "WATCHING YOU UNICOP."],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["I WILL NOT FAIL YOU SIR.", "CHARGING MAXIMUM POWER!"],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["DISMISS AND DESTROY!"],
       },
     ],
@@ -129,23 +129,23 @@ export const cutscenes: Record<number, CutsceneData> = {
   5: {
     _lines: [
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["ALL TARGETS ELIMINATED.", "THE GALAXY IS SAFE."],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["OUTSTANDING BRAVERY UNICOP!", "YOU ARE A TRUE HERO."],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["ALL IN A DAYS PATROL SIR."],
       },
       {
-        _speaker: "captain",
+        _speaker: 1,
         _text: ["RETURN TO STATION FOR MEDALS", "AND RAINBOW DONUTS!"],
       },
       {
-        _speaker: "unicop",
+        _speaker: 0,
         _text: ["UNICOP SIGNING OFF!"],
       },
     ],
@@ -155,15 +155,15 @@ export const cutscenes: Record<number, CutsceneData> = {
 export const defaultCutscene: CutsceneData = {
   _lines: [
     {
-      _speaker: "captain",
+      _speaker: 1,
       _text: ["GREAT SHOOTING UNICOP!", "SECTOR CLEARED."],
     },
     {
-      _speaker: "unicop",
+      _speaker: 0,
       _text: ["ADVANCING TO NEXT COORDINATES."],
     },
     {
-      _speaker: "captain",
+      _speaker: 1,
       _text: ["STAY VIGILANT.", "ENEMIES INCOMING!"],
     },
   ],

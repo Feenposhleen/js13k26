@@ -3,14 +3,13 @@ import { FullState } from "../../../core/game_worker";
 import { createNode, Node } from "../../../core/node";
 import { utils, Vec } from "../../../core/utils";
 import { createParticles } from "../common/particles";
-import { createProjectile, textureByColor } from "./projectile";
+import { textureByColor } from "./projectile";
 
 const zookaPos: Vec = [-0.045, -0.15];
 const zookaRecoilPos: Vec = [-0.1, -0.16];
 
 export const createUnicorn = (game: FullState): Node => {
   const gameplayState = game._state._gameplay;
-  let lastPointerDown = false;
 
   const unicorn = createNode(assetLibrary._textures._unicorn_one, [0.5, 0.5], [0.25, 0.25]);
   const zooka = createNode(assetLibrary._textures._unicorn_zooka, [...zookaPos], [0.5, 0.7]);
@@ -58,7 +57,6 @@ export const createUnicorn = (game: FullState): Node => {
     flash._setUniformScale(utils._lerpRange([1.4, 0], inverseCooldownMod * 3));
     flash._rotation += delta * 6;
 
-    lastPointerDown = game._input._pointer._down;
     gameplayState._playerCooldown -= delta;
   };
 
