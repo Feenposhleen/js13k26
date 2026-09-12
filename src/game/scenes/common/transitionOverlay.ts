@@ -3,7 +3,7 @@ import { Scene } from "../../../core/scene";
 import { createNode, Node } from "../../../core/node";
 import { utils } from "../../../core/utils";
 
-type TransitionOverlayNode = Node & {
+export type TransitionOverlayNode = Node & {
   _transitionTo: (nextScene: Scene) => void;
 };
 

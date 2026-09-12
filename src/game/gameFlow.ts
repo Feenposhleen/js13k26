@@ -3,10 +3,20 @@ import { getCutsceneForLevel } from "./scenes/cutscene/cutsceneData";
 import { createCutsceneScene } from "./scenes/cutsceneScene";
 import { levelSpawns } from "./scenes/gameplay/levelSpawns";
 import { createGameplayScene } from "./scenes/gameplayScene";
-import { createMenuScene } from "./scenes/menuScene";
+import { createLevelSelectScene, createMenuScene } from "./scenes/menuScene";
 import { createTransitionScene } from "./scenes/transitionScene";
 
-export const startMenu = (): Scene => createMenuScene(() => startCutscene(0));
+export const startMenu = (): Scene =>
+  createMenuScene(
+    () => startCutscene(0),
+    () => startLevelSelect(),
+  );
+
+export const startLevelSelect = (): Scene =>
+  createLevelSelectScene(
+    (level) => startGameplay(level),
+    () => startMenu(),
+  );
 
 export const startCutscene = (level: number): Scene => {
   const cutscene = getCutsceneForLevel(level);

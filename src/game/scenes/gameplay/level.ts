@@ -19,12 +19,14 @@ export const createLevel = (
   const remainingSpawns = utils._deepCopy(levelSpawns[levelNr]);
   const level = createEmptyNode();
   const textContainer = createEmptyNode();
+  const timeContainer = createEmptyNode();
   const enemyContainer = createEmptyNode();
   const transition = createTransitionOverlay();
 
   let done = false;
   const enemyCount = levelSpawns[levelNr].length;
   let textScale = 0.05;
+  let lastTimeSec = -1;
 
   gameplayState._levelTotalEnemies = enemyCount;
   gameplayState._levelRemainingEnemies = enemyCount;
@@ -38,6 +40,12 @@ export const createLevel = (
     textScale = 0.4;
   };
 
+  const setTimeText = (timeLeft: number) => {
+    timeContainer._children = [];
+    const text = createText(`TIME LEFT ${timeLeft}`);
+    timeContainer._addChild(text);
+  };
+
   level._updater = (node, game, delta) => {
     if (textScale > 0.05) {
       textScale = utils._max(0.05, textScale - delta);
@@ -48,6 +56,12 @@ export const createLevel = (
     if (newEnemyCount !== game._state._gameplay._levelRemainingEnemies) {
       game._state._gameplay._levelRemainingEnemies = newEnemyCount;
       setText(newEnemyCount);
+    }
+
+    const currentSec = utils._max(0, Math.ceil(game._state._gameplay._levelTimeLeft));
+    if (currentSec !== lastTimeSec) {
+      lastTimeSec = currentSec;
+      setTimeText(currentSec);
     }
 
     if (done) return;
@@ -92,7 +106,15 @@ export const createLevel = (
   textContainer._setUniformScale(0.05);
   level._addChild(textContainer);
 
+  const timeBg = createNode(assetLibrary._textures._ui_square, [0.2, 0.1], [1, 0.3], [0, 0], 0.8);
+  level._addChild(timeBg);
+
+  timeContainer._position = [0.21, 0.1];
+  timeContainer._setUniformScale(0.05);
+  level._addChild(timeContainer);
+
   setText(enemyCount);
+  setTimeText(Math.ceil(gameplayState._levelTimeLeft));
 
   gameplayState._layerUi._addChild(transition);
 
