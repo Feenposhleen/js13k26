@@ -6,10 +6,10 @@ import { createMenu, MenuOption } from "./common/menu";
 import { createParticles } from "./common/particles";
 import { createText } from "./common/text";
 import { createTransitionOverlay, TransitionOverlayNode } from "./common/transitionOverlay";
+import { createTitleText } from "./common/titleText";
 
 const createBaseMenuScene = (
   titleText: string,
-  titleScale: Vec,
   menuOptionsFactory: (transition: TransitionOverlayNode) => MenuOption[],
   menuPos: Vec,
   menuScale: number,
@@ -19,9 +19,8 @@ const createBaseMenuScene = (
 
     const layerBg = createEmptyNode();
     const layerUi = createEmptyNode();
-    const title = createText(titleText);
+    const title = createTitleText(titleText, 0);
     title._position = [0.52, 0.2];
-    title._scale = titleScale;
 
     scene._rootNode._addChildren([layerBg, layerUi]);
 
@@ -61,20 +60,12 @@ const createBaseMenuScene = (
 
     layerBg._addChildren([starSpewer, uni]);
     layerUi._addChildren([menuBg, menu, title, transition]);
-
-    scene._updater = (_s, g, _d) => {
-      title._position = utils._vectorAdd(
-        [0.53, 0.2],
-        utils._vectorRotate([0, 0.01], g._worker._ticks),
-      );
-    };
   });
 };
 
 export const createMenuScene = (onStartGame: () => Scene, onLevelSelect: () => Scene) =>
   createBaseMenuScene(
     "UNICOP",
-    [0.1, 0.1],
     (transition) => [
       {
         _text: "START GAME",
@@ -99,7 +90,6 @@ export const createLevelSelectScene = (
 ) =>
   createBaseMenuScene(
     "LEVEL SELECT",
-    [0.07, 0.07],
     (transition) => [
       ...[1, 2, 3, 4, 5].map((lvl) => ({
         _text: `LEVEL ${lvl}`,
