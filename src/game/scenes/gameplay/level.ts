@@ -7,7 +7,7 @@ import { utils } from "../../../core/utils";
 import { createText } from "../common/text";
 import { createTransitionOverlay } from "../common/transitionOverlay";
 import { createEnemy } from "./enemy";
-import { levelSpawns } from "./levelSpawns";
+import { levelSpawnDuration, levelSpawns } from "./levelSpawns";
 
 export const createLevel = (
   game: FullState,
@@ -28,7 +28,7 @@ export const createLevel = (
 
   gameplayState._levelTotalEnemies = enemyCount;
   gameplayState._levelRemainingEnemies = enemyCount;
-  gameplayState._levelTimeLeft = enemyCount * 2;
+  gameplayState._levelTimeLeft = levelSpawnDuration(remainingSpawns) + 6;
   gameplayState._levelNumber = levelNr;
 
   const setText = (remainingEnemies: number) => {
