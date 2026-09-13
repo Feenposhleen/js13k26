@@ -1,10 +1,9 @@
 import assetLibrary from "../../core/asset_library";
 import createScene, { Scene } from "../../core/scene";
 import { createEmptyNode, createNode } from "../../core/node";
-import { utils, Vec } from "../../core/utils";
+import { utils } from "../../core/utils";
 import { createMenu, MenuOption } from "./common/menu";
 import { createParticles } from "./common/particles";
-import { createText } from "./common/text";
 import { createTransitionOverlay, TransitionOverlayNode } from "./common/transitionOverlay";
 import { createTitleText } from "./common/titleText";
 
@@ -17,7 +16,7 @@ const createBaseMenuScene = (
 
     const layerBg = createEmptyNode();
     const layerUi = createEmptyNode();
-    const title = createTitleText(titleText, 0);
+    const title = createTitleText(titleText);
     title._position = [0.52, 0.2];
 
     scene._rootNode._addChildren([layerBg, layerUi]);
@@ -82,6 +81,26 @@ export const createLevelSelectScene = (
         transition._transitionTo(onSelectLevel(lvl - 1));
       },
     })),
+    {
+      _text: "BACK",
+      _onSelected() {
+        transition._transitionTo(onBack());
+      },
+    },
+  ]);
+
+export const createLevelFailedScene = (
+  completed: boolean,
+  onNextOrRetry: () => Scene,
+  onBack: () => Scene,
+) =>
+  createBaseMenuScene(completed ? "WELL DONE" : "TRY AGAIN", (transition) => [
+    {
+      _text: completed ? "NEXT LEVEL" : "TRY AGAIN",
+      _onSelected() {
+        transition._transitionTo(onNextOrRetry());
+      },
+    },
     {
       _text: "BACK",
       _onSelected() {

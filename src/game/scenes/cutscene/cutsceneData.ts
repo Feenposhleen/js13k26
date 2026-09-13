@@ -17,7 +17,7 @@ export const cutscenes: Record<number, CutsceneData> = {
     _lines: [
       {
         _speaker: 1,
-        _text: ["UNICOP! EMERGENCY!", "THOSE LEPRECHAUNS ARE AT IT AGAIN."],
+        _text: ["UNICOP! EMERGENCY!", "THOSE LEPRECHAUNS ARE HOARDING AGAIN."],
       },
       {
         _speaker: 0,

@@ -3,8 +3,11 @@ import { getCutsceneForLevel } from "./scenes/cutscene/cutsceneData";
 import { createCutsceneScene } from "./scenes/cutsceneScene";
 import { levelSpawns } from "./scenes/gameplay/levelSpawns";
 import { createGameplayScene } from "./scenes/gameplayScene";
-import { createLevelSelectScene, createMenuScene } from "./scenes/menuScene";
-import { createTransitionScene } from "./scenes/transitionScene";
+import {
+  createLevelFailedScene,
+  createLevelSelectScene,
+  createMenuScene,
+} from "./scenes/menuScene";
 
 export const startMenu = (): Scene =>
   createMenuScene(
@@ -39,7 +42,7 @@ export const startGameplay = (level: number): Scene =>
   );
 
 export const startTransition = (level: number, completed: boolean): Scene =>
-  createTransitionScene(
+  createLevelFailedScene(
     completed,
     () => (completed ? startCutscene(level + 1) : startGameplay(level)),
     () => startMenu(),

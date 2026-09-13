@@ -1,11 +1,8 @@
-import assetLibrary from "../../../core/asset_library";
-import { createEmptyNode, createNode, Node } from "../../../core/node";
-import { utils, Vec } from "../../../core/utils";
-import { createMenu, MenuOption } from "./menu";
-import { createParticles } from "./particles";
+import { createEmptyNode, Node } from "../../../core/node";
+import { utils } from "../../../core/utils";
 import { createText } from "./text";
 
-export const createTitleText = (title: string, animationType: number): Node => {
+export const createTitleText = (title: string): Node => {
   const container = createEmptyNode();
 
   for (let i = 0; i < 4; i++) {
