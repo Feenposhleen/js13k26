@@ -22,7 +22,7 @@ export const createEnemy = (
     utils._vectorAdd(targetPosition, enemyOriginAddend),
     [0.2, 0.2],
   ) as ColorNode;
-  enemy._color = color !== null ? color : -1;
+  enemy._color = color !== null && color < 5 ? color : -1;
   enemy._setTrackedMemberOf(game._state._gameplay._enemies);
 
   if (color !== null) {

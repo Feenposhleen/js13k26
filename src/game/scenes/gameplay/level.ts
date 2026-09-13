@@ -74,7 +74,11 @@ export const createLevel = (
       const spawn = remainingSpawns.shift()!;
 
       const texture: RawTexture =
-        spawn._type < 4 ? assetLibrary._textures._enemy_two : assetLibrary._textures._enemy_one;
+        spawn._type === 5
+          ? assetLibrary._textures._enemy_leader
+          : spawn._type < 4
+            ? assetLibrary._textures._enemy_two
+            : assetLibrary._textures._enemy_one;
 
       const enemy = createEnemy(
         game,
