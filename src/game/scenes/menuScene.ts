@@ -11,8 +11,6 @@ import { createTitleText } from "./common/titleText";
 const createBaseMenuScene = (
   titleText: string,
   menuOptionsFactory: (transition: TransitionOverlayNode) => MenuOption[],
-  menuPos: Vec,
-  menuScale: number,
 ) => {
   return createScene((scene, game) => {
     game._worker._setMusic(2);
@@ -40,70 +38,54 @@ const createBaseMenuScene = (
       [0.4, 0.9],
       [0.5, 0.8],
     );
-    starSpewer._position = [0.5, 0.5];
+    starSpewer._position = [0.5, 0.3];
 
-    const uni = createNode(assetLibrary._textures._unicorn_one, [0.5, 0.5]);
+    const uni = createNode(assetLibrary._textures._unicorn_one, [0.5, 0.3]);
     uni._updater = (s, g, d) => (s._rotation = s._rotation + d);
     uni._setUniformScale(1);
 
     const options = menuOptionsFactory(transition);
-    const menuBg = createNode(assetLibrary._textures._absolute_bg, [
-      0.5,
-      menuPos[1] + ((options.length - 1) * 1.2 * menuScale) / 2,
-    ]);
-    menuBg._scale = [4, options.length * 1.2 * menuScale + 0.1];
-    menuBg._opacity = 0.8;
 
     const menu = createMenu(options);
-    menu._setUniformScale(menuScale);
-    menu._position = [...menuPos];
+    menu._setUniformScale(0.05);
+    menu._position = [0.5, 0.6];
 
     layerBg._addChildren([starSpewer, uni]);
-    layerUi._addChildren([menuBg, menu, title, transition]);
+    layerUi._addChildren([menu, title, transition]);
   });
 };
 
 export const createMenuScene = (onStartGame: () => Scene, onLevelSelect: () => Scene) =>
-  createBaseMenuScene(
-    "UNICOP",
-    (transition) => [
-      {
-        _text: "START GAME",
-        _onSelected() {
-          transition._transitionTo(onStartGame());
-        },
+  createBaseMenuScene("UNICOP", (transition) => [
+    {
+      _text: "START GAME",
+      _onSelected() {
+        transition._transitionTo(onStartGame());
       },
-      {
-        _text: "LEVEL SELECT",
-        _onSelected() {
-          transition._transitionTo(onLevelSelect());
-        },
+    },
+    {
+      _text: "LEVEL SELECT",
+      _onSelected() {
+        transition._transitionTo(onLevelSelect());
       },
-    ],
-    [0.5, 0.67],
-    0.05,
-  );
+    },
+  ]);
 
 export const createLevelSelectScene = (
   onSelectLevel: (level: number) => Scene,
   onBack: () => Scene,
 ) =>
-  createBaseMenuScene(
-    "LEVEL SELECT",
-    (transition) => [
-      ...[1, 2, 3, 4, 5].map((lvl) => ({
-        _text: `LEVEL ${lvl}`,
-        _onSelected() {
-          transition._transitionTo(onSelectLevel(lvl - 1));
-        },
-      })),
-      {
-        _text: "BACK",
-        _onSelected() {
-          transition._transitionTo(onBack());
-        },
+  createBaseMenuScene("LEVEL SELECT", (transition) => [
+    ...[1, 2, 3, 4, 5].map((lvl) => ({
+      _text: `LEVEL ${lvl}`,
+      _onSelected() {
+        transition._transitionTo(onSelectLevel(lvl - 1));
       },
-    ],
-    [0.5, 0.42],
-    0.045,
-  );
+    })),
+    {
+      _text: "BACK",
+      _onSelected() {
+        transition._transitionTo(onBack());
+      },
+    },
+  ]);

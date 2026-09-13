@@ -56,8 +56,6 @@ export const createUnicorn = (game: FullState): Node => {
     zooka._position = utils._vectorLerp(zookaRecoilPos, zookaPos, inverseCooldownMod);
     flash._setUniformScale(utils._lerpRange([1.4, 0], inverseCooldownMod * 3));
     flash._rotation += delta * 6;
-
-    gameplayState._playerCooldown -= delta / 100;
   };
 
   return unicorn;

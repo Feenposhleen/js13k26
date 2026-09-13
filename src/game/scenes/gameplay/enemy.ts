@@ -32,34 +32,34 @@ export const createEnemy = (
   }
 
   const rand = utils._rndFloat();
-
   enemy._updater = (s, g, d) => {
     s._position = utils._vectorLerp(
       enemyOrigin,
-      utils._vectorAdd(targetPosition, [rand * 0.1, rand * 0.05]),
+      targetPosition,
       utils._easeCubicOut(s._lifetime * 0.4),
     );
 
     s._position = utils._vectorAdd(s._position, [
-      utils._cos(g._worker._ticks * 2 + rand) * 0.01,
+      utils._cos(g._worker._ticks + rand * 2) * 0.01,
       utils._sin(g._worker._ticks + rand) * 0.01,
     ]);
 
-    const targetAngle = utils._sin(g._worker._ticks * 6) * 0.15;
+    const targetAngle = utils._sin(g._worker._ticks * 6) * 0.05;
     s._rotation += (targetAngle - s._rotation) * utils._clamp(d * 5, 0, 1);
   };
 
   const trail = createParticles(
     assetLibrary._textures._particle,
-    32,
+    16,
     true,
-    enemy,
+    null,
     [-utils._pi - 0.05, -utils._pi + 0.05],
-    [0.4, 0.6],
-    [0.3, 0.6],
-    [0.08, 0.1],
+    [0.6, 0.8],
+    [0.8, 1],
+    [0.5, 0.5],
   );
-  game._state._gameplay._layerFxBack._addChild(trail);
+  trail._position = [-0.18, 0];
+  enemy._addChild(trail);
 
   return enemy;
 };

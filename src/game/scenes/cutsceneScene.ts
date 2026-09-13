@@ -6,8 +6,8 @@ import { createText } from "./common/text";
 import { createTransitionOverlay } from "./common/transitionOverlay";
 import { CutsceneData } from "./cutscene/cutsceneData";
 
-const unicopPos: Vec = [0.22, 0.25];
-const captainPos: Vec = [0.78, 0.25];
+const unicopPos: Vec = [0.22, 0.3];
+const captainPos: Vec = [0.78, 0.3];
 
 export const createCutsceneScene = (cutscene: CutsceneData, onFinish: () => Scene): Scene => {
   // If no cutscene definition exists, immediately transition to target
@@ -27,19 +27,31 @@ export const createCutsceneScene = (cutscene: CutsceneData, onFinish: () => Scen
     const transition = createTransitionOverlay();
 
     // Background quad
-    const bg = createNode(assetLibrary._textures._absolute_bg, [1.5, 0.5], [10, 10]);
+    const bg = createNode(assetLibrary._textures._absolute_bg, [0.5, 0.5], [10, 10]);
     layerBg._addChild(bg);
 
     // Characters: Unicop on the left, Captain on the right
-    const unicopNode = createNode(assetLibrary._textures._unicorn_one, unicopPos, [0.55, 0.55]);
+    const unicopNode = createNode(assetLibrary._textures._unicorn_one, unicopPos, [1.2, 1.2]);
 
     const captainNode = createNode(
       assetLibrary._textures._unicorn_captain,
       captainPos,
-      [-0.55, 0.55],
+      [-1.2, 1.2],
     );
 
-    layerActors._addChildren([unicopNode, captainNode]);
+    const uniClip = createNode(
+      assetLibrary._textures._block_box,
+      utils._vectorAdd(unicopNode._position, [0, 0.06]),
+      [-1.4, 1],
+    );
+
+    const captainClip = createNode(
+      assetLibrary._textures._block_box,
+      utils._vectorAdd(captainNode._position, [0, 0.06]),
+      [1.4, 1],
+    );
+
+    layerActors._addChildren([unicopNode, captainNode, uniClip, captainClip]);
 
     const speakerTagContainer = createEmptyNode();
     speakerTagContainer._setUniformScale(0.04);

@@ -18,51 +18,53 @@ export const createSpawn = (delay: number, type: number, offsetPosition: Vec) =>
   };
 };
 
-const boxFormation = (delay: number = 3, trickle: number = 0) => [
-  createSpawn(delay, 4, [0, 0]),
-  createSpawn(trickle, 4, [0, 1]),
-  createSpawn(trickle, 4, [1, 1]),
-  createSpawn(trickle, 4, [1, 0]),
+const boxFormation = (pos: Vec, delay: number = 3, trickle: number = 0) => [
+  createSpawn(delay, 4, pos),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0, 0.17])),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0.17, 0])),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0.17, 0.17])),
 ];
 
-const horizontalLine = (y: number, delay: number = 3, trickle: number = 0) => [
-  createSpawn(delay, 4, [0, y]),
-  createSpawn(trickle, 4, [0.25, y]),
-  createSpawn(trickle, 4, [0.5, y]),
-  createSpawn(trickle, 4, [0.75, y]),
-  createSpawn(trickle, 4, [1, y]),
+const horizontalLine = (pos: Vec, delay: number = 3, trickle: number = 0) => [
+  createSpawn(delay, 4, pos),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0.17, 0])),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0.33, 0])),
 ];
 
-const verticalLine = (x: number, delay: number = 3, trickle: number = 0) => [
-  createSpawn(delay, 4, [x, 0]),
-  createSpawn(trickle, 4, [x, 0.25]),
-  createSpawn(trickle, 4, [x, 0.5]),
-  createSpawn(trickle, 4, [x, 0.75]),
-  createSpawn(trickle, 4, [x, 1]),
+const verticalLine = (pos: Vec, delay: number = 3, trickle: number = 0) => [
+  createSpawn(delay, 4, pos),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0, 0.17])),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0, 0.33])),
 ];
 
-const blockedDuo = (
-  x: number,
-  y: number,
-  color: number,
+const leftTop: Vec = [0, 0];
+const leftMid: Vec = [0, 0.5];
+const leftBottom: Vec = [0, 1];
+
+const centerTop: Vec = [0.5, 0];
+const centerMid: Vec = [0.5, 0.5];
+const centerBottom: Vec = [0.5, 1];
+
+const rightTop: Vec = [1, 0];
+const rightMid: Vec = [1, 0.5];
+const rightBottom: Vec = [1, 1];
+
+const blockedDuo = (pos: Vec, color: number, delay: number = 3, trickle: number = 0) => [
+  createSpawn(delay, color, pos),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0.2, 0])),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0.4, 0])),
+];
+
+const doubleBlocked = (
+  pos: Vec,
+  color1: number,
+  color2: number,
   delay: number = 3,
   trickle: number = 0,
 ) => [
-  createSpawn(delay, color, [x, y]),
-  createSpawn(trickle, 4, [x + 0.1, y]),
-  createSpawn(trickle, 4, [x + 0.2, y]),
-];
-
-const blockedHalfLine = (
-  x: number,
-  y: number,
-  color: number,
-  delay: number = 3,
-  trickle: number = 0,
-) => [
-  createSpawn(delay, color, [x, y]),
-  createSpawn(trickle, 4, [x + 0.2, y]),
-  createSpawn(trickle, 4, [x + 0.4, y]),
+  createSpawn(delay, color1, pos),
+  createSpawn(trickle, color2, utils._vectorAdd(pos, [0.2, 0])),
+  createSpawn(trickle, 4, utils._vectorAdd(pos, [0.4, 0])),
 ];
 
 const zipSpawns = (spawns1: Array<Spawn>, spawns2: Array<Spawn>): Array<Spawn> =>
@@ -75,75 +77,65 @@ const zipSpawns = (spawns1: Array<Spawn>, spawns2: Array<Spawn>): Array<Spawn> =
 
 export const levelSpawns: Array<Array<Spawn>> = [
   [
-    ...boxFormation(3, 1),
-    ...horizontalLine(0.5, 3, 1),
-    ...verticalLine(0, 3, 1),
-    ...verticalLine(0.5, 3, 1),
-    ...verticalLine(1, 3, 1),
+    ...boxFormation(leftTop, 1),
+    ...horizontalLine(leftMid, 3, 1),
+    ...verticalLine(centerMid, 3, 1),
+    ...verticalLine(leftMid, 3, 1),
+    ...verticalLine(rightMid, 3, 1),
+    ...horizontalLine(leftTop, 3, 1),
+    ...horizontalLine(centerTop, 3, 1),
   ],
   [
-    ...boxFormation(),
-    ...horizontalLine(0),
-    ...horizontalLine(0.5),
-    ...horizontalLine(1),
-    ...horizontalLine(0.25),
-    ...horizontalLine(0.75),
-    ...zipSpawns(verticalLine(0, 3, 0), verticalLine(0.5)),
-    ...zipSpawns(verticalLine(0.25, 3, 0), verticalLine(0.75)),
-    ...horizontalLine(0.5),
+    ...horizontalLine(leftTop, 3, 1),
+    ...horizontalLine(leftBottom, 2, 1),
+    ...horizontalLine(leftMid, 2, 1),
+    ...boxFormation(centerTop, 2),
+    ...boxFormation(centerMid, 1),
+    ...verticalLine(centerMid, 2, 1),
+    ...horizontalLine(leftTop, 2, 1),
+    ...verticalLine(rightMid, 2, 1),
+    ...verticalLine(centerMid, 2, 1),
+    ...verticalLine(leftMid, 2, 1),
+    ...horizontalLine(leftTop, 2, 1),
   ],
   [
-    ...zipSpawns(boxFormation(), verticalLine(0.5)),
-    ...blockedHalfLine(0.2, 0.2, 0, 5),
-    ...blockedHalfLine(0.2, 0.2, 1),
-    ...blockedHalfLine(0.2, 0.1, 2),
-    ...blockedHalfLine(0.2, 0.1, 3),
-    ...verticalLine(0.8),
-    ...verticalLine(0.2),
-    ...blockedHalfLine(0.5, 0.4, 0),
-    ...blockedHalfLine(0.5, 0.6, 3),
-    ...verticalLine(0.8),
-    ...verticalLine(0.2),
-    ...blockedHalfLine(0, 0, 0),
-    ...blockedHalfLine(0, 0.5, 3),
-    ...verticalLine(0),
-    ...verticalLine(1),
+    ...horizontalLine(leftBottom, 3, 1),
+    ...blockedDuo(leftTop, 0, 1, 1),
+    ...horizontalLine(leftMid, 3, 1),
+    ...verticalLine(rightMid, 1, 1),
+    ...blockedDuo(leftBottom, 3, 3, 1),
+    ...blockedDuo(leftMid, 2, 1, 1),
+    ...horizontalLine(leftTop, 3, 1),
+    ...horizontalLine(leftMid, 1, 1),
+    ...verticalLine(rightMid, 3, 1),
+    ...blockedDuo(centerMid, 3, 3, 1),
+    ...blockedDuo(leftMid, 2, 3, 1),
+    ...blockedDuo(leftBottom, 3, 3, 1),
+    ...horizontalLine(centerBottom, 1, 1),
+    ...boxFormation(leftTop, 2),
   ],
   [
-    ...blockedDuo(0.1, 0, 0, 0),
-    ...blockedDuo(0.1, 1, 3, 0),
-    ...blockedDuo(0.1, 0.25, 2, 0),
-    ...blockedDuo(0.1, 0.75, 2, 0),
-    ...verticalLine(1),
-    ...verticalLine(0),
-    ...verticalLine(0.5),
-    ...blockedDuo(0.5, 0, 2),
-    ...blockedDuo(0.5, 1, 3, 0),
-    ...blockedDuo(0, 0, 2),
-    ...blockedDuo(0, 1, 3, 0),
-    ...blockedDuo(0.5, 0.25, 3),
-    ...blockedDuo(0.5, 0.75, 2, 0),
+    ...horizontalLine(centerBottom, 3, 1),
+    ...blockedDuo(leftTop, 2, 1, 1),
+    ...blockedDuo(leftMid, 0, 1, 0),
+    ...boxFormation(leftTop, 2),
+    ...blockedDuo(centerTop, 0, 1, 1),
+    ...blockedDuo(centerMid, 3, 1, 0),
+    ...boxFormation(leftMid, 2, 0),
+    ...boxFormation(leftTop, 0, 0),
+    ...horizontalLine(centerBottom, 3, 1),
+    ...blockedDuo(leftBottom, 0, 1, 0),
+    ...horizontalLine(centerTop, 3, 1),
+    ...blockedDuo(leftTop, 0, 1, 0),
+    ...doubleBlocked(leftMid, 1, 0, 3, 0),
+    ...doubleBlocked(leftBottom, 2, 3, 0, 0),
   ],
   [
-    ...blockedDuo(0.1, 0, 0, 3),
-    ...blockedDuo(0.1, 0.25, 2, 0),
-    ...blockedDuo(0.1, 0.75, 1, 0),
-    ...blockedDuo(0.1, 1, 3, 0),
-    ...verticalLine(0, 2, 5),
-    ...verticalLine(0.25, 1, 1),
-    ...verticalLine(0.5, 1, 1),
-    ...verticalLine(0.75, 1, 1),
-    ...verticalLine(0, 1, 4),
-    ...verticalLine(1, 1, 4),
-    ...zipSpawns(
-      zipSpawns(blockedDuo(0.2, 0, 3), blockedDuo(0.2, 1, 0)),
-      zipSpawns(blockedDuo(0.4, 0.4, 1), blockedDuo(0.4, 0.6, 2)),
-    ),
-    ...zipSpawns(
-      zipSpawns(blockedDuo(0.2, 0, 3), blockedDuo(0.2, 1, 0)),
-      zipSpawns(blockedDuo(0.4, 0.4, 1), blockedDuo(0.4, 0.6, 2)),
-    ),
-    ...verticalLine(1, 1, 4),
+    ...horizontalLine(centerBottom, 3, 1),
+    ...zipSpawns(doubleBlocked(leftTop, 1, 0, 3, 0), doubleBlocked(leftMid, 2, 3, 0, 0)),
+    ...doubleBlocked(centerMid, 0, 1, 3, 0),
+    ...horizontalLine(centerTop, 3, 1),
+    ...horizontalLine(leftBottom, 0, 1),
   ],
 ];
 

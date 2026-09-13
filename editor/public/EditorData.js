@@ -1,4 +1,4 @@
-const FONT_GLYPH_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!";
+const FONT_GLYPH_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!?";
 
 class EditorData {
   constructor(serializedData = null) {
@@ -23,7 +23,7 @@ class EditorData {
     if (idx !== -1) {
       this.palette.splice(idx, 1, newColor);
     }
-    Object.values(this.textures).forEach(texture => {
+    Object.values(this.textures).forEach((texture) => {
       texture.polygons.forEach((polygon) => {
         if (polygon.color === oldColor) {
           polygon.color = newColor;
@@ -37,10 +37,10 @@ class EditorData {
     if (idx !== -1) {
       this.palette.splice(idx, 1);
     }
-    Object.values(this.textures).forEach(texture => {
+    Object.values(this.textures).forEach((texture) => {
       texture.polygons.forEach((polygon) => {
         if (polygon.color === color) {
-          polygon.color = this.palette[0] || '#000';
+          polygon.color = this.palette[0] || "#000";
         }
       });
     });
@@ -70,7 +70,9 @@ class EditorData {
   duplicateTexture(oldName, newName) {
     const original = this.getTexture(oldName);
     if (!original) return null;
-    const clonedPolygons = original.polygons.map(p => new Polygon([...p.points], p.color, p.style));
+    const clonedPolygons = original.polygons.map(
+      (p) => new Polygon([...p.points], p.color, p.style),
+    );
     const newTexture = new Texture(newName, clonedPolygons);
     this.addTexture(newTexture);
     return newTexture;
@@ -95,7 +97,7 @@ class EditorData {
     // These are sideloaded from the bitmap source
     for (var i = 0; i < FONT_GLYPH_LIST.length; i++) {
       const glyph = FONT_GLYPH_LIST[i];
-      const glyphKey = `__font_${ glyph }`;
+      const glyphKey = `__font_${glyph}`;
       output._textures[glyphKey] = [];
     }
 
@@ -103,11 +105,11 @@ class EditorData {
   }
 
   loadSerialized(serializedData) {
-    if (typeof serializedData._palette === 'string') {
+    if (typeof serializedData._palette === "string") {
       const p = serializedData._palette;
       this.palette = [];
       for (let i = 0; i < p.length; i += 6) {
-        this.palette.push('#' + p.substr(i, 6));
+        this.palette.push("#" + p.substr(i, 6));
       }
     } else {
       this.palette = serializedData._palette || [];
@@ -120,7 +122,9 @@ class EditorData {
       // Skip parsing sideloaded font glyphs
       if (name.includes("__font")) return;
 
-      const polygons = serializedTextures[name].map((data) => Polygon.deserialize(data, this.palette));
+      const polygons = serializedTextures[name].map((data) =>
+        Polygon.deserialize(data, this.palette),
+      );
       const texture = new Texture(name, polygons);
       this.addTexture(texture);
     });

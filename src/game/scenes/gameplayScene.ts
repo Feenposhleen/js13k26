@@ -151,7 +151,7 @@ export const createGameplayScene = (
       gameplayState._playerColor = color;
     }
 
-    gameplayState._playerCooldown -= delta;
+    gameplayState._playerCooldown -= delta * 0.66;
   };
 
   return scene;
